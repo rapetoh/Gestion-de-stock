@@ -23,10 +23,10 @@
 - **Phase 4 (Daily reconciliation / Soldes):** ✅ done — 2026-06-27 (attendu vs compté per account
   → "ça tombe juste / il manque X" + history; commissions-as-income deferred — D-012).
 - **Cross-cutting added since (from the StockFlow gap analysis):** ✅ **Activité** (audit log,
-  D-013), ✅ **Sauvegarde** (full backup + CSV export, D-014).
-- **Remaining HIGH gap:** bulk product import (her #1 stress). Then the MEDIUM backlog:
-  credit-debt list, per-product movement view, expiry tracking, worst-sellers, week/half-day
-  sales views, mobile-money commissions as income.
+  D-013), ✅ **Sauvegarde** (full backup + CSV export, D-014), ✅ **Import en masse** de produits
+  (D-015 — her #1 stress).
+- **HIGH gaps: all done.** Remaining is the MEDIUM backlog: credit-debt list, per-product movement
+  view, expiry tracking, worst-sellers, week/half-day sales views, mobile-money commissions as income.
 - **Phase 5 (employee role) / Phase 6 (polish & handover):** not started.
 - **Now building in:** VSCode, repo `Gestion-de-stock`. Detailed build roadmap +
   verification verdict: `~/.claude/plans/so-i-started-working-refactored-hennessy.md`.
@@ -76,7 +76,7 @@ vocabulary + UX is what sank the previous app.
 - [x] **Stock** live view; low-stock flags
 - [x] **Everything editable** with an audit trail (never block a correction)  *(completed 2026-06-27)*
 - [x] **Bénéfices** table: one line per product (acheté | frais | vendu | marge) + totals
-- [~] Fast first-catalog entry flow (works; not yet specially optimized — revisit in Phase 6)
+- [x] Fast first-catalog entry flow — bulk paste import at /produits/import (done 2026-06-27)
 
 **Done when:** she can record an achat and a vente unaided on the first try, and read the
 profit table without a calculator.

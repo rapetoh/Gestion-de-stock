@@ -7,6 +7,20 @@
 
 ## 2026-06-27
 
+### Bulk product import (HIGH gap) — kills the "type 100 products by hand" wall
+- **What:** New **/produits/import** — she pastes a list (one product per line; separated by `;`
+  or a tab if copied from Excel; columns `Nom ; Prix d'achat ; Frais ; Prix de vente ; Stock ;
+  Seuil ; Catégorie`, only the name required). Live **preview** with "nouveau / mise à jour"
+  badges; **upsert by name** (an existing name is updated, not duplicated → re-import is safe).
+  Pure shared parser `lib/import.ts` (no DB, used by both the client preview and the server action);
+  `importerProduits()` in the produits repo runs in a transaction and writes **one** activity-log
+  summary. Linked from the Produits page.
+- **Why:** Her stated **#1 stress** is entering 100+ products by hand. StockFlow had CSV import; we
+  didn't. This directly removes that wall.
+- **Result:** `npm test` 35/35 (+7 import/parser tests); tsc/lint/build clean; live verified
+  (import creates products, preview + link work, imported item appears in the catalog). See **D-015**.
+- **Both HIGH gaps from the parity analysis are now done** (backup/export + bulk import).
+
 ### Backup / data export (HIGH gap) + seed fix
 - **What:** New **Sauvegarde** page + `/sauvegarde/export` route (auth-checked). A **full
   consistent backup** of the whole database via SQLite `VACUUM INTO` (downloadable `.db` she can

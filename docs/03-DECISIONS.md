@@ -5,6 +5,17 @@
 
 ---
 
+## D-015 · Bulk import = paste + upsert-by-name, shared pure parser, one log line
+**Decision:** Products are imported by **pasting** rows (tab from Excel, or `;` / `,`), fixed column
+order, name-only allowed. An existing name **updates** that product (régularisation), otherwise it
+creates one — so re-import is idempotent. The parser lives in a **pure module** (`lib/import.ts`,
+no DB) used by both the client preview and the server action, so the preview is exactly what gets
+imported. The batch writes a single activity-log summary, not one row per product.
+**Reasoning:** Paste is the lowest-friction path for her (copy a list / an Excel column) and avoids
+file-upload plumbing; upsert-by-name matches how she thinks ("regularize my stock"); a shared pure
+parser means one source of truth; one log line keeps the journal readable. Directly removes her
+stated #1 stress (first catalog entry). (Bulk import / parity HIGH gap.)
+
 ## D-014 · Backup = `VACUUM INTO` snapshot (downloadable .db) + CSV exports, auth-checked
 **Decision:** The backup is a full **`VACUUM INTO`** snapshot of the database, streamed as a `.db`
 download (a complete, restorable copy — `VACUUM INTO` is safe on a live DB). Plus CSV exports
