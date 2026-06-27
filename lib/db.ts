@@ -5,16 +5,18 @@
 //
 // Money is stored as INTEGER francs CFA (no decimals — the currency has no cents).
 
-import { createRequire } from "node:module";
 import fs from "node:fs";
 import path from "node:path";
 
-// Load the built-in SQLite via createRequire. A direct `import ... from "node:sqlite"`
-// works at cold start but the bundler can re-externalize it into a `require()` call in
-// an ESM context on hot-reload ("require is not defined"). createRequire is stable across
-// reloads and the production build alike.
-const nodeRequire = createRequire(import.meta.url);
-const { DatabaseSync } = nodeRequire("node:sqlite") as typeof import("node:sqlite");
+// Load the built-in SQLite via process.getBuiltinModule — the bundler-proof way to
+// reach a Node core module. A static `import ... from "node:sqlite"` gets re-externalized
+// into a bare `require()` on hot-reload ("require is not defined"), and
+// `createRequire(import.meta.url)("node:sqlite")` makes Turbopack choke on the file:// URL
+// reference ("Unsupported external type Url for commonjs reference"). getBuiltinModule is a
+// plain property access Turbopack never tries to transform, stable in dev and build alike.
+const { DatabaseSync } = process.getBuiltinModule(
+  "node:sqlite"
+) as typeof import("node:sqlite");
 type DatabaseSync = import("node:sqlite").DatabaseSync;
 
 const DB_PATH =
@@ -25,15 +27,37 @@ const globalForDb = globalThis as unknown as { __maboutiqueDb?: DatabaseSync };
 
 function connect(): DatabaseSync {
   fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
-  const db = new DatabaseSync(DB_PATH);
-  db.exec("PRAGMA journal_mode = WAL;");
-  db.exec("PRAGMA foreign_keys = ON;");
-  migrate(db);
-  return db;
+  const conn = new DatabaseSync(DB_PATH);
+  // busy_timeout first, so the lock-sensitive pragmas/migrate below wait instead of failing
+  // instantly when several processes touch the same file at once — e.g. `next build`'s
+  // parallel page-data workers, or a dev server running alongside a one-off script.
+  conn.exec("PRAGMA busy_timeout = 5000;");
+  conn.exec("PRAGMA journal_mode = WAL;");
+  conn.exec("PRAGMA foreign_keys = ON;");
+  migrate(conn);
+  return conn;
 }
 
-export const db: DatabaseSync = globalForDb.__maboutiqueDb ?? connect();
-if (process.env.NODE_ENV !== "production") globalForDb.__maboutiqueDb = db;
+// Connection is opened lazily on first query — NOT at module import. Importing a repo
+// (which happens for every page during `next build`'s page-data collection) must not open
+// or migrate the database, or 13 build workers race on the file and it locks.
+let cached: DatabaseSync | undefined = globalForDb.__maboutiqueDb;
+function getDb(): DatabaseSync {
+  if (cached) return cached;
+  cached = connect();
+  if (process.env.NODE_ENV !== "production") globalForDb.__maboutiqueDb = cached;
+  return cached;
+}
+
+// Exposed for the rare direct user (e.g. scripts/seed.ts). A Proxy keeps the lazy behavior
+// while presenting the same `db.prepare(...)` / `db.exec(...)` surface as before.
+export const db: DatabaseSync = new Proxy({} as DatabaseSync, {
+  get(_target, prop) {
+    const real = getDb() as unknown as Record<string | symbol, unknown>;
+    const value = real[prop];
+    return typeof value === "function" ? value.bind(real) : value;
+  },
+});
 
 // --- tiny typed helpers -----------------------------------------------------
 
