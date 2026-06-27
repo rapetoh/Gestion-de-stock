@@ -59,6 +59,13 @@ export const db: DatabaseSync = new Proxy({} as DatabaseSync, {
   },
 });
 
+// Sauvegarde cohérente de TOUTE la base dans un seul fichier (snapshot SQLite propre,
+// sûr même pendant que l'app tourne — c'est le rôle de VACUUM INTO).
+export function exporterBase(dest: string): void {
+  const safe = dest.replace(/'/g, "''");
+  getDb().exec(`VACUUM INTO '${safe}'`);
+}
+
 // --- tiny typed helpers -----------------------------------------------------
 
 // node:sqlite returns rows as null-prototype objects. React Server Components

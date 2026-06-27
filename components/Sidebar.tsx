@@ -18,6 +18,7 @@ const NAV_CONTROLE = [
   { href: "/depenses", ic: "▦", label: "Dépenses" },
   { href: "/benefices", ic: "★", label: "Bénéfices" },
   { href: "/activite", ic: "≣", label: "Activité" },
+  { href: "/sauvegarde", ic: "⤓", label: "Sauvegarde" },
 ];
 
 function roleLabel(role: string): string {

@@ -5,6 +5,7 @@ import { db, run, one, nowIso } from "../lib/db";
 
 function clear() {
   for (const t of [
+    "activite",
     "ligne_vente", "vente", "achat", "mouvement_stock",
     "ligne_controle", "controle_stock", "solde_journalier",
     "depense", "compte", "produit", "utilisateur",
