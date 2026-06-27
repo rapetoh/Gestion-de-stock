@@ -5,15 +5,23 @@
 > decisions and their reasoning live in `03-DECISIONS.md`.
 >
 > Legend: `[ ]` not started · `[~]` in progress · `[x]` done.
-> Last updated: 2026-06-25.
+> Last updated: 2026-06-27.
 
 ---
 
 ## Where we are right now
 
-- **Phase 0 (Foundation):** not started.
 - **Design pre-step:** ✅ done — 5 key screens approved (look + vocabulary).
-- **Blocker:** repo write access (push returns 403). Tracked in `02-WORKLOG.md`.
+- **Phase 0 (Foundation):** ✅ done — Next.js + TS + Tailwind app, `node:sqlite` data layer
+  (see D-007/D-009), owner auth, French sidebar, all routes live.
+- **Phase 1 (Notebook replacement):** ✅ done — Produits/Achats/Ventes/Stock/Bénéfices all work;
+  **editability completed 2026-06-27** (achats + ventes were delete-only; now fully editable).
+- **Phase 2 (Anti-theft / Contrôle de stock):** ✅ done — 2026-06-27 (count → écart in CFA →
+  corrects stock + history; list + detail).
+- **Phase 3 (Dépenses → marge réelle):** `[~]` in progress (next).
+- **Now building in:** VSCode, repo `Gestion-de-stock`. Detailed build roadmap +
+  verification verdict: `~/.claude/plans/so-i-started-working-refactored-hennessy.md`.
+- **Blocker:** none open (the old 403 push blocker is resolved — fresh repo).
 
 ---
 
@@ -31,52 +39,55 @@ vocabulary + UX is what sank the previous app.
 
 ---
 
-## Phase 0 — Foundation  `[ ]`
+## Phase 0 — Foundation  `[x]`
 
 **Goal:** a deployable empty app shell with auth and the data model — no features yet.
 
-- [ ] Initialize the from-zero app (Next.js + TypeScript + Tailwind)
-- [ ] Database + ORM (PostgreSQL + Prisma), connection + migrations
-- [ ] Data model: Produit, Achat, Vente, MouvementStock, Compte, Dépense, ContrôleStock, Utilisateur
-- [ ] Owner authentication (single user to start)
-- [ ] French UI shell: sidebar nav with her vocabulary, layout, the design system from the prototype
-- [ ] Deploy pipeline (hosting + env) so it's reachable from laptop and phone
-- [ ] CI: lint + typecheck
+- [x] Initialize the from-zero app (Next.js + TypeScript + Tailwind)
+- [x] Database + thin data layer (**`node:sqlite`**, not Prisma/Postgres — see D-007/D-009),
+      connection + migrations (`lib/db.ts`)
+- [x] Data model: Produit, Achat, Vente, MouvementStock, Compte, Dépense, ContrôleStock, Utilisateur
+- [x] Owner authentication (single user; JWT cookie via jose)
+- [x] French UI shell: sidebar nav with her vocabulary, layout, the design system from the prototype
+- [ ] Deploy pipeline (hosting + env) so it's reachable from laptop and phone  *(still to do)*
+- [~] CI: lint + typecheck pass locally; no CI pipeline wired yet
 
 **Done when:** the app deploys, the owner can log in, every nav item routes to an (empty) page.
+*(Runs locally; remote deploy pipeline still pending.)*
 
 ---
 
-## Phase 1 — The notebook replacement  `[ ]`  ← highest priority
+## Phase 1 — The notebook replacement  `[x]`  ← was highest priority
 
 **Goal:** replace her 100-page cahier. This alone should make the app worth using.
 
-- [ ] **Produits**: create / edit / search by name; barcode optional; categories optional
-- [ ] **Achats**: nom → quantité → prix d'achat → + frais → marge → prix de vente (auto), stock ++
-- [ ] **Ventes**: pick by name, quantity, payment method, encaisser — **no cash session**, stock −−
-- [ ] **Stock** live view; low-stock flags
-- [ ] **Everything editable** with an audit trail (never block a correction)
-- [ ] **Bénéfices** table: one line per product (acheté | frais | vendu | marge) + totals
-- [ ] Fast first-catalog entry flow (her stated stress point)
+- [x] **Produits**: create / edit / search by name; barcode optional; categories optional
+- [x] **Achats**: nom → quantité → prix d'achat → + frais → marge → prix de vente (auto), stock ++
+- [x] **Ventes**: pick by name, quantity, payment method, encaisser — **no cash session**, stock −−
+- [x] **Stock** live view; low-stock flags
+- [x] **Everything editable** with an audit trail (never block a correction)  *(completed 2026-06-27)*
+- [x] **Bénéfices** table: one line per product (acheté | frais | vendu | marge) + totals
+- [~] Fast first-catalog entry flow (works; not yet specially optimized — revisit in Phase 6)
 
 **Done when:** she can record an achat and a vente unaided on the first try, and read the
 profit table without a calculator.
 
 ---
 
-## Phase 2 — Anti-theft (Contrôle de stock)  `[ ]`
+## Phase 2 — Anti-theft (Contrôle de stock)  `[x]`  *(done 2026-06-27)*
 
 **Goal:** detection she can run in minutes, even remotely.
 
-- [ ] Contrôle de stock: théorique vs compté → écart per product
-- [ ] Flag shortfalls + estimated money value
-- [ ] History of controls; per-product variance over time
+- [x] Contrôle de stock: théorique vs compté → écart per product (any subset / spot-check)
+- [x] Flag shortfalls + estimated money value (CFA, at coût de revient)
+- [x] History of controls; per-control detail view (`/controle/[id]`)
+- [ ] Per-product variance trend over time *(history exists per control; cross-control trend later)*
 
-**Done when:** she runs a control and immediately sees which products are short and by how much.
+**Done when:** she runs a control and immediately sees which products are short and by how much. ✅
 
 ---
 
-## Phase 3 — Money truth (Dépenses + marge réelle)  `[ ]`
+## Phase 3 — Money truth (Dépenses + marge réelle)  `[~]`  ← in progress (next)
 
 - [ ] Dépenses ledger: recurring + one-off (loyer, salaires, électricité, eau, transport,
       amortissement, OTR, mairie)
@@ -125,3 +136,7 @@ profit table without a calculator.
 3. **Never a dead end.** No forced session, no blocked edit, no required barcode.
 4. **Ship per phase.** Each phase is independently useful and reviewed before the next.
 5. **No AI branding** in the repo, commits, or product — it reads as the developer's own work.
+6. **Full ownership.** The developer asked for 100% ownership/accountability: drive the
+   roadmap, verify your own work by actually running it (not just asserting), surface problems
+   plainly (including honest pushback), and keep these docs current as you go so anyone joining
+   the project knows exactly what's done and where we are.

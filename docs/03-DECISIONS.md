@@ -5,7 +5,30 @@
 
 ---
 
-## D-008 · Repo = new dedicated project `/home/user/ma-boutique`
+## D-010 · Contrôle de stock corrects stock and keeps the écart in history
+**Decision:** Recording a stock count (a) values each écart at **coût de revient unitaire**
+(`prix_achat + frais`), (b) **corrects the system stock to what was counted**, and (c) keeps the
+original théorique/compté/écart forever in `ligne_controle` + a `mouvement_stock` row of type
+`controle`. Only products she actually counts are recorded (blank = skipped), so it works for a
+full inventory **or** a quick spot-check of a few products.
+**Reasoning:** She needs the stock to become *true* going forward (so future counts mean something)
+**and** to keep the evidence of what was short (the theft signal) even after the fix. Valuing at
+cost = her real money lost. Spot-check support matches how she actually works ("6 bought, 4 sold, 2
+gone"), not an all-or-nothing inventory. (Phase B / Roadmap Phase 2.)
+
+## D-009 · `node:sqlite` via `process.getBuiltinModule` + lazy, retrying connection
+**Decision:** Load `node:sqlite` with `process.getBuiltinModule("node:sqlite")` (not
+`createRequire`, not a static import); open the DB **lazily on first query** (not at module import);
+set `PRAGMA busy_timeout = 5000` before other pragmas/migrate.
+**Reasoning:** Under this Next 16 (Turbopack) + Node 25 environment the previous `createRequire`
+trick threw `Unsupported external type Url for commonjs reference`, 500-ing every page in dev and
+breaking `next build`. `getBuiltinModule` is a plain property access the bundler never transforms.
+Connecting at import meant `next build`'s 13 parallel page-data workers each ran `migrate()` on the
+same file → `database is locked`; lazy connect + busy_timeout fixes it. Confirmed pre-existing
+(reproduced on a clean tree), not introduced by feature work. Net: `next dev` and `next build` both
+clean. Supersedes the loading mechanism noted in D-007 (the `node:sqlite` choice itself stands).
+
+## D-008 · Repo = new dedicated project (`Gestion-de-stock`, local `~/Downloads/ma-boutique`)
 **Decision:** The new software is a brand-new project in its own directory/repository,
 fully separate from the old `Store-management` repo (which is reference-only).
 **Reasoning:** Developer was explicit: the old repo is the old, abandoned software; we are
@@ -34,7 +57,8 @@ we've been committing to branch `claude/inspiring-tesla-fobaq9` of the existing 
   product, no confusion with the abandoned app. Recommended if this fully replaces StockFlow.
 - (B) **Same repo, `boutique/` subdir:** keeps the old app side-by-side as reference; one place.
 - (C) **Same repo, replace root:** archive old app to a folder, make Ma Boutique the main app.
-**Status:** awaiting developer decision. Leaning (A) for a clean break.
+**Status:** **RESOLVED (2026-06-27)** — chose (A). Ma Boutique now lives in its own repo
+`Gestion-de-stock`; the old `Store-management` repo is reference-only.
 
 ## D-005 · Push/write blocked by 403 — environmental, not a code issue
 **Decision:** Treat the failed push as a permissions blocker to be resolved by the developer;
@@ -70,3 +94,9 @@ role makes handing over the computer safer than today.
 balances and the app reconciles ("ça tombe juste ?"). No per-deposit/withdrawal logging.
 **Reasoning:** Her #1 need (does the money add up) is meaningless without the phone floats,
 but full transaction logging is the overload that killed app #1. Light is the right altitude.
+**Revisit (2026-06-27):** the raw answers show mobile money is ~half her day and her real check
+is concrete — cash + TMoney balance + Flooz balance vs **deposited capital** → `perte` if it
+doesn't match — plus commissions on selling/buying crédit and network-delayed SMS balances. The
+"light" altitude likely needs to be a notch richer than first scoped. To be confirmed with the
+developer before Phase D (Roadmap Phase 4). Still *balances-and-reconciliation*, not per-deposit
+logging — that overload stays out.
