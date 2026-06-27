@@ -1,9 +1,7 @@
 import { listProduits } from "@/lib/repo/produits";
 import { listAchats } from "@/lib/repo/achats";
-import { formatCFA } from "@/lib/money";
-import { jourCourt } from "@/lib/dates";
 import AchatForm from "./AchatForm";
-import { supprimerAchat } from "./actions";
+import AchatRow from "./AchatRow";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -59,24 +57,7 @@ export default function AchatsPage() {
                   </td>
                 </tr>
               ) : (
-                achats.map((a) => (
-                  <tr key={a.id}>
-                    <td className="muted">{jourCourt(a.date)}</td>
-                    <td className="prod">{a.nom}</td>
-                    <td className="num">{a.quantite}</td>
-                    <td className="num">{formatCFA(a.prix_achat)}</td>
-                    <td className="num">{formatCFA(a.frais)}</td>
-                    <td className="num">{formatCFA(a.prix_vente)}</td>
-                    <td className="num">
-                      <form action={supprimerAchat}>
-                        <input type="hidden" name="id" value={a.id} />
-                        <button type="submit" className="btn ghost">
-                          Supprimer
-                        </button>
-                      </form>
-                    </td>
-                  </tr>
-                ))
+                achats.map((a) => <AchatRow key={a.id} a={a} />)
               )}
             </tbody>
           </table>

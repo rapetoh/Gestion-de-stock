@@ -3,17 +3,10 @@ import { listVentesDuJour } from "@/lib/repo/ventes";
 import { formatCFA } from "@/lib/money";
 import { heure } from "@/lib/dates";
 import VenteCaisse from "./VenteCaisse";
-import { supprimerVente } from "./actions";
+import VenteRow from "./VenteRow";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-const PAY_LABEL: Record<string, string> = {
-  especes: "Espèces",
-  tmoney: "TMoney",
-  flooz: "Flooz",
-  credit: "Crédit",
-};
 
 export default function VentesPage() {
   const produits = listProduits();
@@ -61,28 +54,7 @@ export default function VentesPage() {
               </tr>
             ) : (
               ventes.map((v) => (
-                <tr key={v.id}>
-                  <td className="muted">{heure(v.date)}</td>
-                  <td>
-                    {v.lignes
-                      .map((l) => `${l.nom_produit} ×${l.quantite}`)
-                      .join(", ")}
-                  </td>
-                  <td>
-                    <span className="badge pay">
-                      {PAY_LABEL[v.paiement] ?? v.paiement}
-                    </span>
-                  </td>
-                  <td className="num">{formatCFA(v.total)}</td>
-                  <td className="num">
-                    <form action={supprimerVente}>
-                      <input type="hidden" name="id" value={v.id} />
-                      <button type="submit" className="btn ghost">
-                        Supprimer
-                      </button>
-                    </form>
-                  </td>
-                </tr>
+                <VenteRow key={v.id} v={v} heureLabel={heure(v.date)} />
               ))
             )}
           </tbody>

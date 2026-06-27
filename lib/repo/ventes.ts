@@ -131,6 +131,89 @@ export function createVente(input: CreateVenteInput): number {
   });
 }
 
+export type UpdateVenteInput = {
+  paiement?: Paiement;
+  // quantite = 0 retire la ligne. Le stock se réajuste de la différence.
+  lignes?: { ligneId: number; quantite: number }[];
+};
+
+export function updateVente(id: number, input: UpdateVenteInput): void {
+  const vente = one<Vente>(`SELECT * FROM vente WHERE id = ?`, id);
+  if (!vente) throw new Error("Vente introuvable.");
+
+  tx(() => {
+    const now = nowIso();
+
+    if (input.paiement) {
+      run(`UPDATE vente SET paiement = ? WHERE id = ?`, input.paiement, id);
+    }
+
+    for (const chg of input.lignes ?? []) {
+      const ligne = one<LigneVente>(
+        `SELECT * FROM ligne_vente WHERE id = ? AND vente_id = ?`,
+        chg.ligneId,
+        id
+      );
+      if (!ligne) continue;
+
+      const nouvelleQte = Math.max(0, Math.round(chg.quantite));
+      const delta = nouvelleQte - ligne.quantite; // vendu en plus => le stock baisse
+
+      if (delta !== 0 && ligne.produit_id != null) {
+        const prod = one<{ stock: number }>(
+          `SELECT stock FROM produit WHERE id = ?`,
+          ligne.produit_id
+        );
+        const stockAvant = prod?.stock ?? 0;
+        const stockApres = stockAvant - delta;
+        run(
+          `UPDATE produit SET stock = ?, maj_le = ? WHERE id = ?`,
+          stockApres,
+          now,
+          ligne.produit_id
+        );
+        run(
+          `INSERT INTO mouvement_stock
+             (produit_id, type, quantite, stock_avant, stock_apres, raison, ref_id, user_id, date)
+           VALUES (?,?,?,?,?,?,?,?,?)`,
+          ligne.produit_id,
+          "correction",
+          -delta,
+          stockAvant,
+          stockApres,
+          "Correction de vente",
+          id,
+          vente.user_id,
+          now
+        );
+      }
+
+      if (nouvelleQte === 0) {
+        run(`DELETE FROM ligne_vente WHERE id = ?`, ligne.id);
+      } else {
+        run(
+          `UPDATE ligne_vente SET quantite = ?, total = ? WHERE id = ?`,
+          nouvelleQte,
+          ligne.prix_unitaire * nouvelleQte,
+          ligne.id
+        );
+      }
+    }
+
+    const reste = one<{ n: number; total: number }>(
+      `SELECT COUNT(*) AS n, COALESCE(SUM(total), 0) AS total
+         FROM ligne_vente WHERE vente_id = ?`,
+      id
+    );
+    if (!reste || reste.n === 0) {
+      // Plus aucune ligne : on retire la vente vide (le stock a déjà été remis).
+      run(`DELETE FROM vente WHERE id = ?`, id);
+    } else {
+      run(`UPDATE vente SET total = ? WHERE id = ?`, reste.total, id);
+    }
+  });
+}
+
 export function deleteVente(id: number): void {
   const lignes = all<LigneVente>(
     `SELECT * FROM ligne_vente WHERE vente_id = ?`,

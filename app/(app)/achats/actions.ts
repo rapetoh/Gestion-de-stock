@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { parseCFA } from "@/lib/money";
 import { getSession } from "@/lib/auth";
 import { getProduitParNom, createProduit } from "@/lib/repo/produits";
-import { createAchat, deleteAchat } from "@/lib/repo/achats";
+import { createAchat, updateAchat, deleteAchat } from "@/lib/repo/achats";
 
 export async function enregistrerAchat(formData: FormData): Promise<void> {
   const nom = String(formData.get("nom") ?? "").trim();
@@ -36,6 +36,27 @@ export async function enregistrerAchat(formData: FormData): Promise<void> {
     fournisseur,
     note,
     userId: session?.userId ?? null,
+  });
+
+  revalidatePath("/achats");
+  revalidatePath("/stock");
+  revalidatePath("/");
+}
+
+export async function modifierAchat(formData: FormData): Promise<void> {
+  const id = Number(formData.get("id"));
+  if (!id) return;
+
+  const quantite = parseCFA(String(formData.get("quantite") ?? ""));
+  if (quantite <= 0) return;
+
+  updateAchat(id, {
+    quantite,
+    prixAchat: parseCFA(String(formData.get("prixAchat") ?? "")),
+    frais: parseCFA(String(formData.get("frais") ?? "")),
+    prixVente: parseCFA(String(formData.get("prixVente") ?? "")),
+    fournisseur: String(formData.get("fournisseur") ?? "").trim() || null,
+    note: String(formData.get("note") ?? "").trim() || null,
   });
 
   revalidatePath("/achats");
