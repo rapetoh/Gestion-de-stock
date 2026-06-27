@@ -225,5 +225,24 @@ function migrate(database: DatabaseSync): void {
       user_id       INTEGER REFERENCES utilisateur(id)
     );
     CREATE INDEX IF NOT EXISTS idx_depense_date ON depense(date);
+    CREATE INDEX IF NOT EXISTS idx_solde_date ON solde_journalier(date);
   `);
+
+  // Migrations additives idempotentes (un ALTER n'est pas couvert par CREATE TABLE IF NOT EXISTS).
+  // attendu = ce qui DEVRAIT être sur le compte ce jour-là (capital/float), à côté du solde compté.
+  ajouterColonneSiAbsente(database, "solde_journalier", "attendu", "INTEGER NOT NULL DEFAULT 0");
+}
+
+function ajouterColonneSiAbsente(
+  database: DatabaseSync,
+  table: string,
+  colonne: string,
+  ddl: string
+): void {
+  const cols = database.prepare(`PRAGMA table_info(${table})`).all() as {
+    name: string;
+  }[];
+  if (!cols.some((c) => c.name === colonne)) {
+    database.exec(`ALTER TABLE ${table} ADD COLUMN ${colonne} ${ddl};`);
+  }
 }
