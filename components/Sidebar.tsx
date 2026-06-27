@@ -8,6 +8,7 @@ type Props = { nom: string; role: string };
 
 const NAV_PRINCIPAL = [{ href: "/", ic: "▣", label: "Tableau de bord" }];
 const NAV_JOUR = [
+  { href: "/produits", ic: "▥", label: "Produits" },
   { href: "/achats", ic: "↓", label: "Achats" },
   { href: "/ventes", ic: "↑", label: "Ventes" },
   { href: "/stock", ic: "▤", label: "Stock" },

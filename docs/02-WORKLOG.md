@@ -7,6 +7,12 @@
 
 ## 2026-06-27
 
+### Fix: Produits was missing from the sidebar (import was unreachable)
+- **What:** Added **Produits** to the sidebar nav. It wasn't there at all, so the page — and the
+  "Importer une liste" button on it — could only be reached by typing the URL. Now: sidebar →
+  Produits → Importer une liste (/produits/import).
+- **Why:** The developer couldn't find the bulk import. Root cause was navigation, not the feature.
+
 ### Bulk product import (HIGH gap) — kills the "type 100 products by hand" wall
 - **What:** New **/produits/import** — she pastes a list (one product per line; separated by `;`
   or a tab if copied from Excel; columns `Nom ; Prix d'achat ; Frais ; Prix de vente ; Stock ;
