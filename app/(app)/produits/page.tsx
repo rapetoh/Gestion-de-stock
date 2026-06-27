@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { listProduits } from "@/lib/repo/produits";
 import { ajouterProduit } from "./actions";
 import ProduitRow from "./ProduitRow";
@@ -23,6 +24,9 @@ export default async function ProduitsPage({
             obligatoire.
           </div>
         </div>
+        <Link href="/produits/import" className="btn ghost">
+          Importer une liste
+        </Link>
       </div>
 
       <div className="card" style={{ marginBottom: 18 }}>

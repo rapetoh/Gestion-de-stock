@@ -2,11 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { parseCFA } from "@/lib/money";
+import { parseProduitsTexte } from "@/lib/import";
 import { getSession } from "@/lib/auth";
 import {
   createProduit,
   updateProduit,
   removeProduit,
+  importerProduits,
 } from "@/lib/repo/produits";
 
 export async function ajouterProduit(formData: FormData): Promise<void> {
@@ -57,4 +59,26 @@ export async function supprimerProduit(formData: FormData): Promise<void> {
   const session = await getSession();
   removeProduit(id, session?.userId ?? null);
   revalidatePath("/produits");
+}
+
+export type ImportState = {
+  ok?: boolean;
+  crees?: number;
+  maj?: number;
+  error?: string;
+} | null;
+
+export async function importerProduitsAction(
+  _prev: ImportState,
+  formData: FormData
+): Promise<ImportState> {
+  const rows = parseProduitsTexte(String(formData.get("texte") ?? ""));
+  if (!rows.length) {
+    return { error: "Aucun produit à importer. Colle au moins une ligne." };
+  }
+  const session = await getSession();
+  const res = importerProduits(rows, session?.userId ?? null);
+  revalidatePath("/produits");
+  revalidatePath("/stock");
+  return { ok: true, crees: res.crees, maj: res.maj };
 }

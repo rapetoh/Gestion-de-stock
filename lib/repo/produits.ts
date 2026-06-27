@@ -1,6 +1,7 @@
 // Repository produits — accès données via les helpers de lib/db uniquement.
-import { all, one, run, nowIso } from "../db";
+import { all, one, run, tx, nowIso } from "../db";
 import { journaliser } from "./activite";
+import type { ImportRow } from "../import";
 
 export type Produit = {
   id: number;
@@ -117,6 +118,66 @@ export function removeProduit(id: number, userId?: number | null): void {
     entite: "produit",
     details: `Produit retiré${before ? ` : ${before.nom}` : ""}`,
     refId: id,
+  });
+}
+
+// Import en masse : crée les nouveaux produits, met à jour ceux dont le nom existe déjà
+// (régularisation), le tout dans une transaction. Une seule ligne de journal résume l'opération.
+export function importerProduits(
+  rows: ImportRow[],
+  userId?: number | null
+): { crees: number; maj: number } {
+  return tx(() => {
+    let crees = 0;
+    let maj = 0;
+    const now = nowIso();
+    for (const r of rows) {
+      const nom = r.nom.trim();
+      if (!nom) continue;
+      const existant = one<{ id: number }>(
+        `SELECT id FROM produit WHERE actif = 1 AND nom = ? COLLATE NOCASE`,
+        nom
+      );
+      if (existant) {
+        run(
+          `UPDATE produit SET categorie = ?, prix_achat = ?, frais = ?, prix_vente = ?,
+             stock = ?, seuil_stock = ?, maj_le = ? WHERE id = ?`,
+          r.categorie ?? null,
+          r.prixAchat,
+          r.frais,
+          r.prixVente,
+          r.stock,
+          r.seuilStock,
+          now,
+          existant.id
+        );
+        maj++;
+      } else {
+        run(
+          `INSERT INTO produit
+             (nom, categorie, prix_achat, frais, prix_vente, stock, seuil_stock, code_barre, actif, cree_le, maj_le)
+           VALUES (?,?,?,?,?,?,?,?,1,?,?)`,
+          nom,
+          r.categorie ?? null,
+          r.prixAchat,
+          r.frais,
+          r.prixVente,
+          r.stock,
+          r.seuilStock,
+          null,
+          now,
+          now
+        );
+        crees++;
+      }
+    }
+    journaliser({
+      userId,
+      action: "creation",
+      entite: "produit",
+      details: `Import de produits : ${crees} créés, ${maj} mis à jour`,
+    });
+    return { crees, maj };
   });
 }
 
