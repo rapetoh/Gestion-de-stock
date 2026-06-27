@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { parProduit } from "@/lib/repo/benefices";
+import { totalDepensesMois } from "@/lib/repo/depenses";
 import { formatCFA } from "@/lib/money";
 import { moisAnnee } from "@/lib/dates";
 
@@ -34,6 +36,8 @@ export default async function BeneficesPage({
   }
 
   const { lignes, totaux } = parProduit(year, month);
+  const depensesMois = totalDepensesMois(year, month);
+  const margeReelle = totaux.marge - depensesMois;
   const options = dernierMois();
   const selected = `${year}-${String(month).padStart(2, "0")}`;
 
@@ -102,6 +106,35 @@ export default async function BeneficesPage({
             <span className="u"> F</span>
           </div>
           <div className="delta up">ce que la marchandise t&apos;a rapporté</div>
+        </div>
+      </div>
+
+      <div className="card" style={{ marginBottom: 18 }}>
+        <h2>Ton gain réel ce mois-ci</h2>
+        <div className="hint">
+          La marge sur la marchandise, moins les dépenses de la boutique.
+        </div>
+        <div className="calcbox" style={{ marginTop: 8 }}>
+          <div className="calcline">
+            <span>Marge sur marchandise</span>
+            <span>{formatCFA(totaux.marge)}</span>
+          </div>
+          <div className="calcline">
+            <span>
+              − Dépenses du mois{" "}
+              <Link href={`/depenses?mois=${selected}`} className="sub">
+                (voir / modifier)
+              </Link>
+            </span>
+            <span className="neg">{formatCFA(depensesMois)}</span>
+          </div>
+          <div className="calcline total">
+            <span>Marge réelle (net)</span>
+            <span className={margeReelle >= 0 ? "pos" : "neg"}>
+              {margeReelle >= 0 ? "+" : ""}
+              {formatCFA(margeReelle)}
+            </span>
+          </div>
         </div>
       </div>
 
