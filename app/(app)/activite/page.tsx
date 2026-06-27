@@ -78,7 +78,8 @@ export default async function ActivitePage({
       <div className="card">
         <div className="hint">
           {lignes.length} action{lignes.length > 1 ? "s" : ""} affichée
-          {lignes.length > 1 ? "s" : ""} (les plus récentes en premier).
+          {lignes.length > 1 ? "s" : ""} (les plus récentes en premier)
+          {lignes.length >= 200 ? " — limité aux 200 dernières" : ""}.
         </div>
         <table>
           <thead>

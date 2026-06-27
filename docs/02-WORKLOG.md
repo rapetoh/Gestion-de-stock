@@ -19,8 +19,12 @@
   repeated across screens, plus missing confirmation/feedback throughout.
 - **Result:** tsc/lint/build clean; 35 tests still green; all six screens render 200 with the new
   behavior. See docs/05-UX-REVIEW.md for the full findings list.
-- **Next (same review):** P2 mobile/responsive layout (no media queries today; she uses a phone),
-  then P3 polish (filter UX, truncation notes, dashboard title dedupe).
+- **P2 (done, same day):** responsive layout — a hamburger **drawer** sidebar (new `AppShell`),
+  single-column grids, scrollable tables, stacked form rows on small screens. **Verified in headless
+  Chrome**: at 390px no horizontal overflow + drawer slides in on tap; at 1280px sidebar fixed and
+  grids multi-column.
+- **P3 (done):** dashboard table retitled; Activité/Import note when lists are capped. Filter buttons
+  kept explicit by choice. Full status in docs/05-UX-REVIEW.md.
 
 ### Fix: Produits was missing from the sidebar (import was unreachable)
 - **What:** Added **Produits** to the sidebar nav. It wasn't there at all, so the page — and the

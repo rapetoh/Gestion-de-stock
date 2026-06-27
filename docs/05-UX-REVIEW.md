@@ -74,3 +74,15 @@ taps = double records. **Fix:** disable the button while pending (pairs with the
 
 Verification per batch: `npm run build`, live click-through on the affected screens (desktop + a
 narrow viewport), and tests for any logic touched.
+
+## Resolution status (2026-06-27)
+- **P1 — all fixed.** One-editor-at-a-time inline edit that closes on save; delete confirmation +
+  red `.btn.danger`; success "✓" flash + form/cart reset; `SubmitButton` disables while saving.
+- **P2 — fixed.** Responsive layout added (hamburger drawer sidebar, single-column grids, scrollable
+  tables, stacked form rows). **Verified in headless Chrome** at 390px (no horizontal overflow;
+  drawer slides in on tap) and 1280px (sidebar fixed, multi-column).
+- **P3 — done:** dashboard table retitled "Classement des ventes du mois"; Activité notes when capped
+  at 200; Import preview notes when showing the first 200 of more. Filter "Afficher/Filtrer" buttons
+  kept (explicit) by choice.
+- **Still open (backlog, not friction):** worst-sellers report, per-product movement view,
+  credit-debt list, expiry, commissions-as-income.

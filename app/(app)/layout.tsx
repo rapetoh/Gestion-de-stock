@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
-import Sidebar from "@/components/Sidebar";
+import AppShell from "@/components/AppShell";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,9 +14,8 @@ export default async function AppLayout({
   if (!session) redirect("/connexion");
 
   return (
-    <div className="app">
-      <Sidebar nom={session.nom} role={session.role} />
-      <main className="main">{children}</main>
-    </div>
+    <AppShell nom={session.nom} role={session.role}>
+      {children}
+    </AppShell>
   );
 }

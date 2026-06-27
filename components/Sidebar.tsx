@@ -4,7 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { deconnexion } from "@/app/(app)/actions";
 
-type Props = { nom: string; role: string };
+type Props = {
+  nom: string;
+  role: string;
+  open?: boolean;
+  onNavigate?: () => void;
+};
 
 const NAV_PRINCIPAL = [{ href: "/", ic: "▣", label: "Tableau de bord" }];
 const NAV_JOUR = [
@@ -26,7 +31,7 @@ function roleLabel(role: string): string {
   return role === "proprietaire" ? "Propriétaire" : "Vendeuse";
 }
 
-export default function Sidebar({ nom, role }: Props) {
+export default function Sidebar({ nom, role, open = false, onNavigate }: Props) {
   const pathname = usePathname();
 
   const isActive = (href: string) =>
@@ -36,6 +41,7 @@ export default function Sidebar({ nom, role }: Props) {
     <Link
       key={item.href}
       href={item.href}
+      onClick={onNavigate}
       className={`nav-item${isActive(item.href) ? " active" : ""}`}
     >
       <span className="ic">{item.ic}</span> {item.label}
@@ -45,7 +51,7 @@ export default function Sidebar({ nom, role }: Props) {
   const initiale = (nom || "?").charAt(0).toUpperCase();
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar${open ? " open" : ""}`}>
       <div className="brand">
         <div className="logo">B</div>
         <div>

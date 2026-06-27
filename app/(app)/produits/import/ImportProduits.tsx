@@ -97,6 +97,9 @@ export default function ImportProduits({ existants }: { existants: string[] }) {
         <div className="hint">
           {nbNouveaux} nouveau{nbNouveaux > 1 ? "x" : ""}, {nbMaj} mise
           {nbMaj > 1 ? "s" : ""} à jour. Vérifie avant d&apos;importer.
+          {rows.length > 200
+            ? ` (aperçu des 200 premiers ; les ${rows.length} seront importés)`
+            : ""}
         </div>
         <table style={{ marginTop: 6 }}>
           <thead>

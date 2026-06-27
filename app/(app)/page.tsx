@@ -110,7 +110,7 @@ export default function TableauDeBordPage() {
       <div className="section-gap"></div>
 
       <div className="card">
-        <h2>Ce qui se vend le plus ce mois-ci</h2>
+        <h2>Classement des ventes du mois</h2>
         <div className="hint">
           Pour savoir sur quoi te concentrer — et ce qui ne marche pas.
         </div>
