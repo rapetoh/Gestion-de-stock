@@ -20,8 +20,10 @@
   corrects stock + history; list + detail).
 - **Phase 3 (Dépenses → marge réelle):** ✅ done — 2026-06-27 (expense ledger + net margin in
   Bénéfices).
-- **Phase 4 (Daily reconciliation / Comptes):** `[~]` next — confirm mobile-money scope first
-  (see Open question in 02-WORKLOG.md / D-001).
+- **Phase 4 (Daily reconciliation / Soldes):** ✅ done — 2026-06-27 (attendu vs compté per account
+  → "ça tombe juste / il manque X" + history; commissions-as-income deferred — D-012).
+- **Phase 5 (employee role) / Phase 6 (polish & handover):** not started. Plus a small backlog:
+  mobile-money commissions as income, worst-sellers, week/half-day sales breakdowns, credit-debt list.
 - **Now building in:** VSCode, repo `Gestion-de-stock`. Detailed build roadmap +
   verification verdict: `~/.claude/plans/so-i-started-working-refactored-hennessy.md`.
 - **Blocker:** none open (the old 403 push blocker is resolved — fresh repo).
@@ -101,13 +103,14 @@ profit table without a calculator.
 
 ---
 
-## Phase 4 — Daily reconciliation (Comptes / Soldes)  `[ ]`
+## Phase 4 — Daily reconciliation (Soldes)  `[x]`  *(done 2026-06-27)*
 
-- [ ] Comptes: Espèces, TMoney, Flooz, Crédit (configurable)
-- [ ] Daily balance entry → "ça tombe juste ?" with the écart highlighted
-- [ ] Light mobile-money commissions as income
+- [x] Comptes: Espèces, TMoney, Flooz, Crédit (seeded; active ones shown)
+- [x] Daily balance entry (attendu vs compté) → "ça tombe juste ?" with the écart highlighted
+- [x] History of recent days; per-account écart
+- [ ] Light mobile-money commissions as income *(deferred — D-012; small backlog item)*
 
-**Done when:** at end of day she enters balances and the app confirms it balances or shows the gap.
+**Done when:** at end of day she enters balances and the app confirms it balances or shows the gap. ✅
 
 ---
 

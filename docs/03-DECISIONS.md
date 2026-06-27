@@ -5,6 +5,19 @@
 
 ---
 
+## D-012 · Soldes = balances-only reconciliation (attendu vs compté), commissions deferred
+**Decision:** The daily money check models **balances**, not transactions. Per account she enters
+`attendu` (capital/float that should be there) and `compté` (actual); the app flags the écart
+("ça tombe juste" / "il manque X"). One record per account per day (re-save replaces); `attendu`
+carries forward to uncounted days. Mobile-money **commissions as income** are deferred to a later
+follow-up (fold into Bénéfices), not built now.
+**Reasoning:** This is exactly her described ritual (cash + TMoney + Flooz vs deposited capital →
+perte). Per-transaction logging is the overload that killed app #1, so it stays out — confirms the
+"light" altitude of D-001 with a concrete shape. Stored `attendu` alongside `solde` (new
+`solde_journalier.attendu` column, idempotent migration) so history shows an accurate écart even
+as the capital changes over time. Commissions deferred to keep the daily form light; documented so
+it isn't lost. (Phase D / Roadmap Phase 4.)
+
 ## D-011 · Dépenses = a manual ledger; marge réelle = marge − dépenses (shown in Bénéfices)
 **Decision:** Dépenses is a simple editable ledger (libellé, montant, catégorie, date, "revient
 chaque mois" flag). The Bénéfices page subtracts the month's total dépenses from the goods margin

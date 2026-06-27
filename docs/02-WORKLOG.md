@@ -7,6 +7,23 @@
 
 ## 2026-06-27
 
+### Phase D — Soldes du jour (daily money reconciliation)
+- **What:** Built her #1 money check: `lib/repo/comptes.ts` + `app/(app)/soldes/` (new sidebar
+  item "Soldes du jour"). For each account (Espèces, TMoney, Flooz, Crédit) she enters **attendu**
+  (what should be there / her capital-float) and **compté** (what's really there); the app shows
+  per-account and total écart with a clear verdict — **"Ça tombe juste ✓" / "Il manque X"** — plus
+  a day picker and a history of recent days. One record per account per day (re-save replaces);
+  attendu carries forward to days not yet counted. Added an idempotent migration
+  (`solde_journalier.attendu` column) in `lib/db.ts`.
+- **Why:** Straight from her words — cash + TMoney + Flooz vs the capital she put in; if it's
+  short, "il y a une perte." Deliberately **balances-only, not per-transaction logging** (that
+  overload is what she abandoned app #1 over). See D-001/D-012.
+- **Deferred (documented, not dropped):** mobile-money **commissions as income** (she totals
+  TMoney/Flooz commissions monthly) — a clean follow-up to fold into Bénéfices later.
+- **Result:** `npm test` 19/19 (added 5 reconciliation tests); tsc/lint/build clean; live verified.
+- **Next:** Phase E polish (worst-sellers, week/half-day breakdowns, credit-debt list) and the
+  commissions-as-income follow-up.
+
 ### Phase C — Dépenses → marge réelle (real net profit)
 - **What:** Built the expense ledger: `lib/repo/depenses.ts` (create/edit/delete, per-month
   total) + `app/(app)/depenses/` (month selector, form with her categories — loyer, salaires,
