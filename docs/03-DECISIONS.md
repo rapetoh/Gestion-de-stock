@@ -5,6 +5,18 @@
 
 ---
 
+## D-014 · Backup = `VACUUM INTO` snapshot (downloadable .db) + CSV exports, auth-checked
+**Decision:** The backup is a full **`VACUUM INTO`** snapshot of the database, streamed as a `.db`
+download (a complete, restorable copy — `VACUUM INTO` is safe on a live DB). Plus CSV exports
+(produits/ventes/dépenses) with a UTF-8 BOM for Excel. The `/sauvegarde/export` GET handler
+**re-checks `getSession()`** even though middleware already guards it (the payload is the entire
+business, incl. password hashes — defense in depth). Download URLs avoid a `.` in the path so the
+middleware matcher (which excludes `*.*`) still protects them.
+**Reasoning:** A single downloadable file she can put on a USB key / Drive is the simplest real
+backup; `VACUUM INTO` guarantees consistency without stopping the app. Corollary discovered: any
+new table with FKs must be added to `scripts/seed.ts` `clear()` (the `activite` table broke seed
+until fixed). (Backup build / parity HIGH gap.)
+
 ## D-013 · Audit log written at the data layer, best-effort, user via FK + join
 **Decision:** The activity log (`activite`) is written from inside the repos, in the same
 transaction as the change it records (not from the UI/action layer). It stores `user_id` (a real

@@ -7,6 +7,22 @@
 
 ## 2026-06-27
 
+### Backup / data export (HIGH gap) + seed fix
+- **What:** New **Sauvegarde** page + `/sauvegarde/export` route (auth-checked). A **full
+  consistent backup** of the whole database via SQLite `VACUUM INTO` (downloadable `.db` she can
+  store off the laptop), plus **CSV exports** (produits, ventes, dépenses) for Excel. Added
+  `lib/repo/export.ts`, `exporterBase()` in `lib/db.ts`, and a sidebar entry.
+- **Fixed a bug I had introduced:** `npm run db:seed` was failing — `scripts/seed.ts` `clear()`
+  didn't delete the new `activite` table, whose FK to `utilisateur` blocked `DELETE FROM
+  utilisateur`. Added `activite` to the clear list. *(Lesson: adding a table means updating seed.)*
+- **Why:** Her entire business lived in one file with no copy — the top data-loss risk from the
+  parity analysis. A non-expert wouldn't ask for it; it's essential.
+- **Result:** `npm test` 28/28 (+5 export tests, incl. that `exporterBase` writes a *restituable*
+  SQLite file); tsc/lint/build clean; live verified — valid 118 KB `.db` download (correct SQLite
+  magic bytes), CSV with real data, and an **unauthenticated** download is blocked (307, no leak).
+  See **D-014**.
+- **Next:** bulk product import (the other HIGH gap).
+
 ### Journal d'activité (audit log) — "qui a fait quoi, et quand"
 - **What:** Added a full action log: new `activite` table (idempotent in migrate) + `lib/repo/
   activite.ts` (`journaliser`, `listActivite` with action/day filters), wired into **every
