@@ -85,7 +85,9 @@ export default function ImportProduits({ existants }: { existants: string[] }) {
             <div className="calcline total">
               <span>Terminé</span>
               <span>
-                <Link href="/produits">Voir mes produits →</Link>
+                <Link href="/produits" className="lien">
+                  Voir mes produits →
+                </Link>
               </span>
             </div>
           </div>

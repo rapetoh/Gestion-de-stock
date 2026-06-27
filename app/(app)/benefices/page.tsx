@@ -122,7 +122,7 @@ export default async function BeneficesPage({
           <div className="calcline">
             <span>
               − Dépenses du mois{" "}
-              <Link href={`/depenses?mois=${selected}`} className="sub">
+              <Link href={`/depenses?mois=${selected}`} className="lien">
                 (voir / modifier)
               </Link>
             </span>

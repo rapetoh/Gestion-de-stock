@@ -7,6 +7,14 @@
 
 ## 2026-06-27
 
+### Fix: stray underlines on links/buttons (missing global link reset)
+- **What:** Links (incl. anchors styled as buttons: "Nouvelle vente", "Importer une liste", the
+  Sauvegarde downloads, "← Retour"…) showed the browser's default underline — only `.nav-item` had
+  `text-decoration: none`. Added a global `a { text-decoration: none; color: inherit }` reset; real
+  inline text links now use a `.lien` style (coloured, underline on hover). Verified in headless
+  Chrome (button-links and nav now report `underline=none`).
+- **Why:** The developer noticed lots of underlined text — it was an unintended default, not a choice.
+
 ### Full UX review + P1 fixes (the inline-edit bug and its siblings)
 - **What:** Reviewed the whole UX as a senior designer (docs/05-UX-REVIEW.md). Fixed the P1
   cross-cutting frictions: (1) **inline edit** now opens **one row at a time** and **closes
