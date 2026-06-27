@@ -7,6 +7,21 @@
 
 ## 2026-06-27
 
+### Journal d'activité (audit log) — "qui a fait quoi, et quand"
+- **What:** Added a full action log: new `activite` table (idempotent in migrate) + `lib/repo/
+  activite.ts` (`journaliser`, `listActivite` with action/day filters), wired into **every
+  data-changing repo** (ventes, achats, produits, depenses, controle, soldes create/modify/delete)
+  and login. Logging happens **at the data layer, inside the same transaction** as the change, so
+  it's tamper-consistent; it's **best-effort** (a log error never breaks the operation). New
+  `/activite` page + sidebar item, filterable by action and day, showing when / who / action /
+  what / details / amount. Threaded the session user id into the repo edit/delete signatures.
+- **Why:** The developer rightly flagged that a theft/accountability-focused app must record who did
+  what and when — the old software had it, we didn't. Core to the purpose, not optional.
+- **Result:** `npm test` 23/23 (added `activite` tests; user_id is a real FK so a `creerUser`
+  test helper was added); tsc/lint/build clean; live verified (a recorded sale shows in the log
+  with the user's name). See **D-013**.
+- **Next:** the two HIGH gaps from the parity analysis — backup/export, then bulk import.
+
 ### Parity & gap analysis vs the old software (StockFlow)
 - **What:** Cloned and read the OLD app (StockFlow / `Store-management`) in full — 17-model Prisma
   schema, all pages/API routes, docs — and diffed it against Ma Boutique, applying expert judgment

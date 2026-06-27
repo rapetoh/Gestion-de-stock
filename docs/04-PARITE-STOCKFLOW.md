@@ -52,6 +52,12 @@ She buys by **carton** but sells by **unit** ("6 in a paquet"). Neither app trul
 carton→unit conversion; she works around it by naming products per selling unit. Worth a decision
 on whether to support pack/unit conversion, or keep the manual workaround.
 
+## Update (2026-06-27) — audit log built
+The developer flagged a gap my first pass under-weighted: **an action log** (StockFlow had
+`ActivityLog`; we didn't). For a theft/accountability app this is core, not optional. It's now
+built — see worklog "Journal d'activité" and D-013. Lesson logged: weigh "who did what, when"
+as HIGH for this kind of business, not a Phase-5 afterthought.
+
 ## Recommendation
 Build the two **HIGH** gaps next (backup/export, then bulk import) — they're the real risk and the
 real pain, and a non-expert owner wouldn't flag either. Then work the MEDIUM list (movement-history

@@ -5,6 +5,19 @@
 
 ---
 
+## D-013 · Audit log written at the data layer, best-effort, user via FK + join
+**Decision:** The activity log (`activite`) is written from inside the repos, in the same
+transaction as the change it records (not from the UI/action layer). It stores `user_id` (a real
+FK to `utilisateur`); the display name is obtained by JOIN at read time, not snapshotted. Logging
+is **best-effort** — `journaliser` swallows its own errors so a logging failure can never break a
+sale/achat/etc. Repo edit/delete signatures gained an optional `userId` so the actor is recorded.
+**Reasoning:** Logging at the data layer means *every* path that changes data is captured and the
+log commits atomically with the change (tamper-consistent) — more trustworthy for an anti-theft
+tool than logging in the UI, which could be bypassed or get out of sync. FK + join keeps names
+correct even after a user is renamed; best-effort keeps the business operation sacred. The
+developer identified this as essential (not in the owner's stated list) — exactly the kind of
+expert gap ownership is meant to catch. (Audit log build / parity gap.)
+
 ## D-012 · Soldes = balances-only reconciliation (attendu vs compté), commissions deferred
 **Decision:** The daily money check models **balances**, not transactions. Per account she enters
 `attendu` (capital/float that should be there) and `compté` (actual); the app flags the écart
