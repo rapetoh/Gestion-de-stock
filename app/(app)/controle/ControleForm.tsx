@@ -3,12 +3,14 @@
 import { useMemo, useState } from "react";
 import { formatCFA } from "@/lib/money";
 import type { Produit } from "@/lib/repo/produits";
+import SubmitButton from "@/components/SubmitButton";
 import { enregistrerControleAction } from "./actions";
 
 export default function ControleForm({ produits }: { produits: Produit[] }) {
   const [recherche, setRecherche] = useState("");
   // produitId -> quantité comptée (texte). Vide = pas encore compté (on ignore).
   const [comptes, setComptes] = useState<Record<number, string>>({});
+  const [flash, setFlash] = useState<string | null>(null);
 
   function coutUnit(p: Produit) {
     return p.prix_achat + p.frais;
@@ -47,6 +49,18 @@ export default function ControleForm({ produits }: { produits: Produit[] }) {
   const payload = JSON.stringify(
     comptees.map((c) => ({ produitId: c.p.id, compte: c.compte }))
   );
+
+  async function soumettre(formData: FormData) {
+    if (!comptees.length) return;
+    const m = resume.manque;
+    await enregistrerControleAction(formData);
+    setComptes({});
+    setFlash(
+      m > 0
+        ? `Contrôle enregistré ✓ — manque de ${formatCFA(m)}`
+        : "Contrôle enregistré ✓ — tout est juste"
+    );
+  }
 
   function ecartBadge(ecart: number) {
     if (ecart < 0) return <span className="badge bad">manque {Math.abs(ecart)}</span>;
@@ -158,7 +172,7 @@ export default function ControleForm({ produits }: { produits: Produit[] }) {
           </div>
         </div>
 
-        <form action={enregistrerControleAction} style={{ marginTop: 14 }}>
+        <form action={soumettre} style={{ marginTop: 14 }}>
           <input type="hidden" name="lignes" value={payload} />
           <div className="field">
             <label>
@@ -171,18 +185,23 @@ export default function ControleForm({ produits }: { produits: Produit[] }) {
               placeholder="ex : contrôle avant départ employée"
             />
           </div>
-          <button
-            type="submit"
+          <SubmitButton
             className="btn primary big"
             style={{ width: "100%" }}
             disabled={resume.nb === 0}
           >
             Enregistrer le contrôle
-          </button>
-          <div className="note">
-            Le stock se corrige avec ce que tu as compté. L&apos;écart reste
-            gardé dans l&apos;historique.
-          </div>
+          </SubmitButton>
+          {flash ? (
+            <div className="flash" style={{ display: "block" }}>
+              {flash}
+            </div>
+          ) : (
+            <div className="note">
+              Le stock se corrige avec ce que tu as compté. L&apos;écart reste
+              gardé dans l&apos;historique.
+            </div>
+          )}
         </form>
       </div>
     </div>

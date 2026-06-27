@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { formatCFA } from "@/lib/money";
 import type { VenteAvecLignes, Paiement } from "@/lib/repo/ventes";
+import SubmitButton from "@/components/SubmitButton";
 import { modifierVente, supprimerVente } from "./actions";
 
 const PAY: { id: Paiement; label: string }[] = [
@@ -15,17 +16,33 @@ const PAY: { id: Paiement; label: string }[] = [
 export default function VenteRow({
   v,
   heureLabel,
+  editing,
+  onEdit,
+  onClose,
 }: {
   v: VenteAvecLignes;
   heureLabel: string;
+  editing: boolean;
+  onEdit: () => void;
+  onClose: () => void;
 }) {
-  const [edit, setEdit] = useState(false);
+  const init = () =>
+    Object.fromEntries(v.lignes.map((l) => [l.id, l.quantite])) as Record<number, number>;
   const [paiement, setPaiement] = useState<Paiement>(v.paiement);
-  const [qtes, setQtes] = useState<Record<number, number>>(
-    Object.fromEntries(v.lignes.map((l) => [l.id, l.quantite]))
-  );
+  const [qtes, setQtes] = useState<Record<number, number>>(init);
 
-  if (edit) {
+  function annuler() {
+    setPaiement(v.paiement);
+    setQtes(init());
+    onClose();
+  }
+
+  async function enregistrer(formData: FormData) {
+    await modifierVente(formData);
+    onClose();
+  }
+
+  if (editing) {
     const payload = JSON.stringify(
       v.lignes.map((l) => ({ ligneId: l.id, quantite: qtes[l.id] ?? 0 }))
     );
@@ -37,7 +54,7 @@ export default function VenteRow({
     return (
       <tr>
         <td colSpan={5}>
-          <form action={modifierVente}>
+          <form action={enregistrer}>
             <input type="hidden" name="id" value={v.id} />
             <input type="hidden" name="paiement" value={paiement} />
             <input type="hidden" name="lignes" value={payload} />
@@ -63,11 +80,7 @@ export default function VenteRow({
                     <td className="num">
                       <input
                         className="input"
-                        style={{
-                          width: 70,
-                          padding: "6px 8px",
-                          textAlign: "right",
-                        }}
+                        style={{ width: 70, padding: "6px 8px", textAlign: "right" }}
                         value={qtes[l.id] ?? 0}
                         inputMode="numeric"
                         onChange={(e) =>
@@ -103,20 +116,10 @@ export default function VenteRow({
             </div>
 
             <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-              <button type="submit" className="btn primary">
+              <SubmitButton className="btn primary">
                 Enregistrer ({formatCFA(nouveauTotal)})
-              </button>
-              <button
-                type="button"
-                className="btn ghost"
-                onClick={() => {
-                  setPaiement(v.paiement);
-                  setQtes(
-                    Object.fromEntries(v.lignes.map((l) => [l.id, l.quantite]))
-                  );
-                  setEdit(false);
-                }}
-              >
+              </SubmitButton>
+              <button type="button" className="btn ghost" onClick={annuler}>
                 Annuler
               </button>
             </div>
@@ -140,16 +143,19 @@ export default function VenteRow({
       <td className="num">{formatCFA(v.total)}</td>
       <td className="num">
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-          <button
-            type="button"
-            className="btn ghost"
-            onClick={() => setEdit(true)}
-          >
+          <button type="button" className="btn ghost" onClick={onEdit}>
             Modifier
           </button>
-          <form action={supprimerVente}>
+          <form
+            action={supprimerVente}
+            onSubmit={(e) => {
+              if (!confirm("Supprimer cette vente ? Le stock sera remis. Cette action est définitive.")) {
+                e.preventDefault();
+              }
+            }}
+          >
             <input type="hidden" name="id" value={v.id} />
-            <button type="submit" className="btn ghost">
+            <button type="submit" className="btn danger">
               Supprimer
             </button>
           </form>

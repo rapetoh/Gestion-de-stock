@@ -1,21 +1,35 @@
 "use client";
 
-import { useState } from "react";
 import { formatCFA } from "@/lib/money";
 import { jourCourt } from "@/lib/dates";
 import type { Depense } from "@/lib/repo/depenses";
+import SubmitButton from "@/components/SubmitButton";
 import { modifierDepense, supprimerDepense } from "./actions";
 import { CATEGORIES } from "./categories";
 
-export default function DepenseRow({ d }: { d: Depense }) {
-  const [edit, setEdit] = useState(false);
+export default function DepenseRow({
+  d,
+  editing,
+  onEdit,
+  onClose,
+}: {
+  d: Depense;
+  editing: boolean;
+  onEdit: () => void;
+  onClose: () => void;
+}) {
   const dateJour = d.date.slice(0, 10);
 
-  if (edit) {
+  async function enregistrer(formData: FormData) {
+    await modifierDepense(formData);
+    onClose();
+  }
+
+  if (editing) {
     return (
       <tr>
         <td colSpan={5}>
-          <form action={modifierDepense}>
+          <form action={enregistrer}>
             <input type="hidden" name="id" value={d.id} />
             <div className="row3" style={{ marginBottom: 12 }}>
               <div className="field" style={{ margin: 0 }}>
@@ -70,14 +84,8 @@ export default function DepenseRow({ d }: { d: Depense }) {
               </div>
             </div>
             <div style={{ display: "flex", gap: 10 }}>
-              <button type="submit" className="btn primary">
-                Enregistrer
-              </button>
-              <button
-                type="button"
-                className="btn ghost"
-                onClick={() => setEdit(false)}
-              >
+              <SubmitButton className="btn primary">Enregistrer</SubmitButton>
+              <button type="button" className="btn ghost" onClick={onClose}>
                 Annuler
               </button>
             </div>
@@ -102,16 +110,19 @@ export default function DepenseRow({ d }: { d: Depense }) {
       <td className="num neg">{formatCFA(d.montant)}</td>
       <td className="num">
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-          <button
-            type="button"
-            className="btn ghost"
-            onClick={() => setEdit(true)}
-          >
+          <button type="button" className="btn ghost" onClick={onEdit}>
             Modifier
           </button>
-          <form action={supprimerDepense}>
+          <form
+            action={supprimerDepense}
+            onSubmit={(e) => {
+              if (!confirm(`Supprimer la dépense « ${d.libelle} » ? Cette action est définitive.`)) {
+                e.preventDefault();
+              }
+            }}
+          >
             <input type="hidden" name="id" value={d.id} />
-            <button type="submit" className="btn ghost">
+            <button type="submit" className="btn danger">
               Supprimer
             </button>
           </form>

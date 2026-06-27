@@ -1,7 +1,7 @@
 import { listProduits } from "@/lib/repo/produits";
 import { listAchats } from "@/lib/repo/achats";
 import AchatForm from "./AchatForm";
-import AchatRow from "./AchatRow";
+import AchatsRows from "./AchatsRows";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -57,7 +57,7 @@ export default function AchatsPage() {
                   </td>
                 </tr>
               ) : (
-                achats.map((a) => <AchatRow key={a.id} a={a} />)
+                <AchatsRows achats={achats} />
               )}
             </tbody>
           </table>

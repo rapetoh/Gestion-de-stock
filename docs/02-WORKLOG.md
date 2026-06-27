@@ -7,6 +7,21 @@
 
 ## 2026-06-27
 
+### Full UX review + P1 fixes (the inline-edit bug and its siblings)
+- **What:** Reviewed the whole UX as a senior designer (docs/05-UX-REVIEW.md). Fixed the P1
+  cross-cutting frictions: (1) **inline edit** now opens **one row at a time** and **closes
+  automatically on save** (Produits/Achats/Ventes/Dépenses — via per-table `*Rows` wrappers that
+  own the open row; rows became controlled); (2) **destructive actions** ask for confirmation and
+  use a new red `.btn.danger`; (3) **success feedback + reset**: forms and the sales cart clear on
+  success and show a short "✓" flash (Ventes cart, Achats/Dépenses/Produits-new/Contrôle/Soldes);
+  (4) a shared `SubmitButton` **disables while saving** (no double-submit). 
+- **Why:** The developer noticed edit rows stacking and never closing; it was a symptom of patterns
+  repeated across screens, plus missing confirmation/feedback throughout.
+- **Result:** tsc/lint/build clean; 35 tests still green; all six screens render 200 with the new
+  behavior. See docs/05-UX-REVIEW.md for the full findings list.
+- **Next (same review):** P2 mobile/responsive layout (no media queries today; she uses a phone),
+  then P3 polish (filter UX, truncation notes, dashboard title dedupe).
+
 ### Fix: Produits was missing from the sidebar (import was unreachable)
 - **What:** Added **Produits** to the sidebar nav. It wasn't there at all, so the page — and the
   "Importer une liste" button on it — could only be reached by typing the URL. Now: sidebar →

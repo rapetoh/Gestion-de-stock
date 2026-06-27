@@ -1,9 +1,8 @@
 import { listProduits } from "@/lib/repo/produits";
 import { listVentesDuJour } from "@/lib/repo/ventes";
 import { formatCFA } from "@/lib/money";
-import { heure } from "@/lib/dates";
 import VenteCaisse from "./VenteCaisse";
-import VenteRow from "./VenteRow";
+import VentesRows from "./VentesRows";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -53,9 +52,7 @@ export default function VentesPage() {
                 </td>
               </tr>
             ) : (
-              ventes.map((v) => (
-                <VenteRow key={v.id} v={v} heureLabel={heure(v.date)} />
-              ))
+              <VentesRows ventes={ventes} />
             )}
           </tbody>
         </table>

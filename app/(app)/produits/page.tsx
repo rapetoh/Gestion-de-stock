@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { listProduits } from "@/lib/repo/produits";
-import { ajouterProduit } from "./actions";
-import ProduitRow from "./ProduitRow";
+import NouveauProduitForm from "./NouveauProduitForm";
+import ProduitsRows from "./ProduitsRows";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -34,76 +34,7 @@ export default async function ProduitsPage({
         <div className="hint">
           Tu peux aussi créer un produit directement en enregistrant un achat.
         </div>
-        <form action={ajouterProduit}>
-          <div className="row3" style={{ marginBottom: 12 }}>
-            <div className="field" style={{ margin: 0 }}>
-              <label>Nom</label>
-              <input className="input" name="nom" required />
-            </div>
-            <div className="field" style={{ margin: 0 }}>
-              <label>Catégorie</label>
-              <input className="input" name="categorie" />
-            </div>
-            <div className="field" style={{ margin: 0 }}>
-              <label>Stock de départ</label>
-              <input
-                className="input"
-                name="stock"
-                defaultValue="0"
-                inputMode="numeric"
-              />
-            </div>
-          </div>
-          <div className="row3" style={{ marginBottom: 12 }}>
-            <div className="field" style={{ margin: 0 }}>
-              <label>Prix d&apos;achat</label>
-              <input
-                className="input"
-                name="prixAchat"
-                defaultValue="0"
-                inputMode="numeric"
-              />
-            </div>
-            <div className="field" style={{ margin: 0 }}>
-              <label>Frais (unitaire)</label>
-              <input
-                className="input"
-                name="frais"
-                defaultValue="0"
-                inputMode="numeric"
-              />
-            </div>
-            <div className="field" style={{ margin: 0 }}>
-              <label>Prix de vente</label>
-              <input
-                className="input"
-                name="prixVente"
-                defaultValue="0"
-                inputMode="numeric"
-              />
-            </div>
-          </div>
-          <div className="row2" style={{ marginBottom: 12 }}>
-            <div className="field" style={{ margin: 0 }}>
-              <label>Seuil de stock</label>
-              <input
-                className="input"
-                name="seuilStock"
-                defaultValue="0"
-                inputMode="numeric"
-              />
-            </div>
-            <div className="field" style={{ margin: 0 }}>
-              <label>
-                Code-barres <span className="sub">(facultatif)</span>
-              </label>
-              <input className="input" name="codeBarre" />
-            </div>
-          </div>
-          <button type="submit" className="btn primary big">
-            Ajouter le produit
-          </button>
-        </form>
+        <NouveauProduitForm />
       </div>
 
       <div className="card">
@@ -137,7 +68,7 @@ export default async function ProduitsPage({
                 </td>
               </tr>
             ) : (
-              produits.map((p) => <ProduitRow key={p.id} p={p} />)
+              <ProduitsRows produits={produits} />
             )}
           </tbody>
         </table>

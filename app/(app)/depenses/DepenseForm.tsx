@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import SubmitButton from "@/components/SubmitButton";
 import { ajouterDepense } from "./actions";
 import { CATEGORIES } from "./categories";
 
@@ -10,9 +11,20 @@ function aujourdhui(): string {
 
 export default function DepenseForm() {
   const [date, setDate] = useState(aujourdhui);
+  const [flash, setFlash] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  async function soumettre(formData: FormData) {
+    const libelle = String(formData.get("libelle") ?? "").trim();
+    if (!libelle) return;
+    await ajouterDepense(formData);
+    formRef.current?.reset();
+    setDate(aujourdhui());
+    setFlash(`Dépense « ${libelle} » enregistrée ✓`);
+  }
 
   return (
-    <form action={ajouterDepense}>
+    <form ref={formRef} action={soumettre} onChange={() => flash && setFlash(null)}>
       <div className="field">
         <label>Quelle dépense ?</label>
         <input
@@ -67,12 +79,18 @@ export default function DepenseForm() {
         </div>
       </div>
 
-      <button type="submit" className="btn primary big" style={{ width: "100%" }}>
+      <SubmitButton className="btn primary big" style={{ width: "100%" }}>
         Enregistrer la dépense
-      </button>
-      <div className="note">
-        Les dépenses du mois se retirent de ta marge pour donner ton gain réel.
-      </div>
+      </SubmitButton>
+      {flash ? (
+        <div className="flash" style={{ display: "block" }}>
+          {flash}
+        </div>
+      ) : (
+        <div className="note">
+          Les dépenses du mois se retirent de ta marge pour donner ton gain réel.
+        </div>
+      )}
     </form>
   );
 }

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { formatCFA } from "@/lib/money";
 import type { LigneReconciliation } from "@/lib/repo/comptes";
+import SubmitButton from "@/components/SubmitButton";
 import { enregistrerSoldesAction } from "./actions";
 
 export default function ReconciliationForm({
@@ -21,6 +22,7 @@ export default function ReconciliationForm({
       lignes.map((l) => [l.compte_id, l.compte == null ? "" : String(l.compte)])
     )
   );
+  const [flash, setFlash] = useState<string | null>(null);
 
   const calc = useMemo(() => {
     const parLigne = lignes.map((l) => {
@@ -41,6 +43,19 @@ export default function ReconciliationForm({
       .filter((x) => x.c != null)
       .map((x) => ({ compteId: x.l.compte_id, attendu: x.a, compte: x.c }))
   );
+
+  async function soumettre(formData: FormData) {
+    if (calc.nb === 0) return;
+    const e = calc.ecart;
+    await enregistrerSoldesAction(formData);
+    setFlash(
+      e === 0
+        ? "Soldes enregistrés ✓ — ça tombe juste"
+        : e < 0
+        ? `Soldes enregistrés ✓ — il manque ${formatCFA(-e)}`
+        : `Soldes enregistrés ✓ — ${formatCFA(e)} en plus`
+    );
+  }
 
   function verdict() {
     if (calc.nb === 0)
@@ -138,20 +153,25 @@ export default function ReconciliationForm({
         </div>
         <div style={{ margin: "12px 0", textAlign: "center" }}>{verdict()}</div>
 
-        <form action={enregistrerSoldesAction}>
+        <form action={soumettre}>
           <input type="hidden" name="jour" value={jour} />
           <input type="hidden" name="lignes" value={payload} />
-          <button
-            type="submit"
+          <SubmitButton
             className="btn primary big"
             style={{ width: "100%" }}
             disabled={calc.nb === 0}
           >
             Enregistrer les soldes
-          </button>
-          <div className="note">
-            Un manque qui revient = de l&apos;argent qui sort sans être noté.
-          </div>
+          </SubmitButton>
+          {flash ? (
+            <div className="flash" style={{ display: "block" }}>
+              {flash}
+            </div>
+          ) : (
+            <div className="note">
+              Un manque qui revient = de l&apos;argent qui sort sans être noté.
+            </div>
+          )}
         </form>
       </div>
     </div>

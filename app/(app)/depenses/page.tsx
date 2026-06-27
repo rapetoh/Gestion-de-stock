@@ -2,7 +2,7 @@ import { depensesDuMois, totalDepensesMois } from "@/lib/repo/depenses";
 import { formatCFA } from "@/lib/money";
 import { moisAnnee } from "@/lib/dates";
 import DepenseForm from "./DepenseForm";
-import DepenseRow from "./DepenseRow";
+import DepensesRows from "./DepensesRows";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -102,7 +102,7 @@ export default async function DepensesPage({
                   </td>
                 </tr>
               ) : (
-                depenses.map((d) => <DepenseRow key={d.id} d={d} />)
+                <DepensesRows depenses={depenses} />
               )}
             </tbody>
             {depenses.length > 0 ? (

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { formatCFA, parseCFA, coutDeRevientUnitaire } from "@/lib/money";
 import type { Produit } from "@/lib/repo/produits";
+import SubmitButton from "@/components/SubmitButton";
 import { enregistrerAchat } from "./actions";
 
 export default function AchatForm({ produits }: { produits: Produit[] }) {
@@ -11,6 +12,19 @@ export default function AchatForm({ produits }: { produits: Produit[] }) {
   const [prixAchat, setPrixAchat] = useState("0");
   const [frais, setFrais] = useState("0");
   const [prixVente, setPrixVente] = useState("0");
+  const [flash, setFlash] = useState<string | null>(null);
+
+  async function soumettre(formData: FormData) {
+    const n = nom.trim();
+    if (!n) return;
+    await enregistrerAchat(formData);
+    setNom("");
+    setQuantite("1");
+    setPrixAchat("0");
+    setFrais("0");
+    setPrixVente("0");
+    setFlash(`Achat de « ${n} » enregistré ✓`);
+  }
 
   // Pré-remplissage si le nom correspond à un produit existant.
   function onNomChange(v: string) {
@@ -35,7 +49,7 @@ export default function AchatForm({ produits }: { produits: Produit[] }) {
   }, [quantite, prixAchat, frais, prixVente]);
 
   return (
-    <form action={enregistrerAchat}>
+    <form action={soumettre} onChange={() => flash && setFlash(null)}>
       <div className="field">
         <label>Produit</label>
         <input
@@ -131,12 +145,18 @@ export default function AchatForm({ produits }: { produits: Produit[] }) {
         <input className="input" name="fournisseur" autoComplete="off" />
       </div>
 
-      <button type="submit" className="btn primary big" style={{ width: "100%" }}>
+      <SubmitButton className="btn primary big" style={{ width: "100%" }}>
         Enregistrer l&apos;achat
-      </button>
-      <div className="note">
-        Le stock augmente tout seul. Tu pourras toujours modifier après.
-      </div>
+      </SubmitButton>
+      {flash ? (
+        <div className="flash" style={{ display: "block" }}>
+          {flash}
+        </div>
+      ) : (
+        <div className="note">
+          Le stock augmente tout seul. Tu pourras toujours modifier après.
+        </div>
+      )}
     </form>
   );
 }

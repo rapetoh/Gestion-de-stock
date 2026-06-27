@@ -3,6 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import { formatCFA } from "@/lib/money";
 import type { Produit } from "@/lib/repo/produits";
+import SubmitButton from "@/components/SubmitButton";
 import { encaisserVente } from "./actions";
 
 type Ligne = { produitId: number; nom: string; prix: number; quantite: number };
@@ -19,9 +20,21 @@ export default function VenteCaisse({ produits }: { produits: Produit[] }) {
   const [recherche, setRecherche] = useState("");
   const [lignes, setLignes] = useState<Ligne[]>([]);
   const [paiement, setPaiement] = useState<Paiement>("especes");
+  const [flash, setFlash] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
+  async function encaisser(formData: FormData) {
+    if (!lignes.length) return;
+    const montant = lignes.reduce((s, l) => s + l.prix * l.quantite, 0);
+    await encaisserVente(formData);
+    setLignes([]);
+    setPaiement("especes");
+    setRecherche("");
+    setFlash(`Vente enregistrée ✓ — ${formatCFA(montant)}`);
+  }
+
   function ajouter(p: Produit) {
+    setFlash(null);
     setLignes((prev) => {
       const existing = prev.find((l) => l.produitId === p.id);
       if (existing) {
@@ -195,19 +208,25 @@ export default function VenteCaisse({ produits }: { produits: Produit[] }) {
           ))}
         </div>
 
-        <form ref={formRef} action={encaisserVente}>
+        <form ref={formRef} action={encaisser}>
           <input type="hidden" name="paiement" value={paiement} />
           <input type="hidden" name="lignes" value={payload} />
-          <button
-            type="submit"
+          <SubmitButton
             className="btn primary big"
             style={{ width: "100%" }}
             disabled={lignes.length === 0}
+            pendingLabel="Encaissement…"
           >
             Encaisser {formatCFA(total)}
-          </button>
+          </SubmitButton>
         </form>
-        <div className="note">La vente baisse le stock automatiquement.</div>
+        {flash ? (
+          <div className="flash" style={{ display: "block" }}>
+            {flash}
+          </div>
+        ) : (
+          <div className="note">La vente baisse le stock automatiquement.</div>
+        )}
       </div>
     </div>
   );

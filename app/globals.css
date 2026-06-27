@@ -84,7 +84,13 @@ body {
 .btn.primary { background: var(--primary); color: #fff; }
 .btn.primary:hover { background: var(--primary-d); }
 .btn.ghost { background: #fff; border-color: var(--line); color: var(--ink); }
+.btn.danger { background: #fff; border-color: #e7b9b0; color: var(--danger); }
+.btn.danger:hover { background: var(--danger-l); }
 .btn.big { padding: 14px 22px; font-size: 16px; }
+.btn:disabled { opacity: .6; cursor: default; }
+/* petit message de confirmation après une action */
+.flash { display: inline-block; margin-top: 10px; padding: 7px 12px; border-radius: 10px;
+  background: var(--primary-l); color: var(--primary-d); font-weight: 700; font-size: 14px; }
 
 /* ---------- Cards ---------- */
 .grid { display: grid; gap: 18px; }

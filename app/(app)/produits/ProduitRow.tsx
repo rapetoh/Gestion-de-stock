@@ -1,19 +1,34 @@
 "use client";
 
-import { useState } from "react";
 import { formatCFA } from "@/lib/money";
 import type { Produit } from "@/lib/repo/produits";
+import SubmitButton from "@/components/SubmitButton";
 import { modifierProduit, supprimerProduit } from "./actions";
 
-export default function ProduitRow({ p }: { p: Produit }) {
-  const [edit, setEdit] = useState(false);
+export default function ProduitRow({
+  p,
+  editing,
+  onEdit,
+  onClose,
+}: {
+  p: Produit;
+  editing: boolean;
+  onEdit: () => void;
+  onClose: () => void;
+}) {
   const marge = p.prix_vente - (p.prix_achat + p.frais);
 
-  if (edit) {
+  // Enregistre puis ferme l'éditeur (la sauvegarde est terminée quand l'action a résolu).
+  async function enregistrer(formData: FormData) {
+    await modifierProduit(formData);
+    onClose();
+  }
+
+  if (editing) {
     return (
       <tr>
         <td colSpan={8}>
-          <form action={modifierProduit}>
+          <form action={enregistrer}>
             <input type="hidden" name="id" value={p.id} />
             <div className="row3" style={{ marginBottom: 12 }}>
               <div className="field" style={{ margin: 0 }}>
@@ -89,14 +104,8 @@ export default function ProduitRow({ p }: { p: Produit }) {
               </div>
             </div>
             <div style={{ display: "flex", gap: 10 }}>
-              <button type="submit" className="btn primary">
-                Enregistrer
-              </button>
-              <button
-                type="button"
-                className="btn ghost"
-                onClick={() => setEdit(false)}
-              >
+              <SubmitButton className="btn primary">Enregistrer</SubmitButton>
+              <button type="button" className="btn ghost" onClick={onClose}>
                 Annuler
               </button>
             </div>
@@ -120,16 +129,19 @@ export default function ProduitRow({ p }: { p: Produit }) {
       </td>
       <td className="num">
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-          <button
-            type="button"
-            className="btn ghost"
-            onClick={() => setEdit(true)}
-          >
+          <button type="button" className="btn ghost" onClick={onEdit}>
             Modifier
           </button>
-          <form action={supprimerProduit}>
+          <form
+            action={supprimerProduit}
+            onSubmit={(e) => {
+              if (!confirm(`Supprimer « ${p.nom} » ? Cette action est définitive.`)) {
+                e.preventDefault();
+              }
+            }}
+          >
             <input type="hidden" name="id" value={p.id} />
-            <button type="submit" className="btn ghost">
+            <button type="submit" className="btn danger">
               Supprimer
             </button>
           </form>

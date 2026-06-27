@@ -1,19 +1,32 @@
 "use client";
 
-import { useState } from "react";
 import { formatCFA } from "@/lib/money";
 import { jourCourt } from "@/lib/dates";
 import type { AchatAvecProduit } from "@/lib/repo/achats";
+import SubmitButton from "@/components/SubmitButton";
 import { modifierAchat, supprimerAchat } from "./actions";
 
-export default function AchatRow({ a }: { a: AchatAvecProduit }) {
-  const [edit, setEdit] = useState(false);
+export default function AchatRow({
+  a,
+  editing,
+  onEdit,
+  onClose,
+}: {
+  a: AchatAvecProduit;
+  editing: boolean;
+  onEdit: () => void;
+  onClose: () => void;
+}) {
+  async function enregistrer(formData: FormData) {
+    await modifierAchat(formData);
+    onClose();
+  }
 
-  if (edit) {
+  if (editing) {
     return (
       <tr>
         <td colSpan={7}>
-          <form action={modifierAchat}>
+          <form action={enregistrer}>
             <input type="hidden" name="id" value={a.id} />
             <div className="hint" style={{ marginBottom: 10 }}>
               {a.nom} — modifie ce qui est faux, puis enregistre. Le stock se
@@ -71,14 +84,8 @@ export default function AchatRow({ a }: { a: AchatAvecProduit }) {
               </div>
             </div>
             <div style={{ display: "flex", gap: 10 }}>
-              <button type="submit" className="btn primary">
-                Enregistrer
-              </button>
-              <button
-                type="button"
-                className="btn ghost"
-                onClick={() => setEdit(false)}
-              >
+              <SubmitButton className="btn primary">Enregistrer</SubmitButton>
+              <button type="button" className="btn ghost" onClick={onClose}>
                 Annuler
               </button>
             </div>
@@ -98,16 +105,19 @@ export default function AchatRow({ a }: { a: AchatAvecProduit }) {
       <td className="num">{formatCFA(a.prix_vente)}</td>
       <td className="num">
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-          <button
-            type="button"
-            className="btn ghost"
-            onClick={() => setEdit(true)}
-          >
+          <button type="button" className="btn ghost" onClick={onEdit}>
             Modifier
           </button>
-          <form action={supprimerAchat}>
+          <form
+            action={supprimerAchat}
+            onSubmit={(e) => {
+              if (!confirm(`Supprimer cet achat de « ${a.nom} » ? Cette action est définitive.`)) {
+                e.preventDefault();
+              }
+            }}
+          >
             <input type="hidden" name="id" value={a.id} />
-            <button type="submit" className="btn ghost">
+            <button type="submit" className="btn danger">
               Supprimer
             </button>
           </form>
