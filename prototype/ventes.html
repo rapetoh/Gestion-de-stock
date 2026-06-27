@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ma Boutique — Ventes</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">B</div>
+      <div><div class="name">Ma Boutique</div><div class="sub">Clinique St-Joseph</div></div>
+    </div>
+    <a class="nav-item" href="tableau-de-bord.html"><span class="ic">▣</span> Tableau de bord</a>
+    <div class="nav-label">Au jour le jour</div>
+    <a class="nav-item" href="achats.html"><span class="ic">↓</span> Achats</a>
+    <a class="nav-item active" href="ventes.html"><span class="ic">↑</span> Ventes</a>
+    <a class="nav-item" href="#"><span class="ic">▤</span> Stock</a>
+    <div class="nav-label">Contrôle &amp; argent</div>
+    <a class="nav-item" href="controle.html"><span class="ic">⊙</span> Contrôle de stock</a>
+    <a class="nav-item" href="#"><span class="ic">▦</span> Dépenses</a>
+    <a class="nav-item" href="benefices.html"><span class="ic">★</span> Bénéfices</a>
+    <div class="spacer"></div>
+    <div class="userbox"><div class="av">M</div><div><div class="who">Maman</div><div class="role">Propriétaire</div></div></div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h1>Nouvelle vente</h1>
+        <div class="when">Pas besoin d'ouvrir une caisse. Choisis le produit, c'est tout.</div>
+      </div>
+    </div>
+
+    <div class="grid" style="grid-template-columns: 1fr 420px; align-items:start">
+      <!-- LEFT: pick + cart -->
+      <div class="card">
+        <div class="field">
+          <label>Quel produit ?</label>
+          <input class="input big" placeholder="Tape le nom… ex : eau, savon, crédit">
+        </div>
+
+        <table style="margin-top:6px">
+          <thead><tr><th>Produit</th><th class="num">Qté</th><th class="num">Prix</th><th class="num">Total</th></tr></thead>
+          <tbody>
+            <tr><td class="prod">Eau minérale Awa (carton)</td><td class="num">2</td><td class="num">2 000 F</td><td class="num">4 000 F</td></tr>
+            <tr><td class="prod">Eau en sachet (paquet)</td><td class="num">3</td><td class="num">500 F</td><td class="num">1 500 F</td></tr>
+            <tr><td class="prod">Savon Paris — amande</td><td class="num">1</td><td class="num">750 F</td><td class="num">750 F</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- RIGHT: total + pay -->
+      <div class="card">
+        <h2>À encaisser</h2>
+        <div class="calcbox" style="margin-top:8px">
+          <div class="calcline"><span>3 produits</span><span>6 250 F</span></div>
+          <div class="calcline total"><span>Total</span><span>6 250 F</span></div>
+        </div>
+
+        <label style="display:block;font-weight:700;font-size:14px;margin-bottom:9px">Payé comment ?</label>
+        <div class="paygrid" style="margin-bottom:16px">
+          <div class="payopt sel"><span class="ic">💵</span> Espèces</div>
+          <div class="payopt"><span class="ic">📲</span> TMoney</div>
+          <div class="payopt"><span class="ic">📲</span> Flooz</div>
+          <div class="payopt"><span class="ic">⏳</span> Crédit (plus tard)</div>
+        </div>
+
+        <button class="btn primary big" style="width:100%">Encaisser&nbsp;6 250 F</button>
+        <div class="note">La vente baisse le stock automatiquement.</div>
+      </div>
+    </div>
+
+    <div class="section-gap"></div>
+
+    <div class="card">
+      <h2>Ventes d'aujourd'hui</h2>
+      <div class="hint">28 ventes — 45 200 F. Clique une ligne pour corriger.</div>
+      <table>
+        <thead><tr><th>Heure</th><th>Produits</th><th>Paiement</th><th class="num">Montant</th></tr></thead>
+        <tbody>
+          <tr><td class="muted">14:32</td><td>Eau carton ×2, Sachet ×3, Savon ×1</td><td><span class="badge pay">Espèces</span></td><td class="num">6 250 F</td></tr>
+          <tr><td class="muted">14:05</td><td>Crédit</td><td><span class="badge pay">TMoney</span></td><td class="num">1 000 F</td></tr>
+          <tr><td class="muted">13:48</td><td>Lait concentré ×4</td><td><span class="badge pay">Espèces</span></td><td class="num">2 000 F</td></tr>
+          <tr><td class="muted">13:20</td><td>Déodorant ×1</td><td><span class="badge pay">Flooz</span></td><td class="num">1 500 F</td></tr>
+          <tr><td class="muted">12:55</td><td>Draps ×1</td><td><span class="badge pay">Espèces</span></td><td class="num">15 000 F</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+</body>
+</html>

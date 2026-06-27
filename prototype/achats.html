@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ma Boutique — Achats</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">B</div>
+      <div><div class="name">Ma Boutique</div><div class="sub">Clinique St-Joseph</div></div>
+    </div>
+    <a class="nav-item" href="tableau-de-bord.html"><span class="ic">▣</span> Tableau de bord</a>
+    <div class="nav-label">Au jour le jour</div>
+    <a class="nav-item active" href="achats.html"><span class="ic">↓</span> Achats</a>
+    <a class="nav-item" href="ventes.html"><span class="ic">↑</span> Ventes</a>
+    <a class="nav-item" href="#"><span class="ic">▤</span> Stock</a>
+    <div class="nav-label">Contrôle &amp; argent</div>
+    <a class="nav-item" href="controle.html"><span class="ic">⊙</span> Contrôle de stock</a>
+    <a class="nav-item" href="#"><span class="ic">▦</span> Dépenses</a>
+    <a class="nav-item" href="benefices.html"><span class="ic">★</span> Bénéfices</a>
+    <div class="spacer"></div>
+    <div class="userbox"><div class="av">M</div><div><div class="who">Maman</div><div class="role">Propriétaire</div></div></div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h1>Achats</h1>
+        <div class="when">Enregistre un produit qui arrive — du fournisseur ou du marché.</div>
+      </div>
+    </div>
+
+    <div class="grid" style="grid-template-columns: 420px 1fr; align-items:start">
+      <!-- FORM -->
+      <div class="card">
+        <h2>Enregistrer un achat</h2>
+        <div class="hint">Tape le nom du produit. S'il existe déjà, il se complète tout seul.</div>
+
+        <div class="field">
+          <label>Produit</label>
+          <input class="input big" value="Eau minérale Awa (carton)">
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>Quantité reçue</label>
+            <input class="input big" value="20">
+          </div>
+          <div class="field">
+            <label>Prix d'achat <span class="sub">(par carton)</span></label>
+            <input class="input big" value="1 350">
+          </div>
+        </div>
+        <div class="field">
+          <label>Frais de transport <span class="sub">(pour tout le lot)</span></label>
+          <input class="input" value="3 000">
+        </div>
+
+        <!-- auto calc -->
+        <div class="calcbox">
+          <div class="calcline"><span>Coût de revient (par carton)</span><span>1 500 F</span></div>
+          <div class="calcline"><span>Ta marge</span><span>+ 500 F</span></div>
+          <div class="calcline total"><span>Prix de vente</span><span>2 000 F</span></div>
+        </div>
+        <div class="field">
+          <label>Prix de vente <span class="sub">(tu peux le changer)</span></label>
+          <input class="input big" value="2 000">
+        </div>
+
+        <button class="btn primary big" style="width:100%">Enregistrer l'achat</button>
+        <div class="note">Le stock augmente tout seul. Tu pourras toujours modifier après.</div>
+      </div>
+
+      <!-- RECENT -->
+      <div class="card">
+        <h2>Derniers achats</h2>
+        <div class="hint">Tout ce qui est entré récemment. Clique une ligne pour corriger.</div>
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Produit</th><th class="num">Qté</th><th class="num">Prix d'achat</th><th class="num">Frais</th><th class="num">Prix de vente</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="muted">25 juin</td><td class="prod">Eau minérale Awa (carton)</td><td class="num">20</td><td class="num">1 350 F</td><td class="num">3 000 F</td><td class="num">2 000 F</td></tr>
+            <tr><td class="muted">25 juin</td><td class="prod">Savon Paris — fleur de coton</td><td class="num">50</td><td class="num">450 F</td><td class="num">1 500 F</td><td class="num">750 F</td></tr>
+            <tr><td class="muted">24 juin</td><td class="prod">Lait concentré (boîte)</td><td class="num">48</td><td class="num">350 F</td><td class="num">2 000 F</td><td class="num">500 F</td></tr>
+            <tr><td class="muted">24 juin</td><td class="prod">Déodorant Nivea Homme</td><td class="num">12</td><td class="num">900 F</td><td class="num">1 500 F</td><td class="num">1 500 F</td></tr>
+            <tr><td class="muted">23 juin</td><td class="prod">Eau en sachet (paquet)</td><td class="num">100</td><td class="num">300 F</td><td class="num">0 F</td><td class="num">500 F</td></tr>
+            <tr><td class="muted">22 juin</td><td class="prod">Draps importés (Chine)</td><td class="num">10</td><td class="num">9 000 F</td><td class="num">12 000 F</td><td class="num">15 000 F</td></tr>
+          </tbody>
+        </table>
+        <div class="note">Aucun code-barres obligatoire. Tu retrouves tout par le nom.</div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ma Boutique — Contrôle de stock</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">B</div>
+      <div><div class="name">Ma Boutique</div><div class="sub">Clinique St-Joseph</div></div>
+    </div>
+    <a class="nav-item" href="tableau-de-bord.html"><span class="ic">▣</span> Tableau de bord</a>
+    <div class="nav-label">Au jour le jour</div>
+    <a class="nav-item" href="achats.html"><span class="ic">↓</span> Achats</a>
+    <a class="nav-item" href="ventes.html"><span class="ic">↑</span> Ventes</a>
+    <a class="nav-item" href="#"><span class="ic">▤</span> Stock</a>
+    <div class="nav-label">Contrôle &amp; argent</div>
+    <a class="nav-item active" href="controle.html"><span class="ic">⊙</span> Contrôle de stock</a>
+    <a class="nav-item" href="#"><span class="ic">▦</span> Dépenses</a>
+    <a class="nav-item" href="benefices.html"><span class="ic">★</span> Bénéfices</a>
+    <div class="spacer"></div>
+    <div class="userbox"><div class="av">M</div><div><div class="who">Maman</div><div class="role">Propriétaire</div></div></div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h1>Contrôle de stock</h1>
+        <div class="when">Compte ce qu'il y a vraiment sur l'étagère. L'app te dit où ça cloche.</div>
+      </div>
+      <div class="right">
+        <button class="btn ghost">Choisir une catégorie</button>
+        <button class="btn primary">Enregistrer le contrôle</button>
+      </div>
+    </div>
+
+    <!-- summary banner -->
+    <div class="card" style="margin-bottom:18px; border-color:#ecc7bf; background:#fcf4f0">
+      <div class="recon">
+        <span class="badge bad" style="font-size:14px">⚠ 2 écarts trouvés</span>
+        <span class="big-bad">Manque estimé : 3 500 F</span>
+        <span class="muted">sur 24 produits comptés</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Produit</th>
+            <th class="num">Il devrait rester</th>
+            <th class="num">Tu as compté</th>
+            <th class="num">Écart</th>
+            <th>Valeur</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="prod">Eau minérale Awa (carton)</td><td class="num">3</td><td class="num">3</td><td class="num"><span class="badge ok">0</span></td><td class="muted">—</td></tr>
+          <tr class="flag-row"><td class="prod">Savon Paris — amande</td><td class="num">3</td><td class="num">1</td><td class="num"><span class="neg">−2</span></td><td class="neg">−1 500 F</td></tr>
+          <tr><td class="prod">Eau en sachet (paquet)</td><td class="num">22</td><td class="num">22</td><td class="num"><span class="badge ok">0</span></td><td class="muted">—</td></tr>
+          <tr><td class="prod">Déodorant Nivea Homme</td><td class="num">2</td><td class="num">2</td><td class="num"><span class="badge ok">0</span></td><td class="muted">—</td></tr>
+          <tr class="flag-row"><td class="prod">Lait concentré (boîte)</td><td class="num">9</td><td class="num">5</td><td class="num"><span class="neg">−4</span></td><td class="neg">−2 000 F</td></tr>
+          <tr><td class="prod">Draps importés (Chine)</td><td class="num">7</td><td class="num">7</td><td class="num"><span class="badge ok">0</span></td><td class="muted">—</td></tr>
+          <tr><td class="prod">Canette soda (palette)</td><td class="num">14</td><td class="num">14</td><td class="num"><span class="badge ok">0</span></td><td class="muted">—</td></tr>
+        </tbody>
+      </table>
+      <div class="note">Un écart négatif = il manque des produits qui n'ont pas été vendus dans l'app.
+        Tu vois tout de suite quel produit et combien — sans fouiller le cahier pendant des mois.</div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

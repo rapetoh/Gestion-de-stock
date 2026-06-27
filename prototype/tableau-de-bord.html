@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ma Boutique — Tableau de bord</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">B</div>
+      <div><div class="name">Ma Boutique</div><div class="sub">Clinique St-Joseph</div></div>
+    </div>
+    <a class="nav-item active" href="tableau-de-bord.html"><span class="ic">▣</span> Tableau de bord</a>
+    <div class="nav-label">Au jour le jour</div>
+    <a class="nav-item" href="achats.html"><span class="ic">↓</span> Achats</a>
+    <a class="nav-item" href="ventes.html"><span class="ic">↑</span> Ventes</a>
+    <a class="nav-item" href="#"><span class="ic">▤</span> Stock</a>
+    <div class="nav-label">Contrôle &amp; argent</div>
+    <a class="nav-item" href="controle.html"><span class="ic">⊙</span> Contrôle de stock</a>
+    <a class="nav-item" href="#"><span class="ic">▦</span> Dépenses</a>
+    <a class="nav-item" href="benefices.html"><span class="ic">★</span> Bénéfices</a>
+    <div class="spacer"></div>
+    <div class="userbox">
+      <div class="av">M</div>
+      <div><div class="who">Maman</div><div class="role">Propriétaire</div></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h1>Bonjour 👋</h1>
+        <div class="when">Mercredi 25 juin 2026</div>
+      </div>
+      <div class="right">
+        <button class="btn ghost">Enregistrer un achat</button>
+        <button class="btn primary">Nouvelle vente</button>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="grid cols-4" style="margin-bottom:18px">
+      <div class="card kpi">
+        <span class="ic-corner">↑</span>
+        <div class="label">Ventes d'aujourd'hui</div>
+        <div class="value">45 200<span class="u"> F</span></div>
+        <div class="delta up">28 ventes aujourd'hui</div>
+      </div>
+      <div class="card kpi">
+        <span class="ic-corner">★</span>
+        <div class="label">Marge du mois (juin)</div>
+        <div class="value">312 500<span class="u"> F</span></div>
+        <div class="delta up">après dépenses : 168 000 F</div>
+      </div>
+      <div class="card kpi">
+        <span class="ic-corner">▤</span>
+        <div class="label">Produits à recommander</div>
+        <div class="value">4</div>
+        <div class="delta flat">stock bas ou fini</div>
+      </div>
+      <div class="card kpi">
+        <span class="ic-corner">⊙</span>
+        <div class="label">Dernier contrôle de stock</div>
+        <div class="value" style="font-size:22px">il y a 3 jours</div>
+        <div class="delta flat">2 écarts trouvés</div>
+      </div>
+    </div>
+
+    <div class="grid cols-2">
+      <!-- Reconciliation -->
+      <div class="card">
+        <h2>Est-ce que ça tombe juste&nbsp;?</h2>
+        <div class="hint">L'argent compté ce soir, comparé à ce qui devrait être là.</div>
+        <div class="recon" style="margin-bottom:14px">
+          <span class="badge ok" style="font-size:14px">✓ Tout est juste</span>
+          <span class="big-ok">Écart : 0 F</span>
+        </div>
+        <div class="recon-list">
+          <div class="recon-row"><span>Espèces (caisse)</span><span class="v">186 500 F</span></div>
+          <div class="recon-row"><span>TMoney (téléphone 1)</span><span class="v">94 000 F</span></div>
+          <div class="recon-row"><span>Flooz (téléphone 2)</span><span class="v">61 500 F</span></div>
+          <div class="recon-row"><span>Crédit restant</span><span class="v">12 300 F</span></div>
+          <div class="recon-row"><span><strong>Total compté</strong></span><span class="v">354 300 F</span></div>
+          <div class="recon-row"><span><strong>Total attendu</strong></span><span class="v">354 300 F</span></div>
+        </div>
+        <div class="note">Si un soir ça ne tombe pas juste, l'écart s'affiche en rouge ici.</div>
+      </div>
+
+      <!-- Stock bas -->
+      <div class="card">
+        <h2>À recommander bientôt</h2>
+        <div class="hint">Ces produits vont finir — pense à passer commande.</div>
+        <table>
+          <thead><tr><th>Produit</th><th class="num">Reste</th><th class="num">Seuil</th><th></th></tr></thead>
+          <tbody>
+            <tr><td class="prod">Eau minérale Awa (carton)</td><td class="num">3</td><td class="num muted">5</td><td><span class="badge warn">bas</span></td></tr>
+            <tr><td class="prod">Savon Paris — amande</td><td class="num">1</td><td class="num muted">4</td><td><span class="badge bad">presque fini</span></td></tr>
+            <tr><td class="prod">Déodorant Nivea Homme</td><td class="num">2</td><td class="num muted">3</td><td><span class="badge warn">bas</span></td></tr>
+            <tr><td class="prod">Lait concentré (boîte)</td><td class="num">0</td><td class="num muted">6</td><td><span class="badge bad">fini</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-gap"></div>
+
+    <div class="card">
+      <h2>Ce qui se vend le plus ce mois-ci</h2>
+      <div class="hint">Pour savoir sur quoi te concentrer — et ce qui ne marche pas.</div>
+      <table>
+        <thead><tr><th>Produit</th><th class="num">Quantité vendue</th><th class="num">Recette</th><th class="num">Marge</th></tr></thead>
+        <tbody>
+          <tr><td class="prod">Eau en sachet (paquet)</td><td class="num">420</td><td class="num">210 000 F</td><td class="num pos">+63 000 F</td></tr>
+          <tr><td class="prod">Crédit / unités</td><td class="num">—</td><td class="num">185 000 F</td><td class="num pos">+9 250 F</td></tr>
+          <tr><td class="prod">Eau minérale Awa (carton)</td><td class="num">96</td><td class="num">144 000 F</td><td class="num pos">+38 400 F</td></tr>
+          <tr><td class="prod">Savon Paris (toutes senteurs)</td><td class="num">88</td><td class="num">66 000 F</td><td class="num pos">+22 000 F</td></tr>
+          <tr><td class="prod muted">Draps (importés)</td><td class="num">3</td><td class="num">45 000 F</td><td class="num pos">+15 000 F</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ma Boutique — Bénéfices</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">B</div>
+      <div><div class="name">Ma Boutique</div><div class="sub">Clinique St-Joseph</div></div>
+    </div>
+    <a class="nav-item" href="tableau-de-bord.html"><span class="ic">▣</span> Tableau de bord</a>
+    <div class="nav-label">Au jour le jour</div>
+    <a class="nav-item" href="achats.html"><span class="ic">↓</span> Achats</a>
+    <a class="nav-item" href="ventes.html"><span class="ic">↑</span> Ventes</a>
+    <a class="nav-item" href="#"><span class="ic">▤</span> Stock</a>
+    <div class="nav-label">Contrôle &amp; argent</div>
+    <a class="nav-item" href="controle.html"><span class="ic">⊙</span> Contrôle de stock</a>
+    <a class="nav-item" href="#"><span class="ic">▦</span> Dépenses</a>
+    <a class="nav-item active" href="benefices.html"><span class="ic">★</span> Bénéfices</a>
+    <div class="spacer"></div>
+    <div class="userbox"><div class="av">M</div><div><div class="who">Maman</div><div class="role">Propriétaire</div></div></div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h1>Bénéfices</h1>
+        <div class="when">Ce que tu as vraiment gagné — recette moins toutes les dépenses.</div>
+      </div>
+      <div class="right">
+        <select class="input" style="width:auto"><option>Juin 2026</option><option>Mai 2026</option></select>
+        <button class="btn ghost">Exporter</button>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="grid cols-4" style="margin-bottom:18px">
+      <div class="card kpi">
+        <div class="label">Recette (ventes)</div>
+        <div class="value">748 000<span class="u"> F</span></div>
+      </div>
+      <div class="card kpi">
+        <div class="label">Achats (marchandise)</div>
+        <div class="value">435 500<span class="u"> F</span></div>
+      </div>
+      <div class="card kpi">
+        <div class="label">Dépenses (charges)</div>
+        <div class="value">144 500<span class="u"> F</span></div>
+        <div class="delta flat">loyer, salaire, OTR, transport…</div>
+      </div>
+      <div class="card kpi" style="background:var(--primary-l); border-color:#cfe7dd">
+        <div class="label">Marge réelle</div>
+        <div class="value" style="color:var(--primary-d)">168 000<span class="u"> F</span></div>
+        <div class="delta up">ce que la boutique t'a rapporté</div>
+      </div>
+    </div>
+
+    <!-- the table she loves -->
+    <div class="card">
+      <h2>Produit par produit</h2>
+      <div class="hint">Sur une seule ligne : combien acheté, les frais, combien vendu, et ta marge.</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Produit</th>
+            <th class="num">Qté vendue</th>
+            <th class="num">Acheté</th>
+            <th class="num">Frais</th>
+            <th class="num">Vendu</th>
+            <th class="num">Marge</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="prod">Eau en sachet (paquet)</td><td class="num">420</td><td class="num">126 000 F</td><td class="num">0 F</td><td class="num">210 000 F</td><td class="num pos">+84 000 F</td></tr>
+          <tr><td class="prod">Eau minérale Awa (carton)</td><td class="num">96</td><td class="num">129 600 F</td><td class="num">14 400 F</td><td class="num">192 000 F</td><td class="num pos">+48 000 F</td></tr>
+          <tr><td class="prod">Savon Paris (toutes senteurs)</td><td class="num">88</td><td class="num">39 600 F</td><td class="num">8 000 F</td><td class="num">66 000 F</td><td class="num pos">+18 400 F</td></tr>
+          <tr><td class="prod">Lait concentré (boîte)</td><td class="num">120</td><td class="num">42 000 F</td><td class="num">5 000 F</td><td class="num">60 000 F</td><td class="num pos">+13 000 F</td></tr>
+          <tr><td class="prod">Déodorant Nivea Homme</td><td class="num">22</td><td class="num">19 800 F</td><td class="num">2 600 F</td><td class="num">33 000 F</td><td class="num pos">+10 600 F</td></tr>
+          <tr><td class="prod">Draps importés (Chine)</td><td class="num">5</td><td class="num">45 000 F</td><td class="num">6 000 F</td><td class="num">75 000 F</td><td class="num pos">+24 000 F</td></tr>
+          <tr><td class="prod">Crédit / unités</td><td class="num">—</td><td class="num">175 750 F</td><td class="num">0 F</td><td class="num">185 000 F</td><td class="num pos">+9 250 F</td></tr>
+          <tr><td class="prod muted">Liqueur (assortiment)</td><td class="num">9</td><td class="num">27 000 F</td><td class="num">2 000 F</td><td class="num">36 000 F</td><td class="num pos">+7 000 F</td></tr>
+        </tbody>
+        <tfoot>
+          <tr><td>Total</td><td class="num">—</td><td class="num">604 750 F</td><td class="num">38 000 F</td><td class="num">857 000 F</td><td class="num pos">+214 250 F</td></tr>
+        </tfoot>
+      </table>
+      <div class="note">Marge sur marchandise : +214 250 F. Moins les charges (144 500 F) = <strong>168 000 F de marge réelle</strong>.</div>
+    </div>
+  </main>
+</div>
+</body>
+</html>
