@@ -1,6 +1,7 @@
 // Repository dépenses — tout ce qui sort de la caisse (loyer, salaires, transport, taxes…).
 // Sert à calculer la marge RÉELLE : marge sur marchandise − dépenses du mois.
 import { all, one, run, nowIso } from "../db";
+import { journaliser } from "./activite";
 
 export type Depense = {
   id: number;
@@ -36,7 +37,7 @@ function isoDepuisJour(jour?: string | null): string {
 export function createDepense(input: CreateDepenseInput): number {
   const libelle = input.libelle.trim();
   if (!libelle) throw new Error("Libellé manquant.");
-  return run(
+  const id = run(
     `INSERT INTO depense (libelle, montant, categorie, recurrente, date, user_id)
      VALUES (?,?,?,?,?,?)`,
     libelle,
@@ -46,6 +47,15 @@ export function createDepense(input: CreateDepenseInput): number {
     isoDepuisJour(input.date),
     input.userId ?? null
   ).lastId;
+  journaliser({
+    userId: input.userId,
+    action: "creation",
+    entite: "depense",
+    details: `Dépense : ${libelle}`,
+    montant: Math.round(input.montant),
+    refId: id,
+  });
+  return id;
 }
 
 export function updateDepense(
@@ -56,24 +66,43 @@ export function updateDepense(
     categorie?: string | null;
     recurrente?: boolean;
     date?: string | null;
-  }
+  },
+  userId?: number | null
 ): void {
   const before = one<Depense>(`SELECT * FROM depense WHERE id = ?`, id);
   if (!before) throw new Error("Dépense introuvable.");
+  const montant = data.montant != null ? Math.round(data.montant) : before.montant;
   run(
     `UPDATE depense SET libelle = ?, montant = ?, categorie = ?, recurrente = ?, date = ?
      WHERE id = ?`,
     (data.libelle ?? before.libelle).trim() || before.libelle,
-    data.montant != null ? Math.round(data.montant) : before.montant,
+    montant,
     data.categorie !== undefined ? data.categorie : before.categorie,
     data.recurrente !== undefined ? (data.recurrente ? 1 : 0) : before.recurrente,
     data.date ? isoDepuisJour(data.date) : before.date,
     id
   );
+  journaliser({
+    userId,
+    action: "modification",
+    entite: "depense",
+    details: `Dépense modifiée : ${(data.libelle ?? before.libelle).trim() || before.libelle}`,
+    montant,
+    refId: id,
+  });
 }
 
-export function deleteDepense(id: number): void {
+export function deleteDepense(id: number, userId?: number | null): void {
+  const before = one<Depense>(`SELECT * FROM depense WHERE id = ?`, id);
   run(`DELETE FROM depense WHERE id = ?`, id);
+  journaliser({
+    userId,
+    action: "suppression",
+    entite: "depense",
+    details: `Dépense supprimée${before ? ` : ${before.libelle}` : ""}`,
+    montant: before?.montant ?? null,
+    refId: id,
+  });
 }
 
 export function depensesDuMois(year: number, month: number): Depense[] {

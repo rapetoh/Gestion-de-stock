@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getSession } from "@/lib/auth";
 import { enregistrerReconciliation } from "@/lib/repo/comptes";
 
 export async function enregistrerSoldesAction(formData: FormData): Promise<void> {
@@ -31,7 +32,8 @@ export async function enregistrerSoldesAction(formData: FormData): Promise<void>
 
   if (!lignes.length) return;
 
-  enregistrerReconciliation({ jour, lignes });
+  const session = await getSession();
+  enregistrerReconciliation({ jour, lignes, userId: session?.userId ?? null });
   revalidatePath("/soldes");
   revalidatePath("/");
 }

@@ -1,5 +1,6 @@
 // Repository ventes — une vente baisse le stock dans une transaction. Aucune caisse à ouvrir.
 import { all, one, run, tx, nowIso } from "../db";
+import { journaliser } from "./activite";
 
 export type Paiement = "especes" | "tmoney" | "flooz" | "credit";
 
@@ -127,6 +128,14 @@ export function createVente(input: CreateVenteInput): number {
     }
 
     run(`UPDATE vente SET total = ? WHERE id = ?`, total, venteId);
+    journaliser({
+      userId: input.userId,
+      action: "creation",
+      entite: "vente",
+      details: `Vente encaissée (${input.paiement})`,
+      montant: total,
+      refId: venteId,
+    });
     return venteId;
   });
 }
@@ -135,6 +144,7 @@ export type UpdateVenteInput = {
   paiement?: Paiement;
   // quantite = 0 retire la ligne. Le stock se réajuste de la différence.
   lignes?: { ligneId: number; quantite: number }[];
+  userId?: number | null; // l'auteur de la modification, pour le journal
 };
 
 export function updateVente(id: number, input: UpdateVenteInput): void {
@@ -208,13 +218,28 @@ export function updateVente(id: number, input: UpdateVenteInput): void {
     if (!reste || reste.n === 0) {
       // Plus aucune ligne : on retire la vente vide (le stock a déjà été remis).
       run(`DELETE FROM vente WHERE id = ?`, id);
+      journaliser({
+        userId: input.userId,
+        action: "suppression",
+        entite: "vente",
+        details: "Vente vidée puis supprimée",
+        refId: id,
+      });
     } else {
       run(`UPDATE vente SET total = ? WHERE id = ?`, reste.total, id);
+      journaliser({
+        userId: input.userId,
+        action: "modification",
+        entite: "vente",
+        details: "Vente modifiée",
+        montant: reste.total,
+        refId: id,
+      });
     }
   });
 }
 
-export function deleteVente(id: number): void {
+export function deleteVente(id: number, userId?: number | null): void {
   const lignes = all<LigneVente>(
     `SELECT * FROM ligne_vente WHERE vente_id = ?`,
     id
@@ -254,5 +279,12 @@ export function deleteVente(id: number): void {
     }
     // ligne_vente est supprimée en cascade (ON DELETE CASCADE).
     run(`DELETE FROM vente WHERE id = ?`, id);
+    journaliser({
+      userId,
+      action: "suppression",
+      entite: "vente",
+      details: "Vente supprimée",
+      refId: id,
+    });
   });
 }

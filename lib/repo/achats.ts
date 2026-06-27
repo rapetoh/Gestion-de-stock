@@ -1,5 +1,6 @@
 // Repository achats — chaque achat met à jour le produit et le stock dans une transaction.
 import { all, one, run, tx, nowIso } from "../db";
+import { journaliser } from "./activite";
 
 export type Achat = {
   id: number;
@@ -95,13 +96,23 @@ export function createAchat(input: CreateAchatInput): number {
       now
     );
 
+    journaliser({
+      userId: input.userId,
+      action: "creation",
+      entite: "achat",
+      details: `Achat enregistré (qté ${input.quantite})`,
+      montant: input.prixAchat * input.quantite + input.frais,
+      refId: achatId,
+    });
+
     return achatId;
   });
 }
 
 export function updateAchat(
   id: number,
-  data: { quantite?: number; prixAchat?: number; frais?: number; prixVente?: number; fournisseur?: string | null; note?: string | null }
+  data: { quantite?: number; prixAchat?: number; frais?: number; prixVente?: number; fournisseur?: string | null; note?: string | null },
+  userId?: number | null
 ): void {
   const before = one<Achat>(`SELECT * FROM achat WHERE id = ?`, id);
   if (!before) throw new Error("Achat introuvable.");
@@ -156,10 +167,18 @@ export function updateAchat(
         now
       );
     }
+
+    journaliser({
+      userId,
+      action: "modification",
+      entite: "achat",
+      details: `Achat modifié (qté ${before.quantite} → ${nouvelleQte})`,
+      refId: id,
+    });
   });
 }
 
-export function deleteAchat(id: number): void {
+export function deleteAchat(id: number, userId?: number | null): void {
   const before = one<Achat>(`SELECT * FROM achat WHERE id = ?`, id);
   if (!before) return;
 
@@ -192,5 +211,12 @@ export function deleteAchat(id: number): void {
       now
     );
     run(`DELETE FROM achat WHERE id = ?`, id);
+    journaliser({
+      userId,
+      action: "suppression",
+      entite: "achat",
+      details: "Achat supprimé",
+      refId: id,
+    });
   });
 }

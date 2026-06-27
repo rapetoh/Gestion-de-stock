@@ -226,6 +226,19 @@ function migrate(database: DatabaseSync): void {
     );
     CREATE INDEX IF NOT EXISTS idx_depense_date ON depense(date);
     CREATE INDEX IF NOT EXISTS idx_solde_date ON solde_journalier(date);
+
+    -- Journal d'activité : qui a fait quoi, et quand. La trace pour les comptes et le contrôle.
+    CREATE TABLE IF NOT EXISTS activite (
+      id            INTEGER PRIMARY KEY AUTOINCREMENT,
+      date          TEXT    NOT NULL,
+      user_id       INTEGER REFERENCES utilisateur(id),
+      action        TEXT    NOT NULL, -- 'creation' | 'modification' | 'suppression' | 'controle' | 'soldes' | 'connexion'
+      entite        TEXT,             -- 'vente' | 'achat' | 'produit' | 'depense' | 'controle' | 'soldes' | 'session'
+      details       TEXT    NOT NULL,
+      montant       INTEGER,          -- impact financier, si pertinent
+      ref_id        INTEGER
+    );
+    CREATE INDEX IF NOT EXISTS idx_activite_date ON activite(date);
   `);
 
   // Migrations additives idempotentes (un ALTER n'est pas couvert par CREATE TABLE IF NOT EXISTS).

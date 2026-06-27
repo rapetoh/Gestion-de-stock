@@ -30,13 +30,18 @@ export async function modifierDepense(formData: FormData): Promise<void> {
   const id = Number(formData.get("id"));
   const libelle = String(formData.get("libelle") ?? "").trim();
   if (!id || !libelle) return;
-  updateDepense(id, {
-    libelle,
-    montant: parseCFA(String(formData.get("montant") ?? "")),
-    categorie: String(formData.get("categorie") ?? "").trim() || null,
-    recurrente: formData.get("recurrente") != null,
-    date: String(formData.get("date") ?? "").trim() || null,
-  });
+  const session = await getSession();
+  updateDepense(
+    id,
+    {
+      libelle,
+      montant: parseCFA(String(formData.get("montant") ?? "")),
+      categorie: String(formData.get("categorie") ?? "").trim() || null,
+      recurrente: formData.get("recurrente") != null,
+      date: String(formData.get("date") ?? "").trim() || null,
+    },
+    session?.userId ?? null
+  );
   revalidatePath("/depenses");
   revalidatePath("/benefices");
   revalidatePath("/");
@@ -45,7 +50,8 @@ export async function modifierDepense(formData: FormData): Promise<void> {
 export async function supprimerDepense(formData: FormData): Promise<void> {
   const id = Number(formData.get("id"));
   if (!id) return;
-  deleteDepense(id);
+  const session = await getSession();
+  deleteDepense(id, session?.userId ?? null);
   revalidatePath("/depenses");
   revalidatePath("/benefices");
   revalidatePath("/");

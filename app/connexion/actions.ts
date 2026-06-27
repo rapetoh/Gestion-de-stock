@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 import { one } from "@/lib/db";
 import { createSession } from "@/lib/auth";
+import { journaliser } from "@/lib/repo/activite";
 
 type Utilisateur = {
   id: number;
@@ -36,5 +37,11 @@ export async function connexion(
   }
 
   await createSession({ userId: user.id, nom: user.nom, role: user.role });
+  journaliser({
+    userId: user.id,
+    action: "connexion",
+    entite: "session",
+    details: "Connexion à l'application",
+  });
   redirect("/");
 }

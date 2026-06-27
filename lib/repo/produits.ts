@@ -1,5 +1,6 @@
 // Repository produits — accès données via les helpers de lib/db uniquement.
 import { all, one, run, nowIso } from "../db";
+import { journaliser } from "./activite";
 
 export type Produit = {
   id: number;
@@ -49,7 +50,7 @@ export type ProduitInput = {
   codeBarre?: string | null;
 };
 
-export function createProduit(data: ProduitInput): number {
+export function createProduit(data: ProduitInput, userId?: number | null): number {
   const now = nowIso();
   const r = run(
     `INSERT INTO produit
@@ -66,10 +67,21 @@ export function createProduit(data: ProduitInput): number {
     now,
     now
   );
+  journaliser({
+    userId,
+    action: "creation",
+    entite: "produit",
+    details: `Produit créé : ${data.nom.trim()}`,
+    refId: r.lastId,
+  });
   return r.lastId;
 }
 
-export function updateProduit(id: number, data: ProduitInput): void {
+export function updateProduit(
+  id: number,
+  data: ProduitInput,
+  userId?: number | null
+): void {
   run(
     `UPDATE produit SET
        nom = ?, categorie = ?, prix_achat = ?, frais = ?, prix_vente = ?,
@@ -86,11 +98,26 @@ export function updateProduit(id: number, data: ProduitInput): void {
     nowIso(),
     id
   );
+  journaliser({
+    userId,
+    action: "modification",
+    entite: "produit",
+    details: `Produit modifié : ${data.nom.trim()}`,
+    refId: id,
+  });
 }
 
-export function removeProduit(id: number): void {
+export function removeProduit(id: number, userId?: number | null): void {
   // Suppression douce : le produit reste pour l'historique des ventes/achats.
+  const before = one<Produit>(`SELECT nom FROM produit WHERE id = ?`, id);
   run(`UPDATE produit SET actif = 0, maj_le = ? WHERE id = ?`, nowIso(), id);
+  journaliser({
+    userId,
+    action: "suppression",
+    entite: "produit",
+    details: `Produit retiré${before ? ` : ${before.nom}` : ""}`,
+    refId: id,
+  });
 }
 
 export function produitsARecommander(): Produit[] {

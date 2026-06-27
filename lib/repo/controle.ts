@@ -3,6 +3,7 @@
 // (ce que la machine croit), et l'écart négatif = manque = vol/perte possible, chiffré en CFA.
 // Enregistrer un contrôle corrige aussi le stock pour qu'il redevienne vrai, avec une trace.
 import { all, one, run, tx, nowIso } from "../db";
+import { journaliser } from "./activite";
 
 export type Controle = {
   id: number;
@@ -50,6 +51,7 @@ export function enregistrerControle(input: EnregistrerControleInput): number {
       input.userId ?? null
     ).lastId;
 
+    let manqueTotal = 0;
     for (const l of lignes) {
       const prod = one<{ stock: number; prix_achat: number; frais: number }>(
         `SELECT stock, prix_achat, frais FROM produit WHERE id = ?`,
@@ -62,6 +64,7 @@ export function enregistrerControle(input: EnregistrerControleInput): number {
       const ecart = compte - theorique;
       const coutUnit = prod.prix_achat + prod.frais; // coût de revient unitaire
       const valeurEcart = ecart * coutUnit;
+      if (valeurEcart < 0) manqueTotal += -valeurEcart;
 
       run(
         `INSERT INTO ligne_controle
@@ -99,6 +102,15 @@ export function enregistrerControle(input: EnregistrerControleInput): number {
         );
       }
     }
+
+    journaliser({
+      userId: input.userId,
+      action: "controle",
+      entite: "controle",
+      details: `Contrôle de stock (${lignes.length} produits comptés)`,
+      montant: manqueTotal > 0 ? manqueTotal : null,
+      refId: controleId,
+    });
 
     return controleId;
   });

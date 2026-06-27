@@ -19,13 +19,13 @@ export async function enregistrerAchat(formData: FormData): Promise<void> {
 
   if (quantite <= 0) return;
 
+  const session = await getSession();
+
   // Le produit existe par son nom ? Sinon on le crée.
   const existant = getProduitParNom(nom);
   const produitId = existant
     ? existant.id
-    : createProduit({ nom, prixAchat, frais, prixVente });
-
-  const session = await getSession();
+    : createProduit({ nom, prixAchat, frais, prixVente }, session?.userId ?? null);
 
   createAchat({
     produitId,
@@ -50,14 +50,19 @@ export async function modifierAchat(formData: FormData): Promise<void> {
   const quantite = parseCFA(String(formData.get("quantite") ?? ""));
   if (quantite <= 0) return;
 
-  updateAchat(id, {
-    quantite,
-    prixAchat: parseCFA(String(formData.get("prixAchat") ?? "")),
-    frais: parseCFA(String(formData.get("frais") ?? "")),
-    prixVente: parseCFA(String(formData.get("prixVente") ?? "")),
-    fournisseur: String(formData.get("fournisseur") ?? "").trim() || null,
-    note: String(formData.get("note") ?? "").trim() || null,
-  });
+  const session = await getSession();
+  updateAchat(
+    id,
+    {
+      quantite,
+      prixAchat: parseCFA(String(formData.get("prixAchat") ?? "")),
+      frais: parseCFA(String(formData.get("frais") ?? "")),
+      prixVente: parseCFA(String(formData.get("prixVente") ?? "")),
+      fournisseur: String(formData.get("fournisseur") ?? "").trim() || null,
+      note: String(formData.get("note") ?? "").trim() || null,
+    },
+    session?.userId ?? null
+  );
 
   revalidatePath("/achats");
   revalidatePath("/stock");
@@ -67,7 +72,8 @@ export async function modifierAchat(formData: FormData): Promise<void> {
 export async function supprimerAchat(formData: FormData): Promise<void> {
   const id = Number(formData.get("id"));
   if (!id) return;
-  deleteAchat(id);
+  const session = await getSession();
+  deleteAchat(id, session?.userId ?? null);
   revalidatePath("/achats");
   revalidatePath("/stock");
   revalidatePath("/");

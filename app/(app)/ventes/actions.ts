@@ -68,7 +68,8 @@ export async function modifierVente(formData: FormData): Promise<void> {
     lignes = [];
   }
 
-  updateVente(id, { paiement, lignes });
+  const session = await getSession();
+  updateVente(id, { paiement, lignes, userId: session?.userId ?? null });
 
   revalidatePath("/ventes");
   revalidatePath("/stock");
@@ -78,7 +79,8 @@ export async function modifierVente(formData: FormData): Promise<void> {
 export async function supprimerVente(formData: FormData): Promise<void> {
   const id = Number(formData.get("id"));
   if (!id) return;
-  deleteVente(id);
+  const session = await getSession();
+  deleteVente(id, session?.userId ?? null);
   revalidatePath("/ventes");
   revalidatePath("/stock");
   revalidatePath("/");

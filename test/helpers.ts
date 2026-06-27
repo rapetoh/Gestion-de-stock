@@ -1,8 +1,9 @@
 // Shared test helpers. The DB is in-memory (set in vitest.config.ts), fresh per test file;
 // resetDb() clears it between tests so each case starts from a known empty state.
-import { db, all, one } from "../lib/db";
+import { db, all, one, run, nowIso } from "../lib/db";
 
 const TABLES = [
+  "activite",
   "ligne_vente",
   "vente",
   "achat",
@@ -39,4 +40,17 @@ export function lastMvt(
 
 export function countMvts(produitId: number): number {
   return all("SELECT id FROM mouvement_stock WHERE produit_id = ?", produitId).length;
+}
+
+// Crée un utilisateur réel (le user_id est une clé étrangère contrôlée).
+export function creerUser(nom = "Testeur"): number {
+  return run(
+    `INSERT INTO utilisateur (nom, login, mot_de_passe, role, actif, cree_le)
+     VALUES (?,?,?,?,1,?)`,
+    nom,
+    nom.toLowerCase(),
+    "x",
+    "proprietaire",
+    nowIso()
+  ).lastId;
 }

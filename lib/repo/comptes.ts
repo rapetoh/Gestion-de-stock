@@ -4,6 +4,7 @@
 // (compté). La somme des manques = perte possible. Pas de journal transaction par transaction
 // (c'est la surcharge qui a tué la 1re appli) — juste les soldes, comme dans son cahier.
 import { all, one, run, tx } from "../db";
+import { journaliser } from "./activite";
 
 export type Compte = {
   id: number;
@@ -92,6 +93,7 @@ export type EnregistrerReconciliationInput = {
   jour: string; // YYYY-MM-DD
   // Seuls les comptes réellement comptés sont passés (compte >= 0). attendu est sauvegardé avec.
   lignes: { compteId: number; attendu: number; compte: number }[];
+  userId?: number | null; // l'auteur, pour le journal
 };
 
 export function enregistrerReconciliation(
@@ -126,6 +128,15 @@ export function enregistrerReconciliation(
         Math.round(l.compte)
       );
     }
+
+    const ecart = valides.reduce((s, l) => s + (l.compte - l.attendu), 0);
+    journaliser({
+      userId: input.userId,
+      action: "soldes",
+      entite: "soldes",
+      details: `Soldes du ${input.jour} (${valides.length} comptes)`,
+      montant: ecart,
+    });
   });
 }
 
