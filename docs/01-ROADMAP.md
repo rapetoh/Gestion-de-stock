@@ -18,7 +18,10 @@
   **editability completed 2026-06-27** (achats + ventes were delete-only; now fully editable).
 - **Phase 2 (Anti-theft / Contrôle de stock):** ✅ done — 2026-06-27 (count → écart in CFA →
   corrects stock + history; list + detail).
-- **Phase 3 (Dépenses → marge réelle):** `[~]` in progress (next).
+- **Phase 3 (Dépenses → marge réelle):** ✅ done — 2026-06-27 (expense ledger + net margin in
+  Bénéfices).
+- **Phase 4 (Daily reconciliation / Comptes):** `[~]` next — confirm mobile-money scope first
+  (see Open question in 02-WORKLOG.md / D-001).
 - **Now building in:** VSCode, repo `Gestion-de-stock`. Detailed build roadmap +
   verification verdict: `~/.claude/plans/so-i-started-working-refactored-hennessy.md`.
 - **Blocker:** none open (the old 403 push blocker is resolved — fresh repo).
@@ -87,13 +90,14 @@ profit table without a calculator.
 
 ---
 
-## Phase 3 — Money truth (Dépenses + marge réelle)  `[~]`  ← in progress (next)
+## Phase 3 — Money truth (Dépenses + marge réelle)  `[x]`  *(done 2026-06-27)*
 
-- [ ] Dépenses ledger: recurring + one-off (loyer, salaires, électricité, eau, transport,
-      amortissement, OTR, mairie)
-- [ ] Monthly: recette − dépenses = marge réelle; yearly view; capital view
+- [x] Dépenses ledger: recurring flag + one-off (loyer, salaires, électricité, eau, transport,
+      internet, amortissement, OTR/mairie); fully editable; per-month view
+- [x] Monthly: marge sur marchandise − dépenses = **marge réelle** (shown in Bénéfices)
+- [ ] Yearly view / capital view *(monthly done; annual roll-up later)*
 
-**Done when:** she sees real monthly/annual margin without manual subtraction.
+**Done when:** she sees real monthly margin without manual subtraction. ✅ (monthly)
 
 ---
 

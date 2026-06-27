@@ -5,6 +5,18 @@
 
 ---
 
+## D-011 · Dépenses = a manual ledger; marge réelle = marge − dépenses (shown in Bénéfices)
+**Decision:** Dépenses is a simple editable ledger (libellé, montant, catégorie, date, "revient
+chaque mois" flag). The Bénéfices page subtracts the month's total dépenses from the goods margin
+to show **marge réelle**. Amortissement, OTR and Mairie are entered as ordinary periodic lines —
+the app does **not** compute depreciation schedules or tax formulas; the "recurring" flag is a
+label/reminder, not an auto-poster (yet).
+**Reasoning:** This is exactly how she already does it by hand (she "affects a monthly sum" for
+furniture amortization and divides last year's tax across months). A manual ledger matches her
+mental model and avoids over-engineering; auto-recurring posting can come later if she wants it.
+Dates use plain calendar days — the Togo is at GMT so local day = UTC, no timezone drift in
+month buckets. (Phase C / Roadmap Phase 3.)
+
 ## D-010 · Contrôle de stock corrects stock and keeps the écart in history
 **Decision:** Recording a stock count (a) values each écart at **coût de revient unitaire**
 (`prix_achat + frais`), (b) **corrects the system stock to what was counted**, and (c) keeps the

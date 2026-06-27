@@ -7,6 +7,20 @@
 
 ## 2026-06-27
 
+### Phase C — Dépenses → marge réelle (real net profit)
+- **What:** Built the expense ledger: `lib/repo/depenses.ts` (create/edit/delete, per-month
+  total) + `app/(app)/depenses/` (month selector, form with her categories — loyer, salaires,
+  transport, électricité, eau, internet, amortissement, impôts OTR/Mairie — a "revient chaque
+  mois" flag, and an editable/deletable list with a monthly total). Wired the **net margin** into
+  Bénéfices: a new "Ton gain réel ce mois-ci" block showing **marge sur marchandise − dépenses
+  du mois = marge réelle**, linking to /depenses. Replaces the "Bientôt disponible" stub.
+- **Why:** The brief's Bénéfices only showed *gross* margin; she explicitly wants the real number
+  after rent/salaries/transport/taxes. (Roadmap Phase 3.)
+- **Result:** `npm test` now 14/14 (added 4 dépense tests incl. the marge-réelle arithmetic);
+  tsc/lint/build clean; live pages verified. See **D-011**.
+- **Next:** Phase D — daily money reconciliation (cash + TMoney + Flooz). Needs the scope
+  confirmation noted in D-001 first.
+
 ### Test suite added; Phases A–B committed
 - **What:** Added a real `vitest` suite (`npm test`, 10 tests in `test/`) covering achat/vente
   editing (stock + audit rows) and Contrôle de stock (variance, CFA valuation, stock correction,
