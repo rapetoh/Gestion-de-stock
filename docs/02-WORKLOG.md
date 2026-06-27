@@ -7,6 +7,22 @@
 
 ## 2026-06-27
 
+### Parity & gap analysis vs the old software (StockFlow)
+- **What:** Cloned and read the OLD app (StockFlow / `Store-management`) in full — 17-model Prisma
+  schema, all pages/API routes, docs — and diffed it against Ma Boutique, applying expert judgment
+  (not just what the owner asked). Wrote `docs/04-PARITE-STOCKFLOW.md`.
+- **Why:** The owner asked, rightly, whether anything important was lost — she's not a software
+  expert, so part of ownership is catching what she wouldn't think to ask for.
+- **Findings:** Most "missing" features were **correctly cut bloat** (forced cash session, barcode
+  entry, VAT, loyalty/promo, receipts, notification center). Two **HIGH** genuine gaps a pro should
+  insist on: **(1) backup / data export** (whole business in one SQLite file, no backup — biggest
+  miss), **(2) bulk product import** (her #1 stress is typing 100+ products by hand; StockFlow had
+  CSV import). Plus MEDIUM: customer credit/debt ledger, per-product stock-movement history view
+  (cheap, fits her theft-investigation), expiry tracking for perishables, best/worst-seller + week/
+  half-day views, mobile-money commissions as income.
+- **Next:** Build the two HIGH gaps (backup/export, then bulk import) after developer confirms
+  priority; keep refusing the bloat.
+
 ### Phase D — Soldes du jour (daily money reconciliation)
 - **What:** Built her #1 money check: `lib/repo/comptes.ts` + `app/(app)/soldes/` (new sidebar
   item "Soldes du jour"). For each account (Espèces, TMoney, Flooz, Crédit) she enters **attendu**
