@@ -25,7 +25,14 @@ const NAV_CONTROLE = [
   { href: "/depenses", ic: "▦", label: "Dépenses" },
   { href: "/benefices", ic: "★", label: "Bénéfices" },
   { href: "/activite", ic: "≣", label: "Activité" },
+  { href: "/equipe", ic: "👥", label: "Équipe" },
   { href: "/sauvegarde", ic: "⤓", label: "Sauvegarde" },
+];
+
+// La vendeuse n'a que sa caisse et le stock — pas les marges, l'argent, ni la gestion.
+const NAV_VENDEUSE = [
+  { href: "/ventes", ic: "↑", label: "Ventes" },
+  { href: "/stock", ic: "▤", label: "Stock" },
 ];
 
 function roleLabel(role: string): string {
@@ -50,6 +57,7 @@ export default function Sidebar({ nom, role, open = false, onNavigate }: Props) 
   );
 
   const initiale = (nom || "?").charAt(0).toUpperCase();
+  const estProprietaire = role === "proprietaire";
 
   return (
     <aside className={`sidebar${open ? " open" : ""}`}>
@@ -61,11 +69,20 @@ export default function Sidebar({ nom, role, open = false, onNavigate }: Props) 
         </div>
       </div>
 
-      {NAV_PRINCIPAL.map(renderItem)}
-      <div className="nav-label">Au jour le jour</div>
-      {NAV_JOUR.map(renderItem)}
-      <div className="nav-label">Contrôle &amp; argent</div>
-      {NAV_CONTROLE.map(renderItem)}
+      {estProprietaire ? (
+        <>
+          {NAV_PRINCIPAL.map(renderItem)}
+          <div className="nav-label">Au jour le jour</div>
+          {NAV_JOUR.map(renderItem)}
+          <div className="nav-label">Contrôle &amp; argent</div>
+          {NAV_CONTROLE.map(renderItem)}
+        </>
+      ) : (
+        <>
+          <div className="nav-label">Au jour le jour</div>
+          {NAV_VENDEUSE.map(renderItem)}
+        </>
+      )}
 
       <div className="spacer"></div>
 

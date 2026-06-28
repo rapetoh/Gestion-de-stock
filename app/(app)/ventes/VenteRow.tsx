@@ -16,12 +16,14 @@ const PAY: { id: Paiement; label: string }[] = [
 export default function VenteRow({
   v,
   heureLabel,
+  peutGerer,
   editing,
   onEdit,
   onClose,
 }: {
   v: VenteAvecLignes;
   heureLabel: string;
+  peutGerer: boolean;
   editing: boolean;
   onEdit: () => void;
   onClose: () => void;
@@ -142,24 +144,28 @@ export default function VenteRow({
       </td>
       <td className="num">{formatCFA(v.total)}</td>
       <td className="num">
-        <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-          <button type="button" className="btn ghost" onClick={onEdit}>
-            Modifier
-          </button>
-          <form
-            action={supprimerVente}
-            onSubmit={(e) => {
-              if (!confirm("Supprimer cette vente ? Le stock sera remis. Cette action est définitive.")) {
-                e.preventDefault();
-              }
-            }}
-          >
-            <input type="hidden" name="id" value={v.id} />
-            <button type="submit" className="btn danger">
-              Supprimer
+        {peutGerer ? (
+          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+            <button type="button" className="btn ghost" onClick={onEdit}>
+              Modifier
             </button>
-          </form>
-        </div>
+            <form
+              action={supprimerVente}
+              onSubmit={(e) => {
+                if (!confirm("Supprimer cette vente ? Le stock sera remis. Cette action est définitive.")) {
+                  e.preventDefault();
+                }
+              }}
+            >
+              <input type="hidden" name="id" value={v.id} />
+              <button type="submit" className="btn danger">
+                Supprimer
+              </button>
+            </form>
+          </div>
+        ) : (
+          <span className="muted">—</span>
+        )}
       </td>
     </tr>
   );

@@ -10,14 +10,23 @@ function getSecret(): Uint8Array {
   return new TextEncoder().encode("dev-only-insecure-secret-do-not-use-in-prod");
 }
 
-async function isValid(token: string | undefined): Promise<boolean> {
-  if (!token) return false;
+async function lireRole(token: string | undefined): Promise<string | null> {
+  if (!token) return null;
   try {
-    await jwtVerify(token, getSecret());
-    return true;
+    const { payload } = await jwtVerify(token, getSecret());
+    return typeof payload.role === "string" ? payload.role : null;
   } catch {
-    return false;
+    return null;
   }
+}
+
+// Pages autorisées à une vendeuse (rôle limité). Tout le reste — marges, argent, dépenses,
+// commissions, contrôle, équipe, tableau de bord — est réservé au propriétaire.
+const VENDEUSE_OK = ["/ventes", "/stock"];
+
+function autorise(role: string, pathname: string): boolean {
+  if (role === "proprietaire") return true; // accès complet
+  return VENDEUSE_OK.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 }
 
 export async function middleware(req: NextRequest) {
@@ -26,12 +35,21 @@ export async function middleware(req: NextRequest) {
   // Déjà sur la page de connexion : laisser passer.
   if (pathname === "/connexion") return NextResponse.next();
 
-  const token = req.cookies.get("session")?.value;
-  if (await isValid(token)) return NextResponse.next();
+  const role = await lireRole(req.cookies.get("session")?.value);
+  if (!role) {
+    const url = req.nextUrl.clone();
+    url.pathname = "/connexion";
+    return NextResponse.redirect(url);
+  }
 
-  const url = req.nextUrl.clone();
-  url.pathname = "/connexion";
-  return NextResponse.redirect(url);
+  // Connectée mais sans droit sur cette page : on renvoie la vendeuse vers sa caisse.
+  if (!autorise(role, pathname)) {
+    const url = req.nextUrl.clone();
+    url.pathname = "/ventes";
+    return NextResponse.redirect(url);
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {

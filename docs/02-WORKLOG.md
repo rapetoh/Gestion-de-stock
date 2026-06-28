@@ -5,6 +5,31 @@
 
 ---
 
+## 2026-06-28
+
+### Phase 5 — Connexion vendeuse (rôles & droits) : l'anti-vol devient nominatif
+- **What:** Chaque personne au comptoir a désormais **son propre login**. Le propriétaire crée/gère les
+  comptes vendeuse depuis une nouvelle page **/equipe** (créer, désactiver/réactiver — jamais supprimer,
+  l'historique reste à son nom —, réinitialiser le mot de passe). La **vendeuse a un accès limité** :
+  seulement **Ventes** et **Stock** ; tout le reste (tableau de bord, marges, Soldes, Commissions,
+  Dépenses, Contrôle, Équipe, Sauvegarde) lui est **refusé par le middleware** (redirigée vers sa
+  caisse). Elle peut encaisser mais **ne peut ni modifier ni supprimer une vente** (garde côté serveur
+  *et* boutons masqués) — anti-camouflage de vol. La connexion redirige selon le rôle (propriétaire →
+  tableau de bord, vendeuse → caisse). Le journal d'activité et `user_id` portaient déjà l'auteur :
+  avec des logins séparés, **chaque vente/modif est enfin estampillée de la vraie personne**.
+- **Why:** Son besoin n°1 est de **prouver/localiser un vol**. Avec un seul compte partagé, le journal
+  ne pouvait pas distinguer qui a fait quoi — or en **décembre** une employée pas encore de confiance
+  prend le comptoir. C'est le chaînon manquant identifié dans l'audit (docs/05-AUDIT-VERIFICATION.md).
+- **Files:** `lib/repo/utilisateurs.ts` (nouveau), `app/(app)/equipe/*` (nouveau), `middleware.ts`
+  (garde par rôle), `components/Sidebar.tsx` (nav selon rôle), `app/(app)/ventes/*` (boutons masqués +
+  garde serveur), `app/connexion/actions.ts` (redirection selon rôle).
+- **Result:** `npm test` **59/59** (+5 : création/login unique/désactivation/reset) ; **build OK**
+  (route /equipe incluse) ; **test à chaud** : matrice des droits confirmée — propriétaire 200 partout ;
+  vendeuse 200 sur /ventes + /stock, **307 → /ventes** sur tout le reste (tableau de bord, équipe,
+  bénéfices, soldes, commissions, dépenses, contrôle, sauvegarde).
+- **Next:** former la propriétaire à créer le compte de la nouvelle employée avant décembre ; côté
+  exploitation, hébergement à disque persistant + sauvegarde automatique hors-site (P0-2 de l'audit).
+
 ## 2026-06-27
 
 ### Import rendu SOUPLE (en-tête mappé + fichier) — pas un format imposé

@@ -19,7 +19,9 @@
 > - **P2** Suppression confirmée + retours de formulaire (déjà livrés) ; noms de produits normalisés ;
 >   saisies négatives ramenées à 0 ; note sur les ventes à crédit ; rapports groupés par produit (pas
 >   par nom) ; page d'erreur calme en français. *(money.ts, produits.ts, benefices.ts, stats.ts, error.tsx)*
-> - **P3** laissés tels quels (mineurs) ; **Phase 5 (rôle vendeuse)** reste à faire avant décembre.
+> - **P3** laissés tels quels (mineurs). **Phase 5 (connexion vendeuse / rôles & droits) : FAIT**
+>   (2026-06-28) — login par personne, page /equipe, vendeuse limitée à Ventes+Stock, pas de
+>   modif/suppression de vente ; l'attribution au journal devient nominative. Voir le worklog.
 >
 > Reste à faire côté exploitation (hors code) : choisir un hébergement à **disque persistant** et
 > brancher la **sauvegarde automatique hors-site** (voir P0-2).

@@ -43,5 +43,6 @@ export async function connexion(
     entite: "session",
     details: "Connexion à l'application",
   });
-  redirect("/");
+  // La vendeuse arrive directement sur sa caisse ; la propriétaire sur le tableau de bord.
+  redirect(user.role === "proprietaire" ? "/" : "/ventes");
 }

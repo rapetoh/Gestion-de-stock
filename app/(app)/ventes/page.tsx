@@ -1,13 +1,16 @@
 import { listProduits } from "@/lib/repo/produits";
 import { listVentesDuJour } from "@/lib/repo/ventes";
 import { formatCFA } from "@/lib/money";
+import { getSession } from "@/lib/auth";
 import VenteCaisse from "./VenteCaisse";
 import VentesRows from "./VentesRows";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export default function VentesPage() {
+export default async function VentesPage() {
+  const session = await getSession();
+  const peutGerer = session?.role === "proprietaire"; // seule la propriétaire modifie/supprime
   const produits = listProduits();
   const ventes = listVentesDuJour();
   const totalJour = ventes.reduce((s, v) => s + v.total, 0);
@@ -52,7 +55,7 @@ export default function VentesPage() {
                 </td>
               </tr>
             ) : (
-              <VentesRows ventes={ventes} />
+              <VentesRows ventes={ventes} peutGerer={peutGerer} />
             )}
           </tbody>
         </table>

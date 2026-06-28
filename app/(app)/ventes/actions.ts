@@ -43,6 +43,10 @@ export async function encaisserVente(formData: FormData): Promise<void> {
 }
 
 export async function modifierVente(formData: FormData): Promise<void> {
+  // Modifier/supprimer une vente est réservé à la propriétaire (anti-camouflage de vol).
+  const sessionRole = await getSession();
+  if (sessionRole?.role !== "proprietaire") return;
+
   const id = Number(formData.get("id"));
   if (!id) return;
 
@@ -77,9 +81,10 @@ export async function modifierVente(formData: FormData): Promise<void> {
 }
 
 export async function supprimerVente(formData: FormData): Promise<void> {
+  const session = await getSession();
+  if (session?.role !== "proprietaire") return; // réservé à la propriétaire
   const id = Number(formData.get("id"));
   if (!id) return;
-  const session = await getSession();
   deleteVente(id, session?.userId ?? null);
   revalidatePath("/ventes");
   revalidatePath("/stock");
