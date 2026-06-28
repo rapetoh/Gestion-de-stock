@@ -16,6 +16,10 @@ warns about duplicate names in the pasted list and new products with no sale pri
 0, or overwriting a live stock from a static list, would silently corrupt data — exactly the
 "import messes up the software" risk. Additive-only + stock-protected makes re-import safe; column
 parity removes a foot-gun. Refines D-015.
+**Update:** import is now **header-mapped** (columns recognised by name — any order/subset,
+synonyms + accent/case tolerant — unknown columns ignored), with a **positional fallback** when
+there's no header (no breakage), plus **file upload** (.csv/.tsv/.txt) through the same parser.
+Don't impose a single non-standard format on the user — support the standard, flexible way.
 
 ## D-015 · Bulk import = paste + upsert-by-name, shared pure parser, one log line
 **Decision:** Products are imported by **pasting** rows (tab from Excel, or `;` / `,`), fixed column

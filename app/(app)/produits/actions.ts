@@ -73,9 +73,9 @@ export async function importerProduitsAction(
   _prev: ImportState,
   formData: FormData
 ): Promise<ImportState> {
-  const rows = parseProduitsTexte(String(formData.get("texte") ?? ""));
+  const { rows } = parseProduitsTexte(String(formData.get("texte") ?? ""));
   if (!rows.length) {
-    return { error: "Aucun produit à importer. Colle au moins une ligne." };
+    return { error: "Aucun produit à importer. Colle une liste ou choisis un fichier." };
   }
   const session = await getSession();
   const res = importerProduits(rows, session?.userId ?? null);

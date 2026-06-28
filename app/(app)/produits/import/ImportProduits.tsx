@@ -6,9 +6,10 @@ import { parseProduitsTexte } from "@/lib/import";
 import { formatCFA } from "@/lib/money";
 import { importerProduitsAction, type ImportState } from "../actions";
 
-const EXEMPLE = `Savon Paris amande;450;30;750;50;5;Cosmétique
-Eau en sachet (paquet);300;0;500;100;10;Eau
-Lait concentré (boîte);350;40;500;48;6;Alimentation`;
+const EXEMPLE = `Nom;Prix de vente;Stock;Catégorie
+Savon Paris amande;750;50;Cosmétique
+Eau en sachet (paquet);500;100;Eau
+Lait concentré (boîte);500;48;Alimentation`;
 
 export default function ImportProduits({ existants }: { existants: string[] }) {
   const dejaLa = useMemo(
@@ -21,7 +22,17 @@ export default function ImportProduits({ existants }: { existants: string[] }) {
     null
   );
 
-  const rows = useMemo(() => parseProduitsTexte(texte), [texte]);
+  const result = useMemo(() => parseProduitsTexte(texte), [texte]);
+  const rows = result.rows;
+
+  async function onFichier(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    // Lit le fichier comme texte (le BOM éventuel est géré par le parseur).
+    const contenu = await f.text();
+    setTexte(contenu);
+    e.target.value = ""; // permet de re-choisir le même fichier
+  }
 
   // Compte les noms en double DANS la liste collée (le dernier l'emporterait sinon).
   const occurrences = useMemo(() => {
@@ -43,20 +54,31 @@ export default function ImportProduits({ existants }: { existants: string[] }) {
   return (
     <div className="grid" style={{ gridTemplateColumns: "1fr 1fr", alignItems: "start" }}>
       <div className="card">
-        <h2>Coller la liste</h2>
+        <h2>Coller la liste ou choisir un fichier</h2>
         <div className="hint">
-          Un produit par ligne, dans cet ordre, séparé par <strong>;</strong> (ou
-          une tabulation si tu copies depuis Excel) :
+          Un produit par ligne. Le mieux : une <strong>première ligne d&apos;en-tête</strong>
+          qui nomme tes colonnes (<em>Nom, Prix de vente, Stock, Catégorie…</em>) — dans
+          l&apos;ordre que tu veux, tu mets seulement les colonnes que tu as. Séparateur
+          <strong> ; </strong> ou tabulation (copier d&apos;Excel) ou virgule.
           <br />
-          <code>Nom ; Prix d&apos;achat ; Frais ; Prix de vente ; Stock ; Seuil ; Catégorie</code>
-          <br />
-          <strong>Seul le nom est obligatoire.</strong> Une case laissée vide
-          n&apos;est pas touchée (elle ne devient pas 0).
+          <strong>Seul le nom est obligatoire.</strong> Une case vide n&apos;est pas
+          touchée (elle ne devient pas 0).
           <br />• <strong>Nouveau</strong> nom → produit créé.
-          <br />• Nom <strong>déjà là</strong> → on met à jour seulement ce que tu
-          as rempli. Le <strong>stock d&apos;un produit existant n&apos;est jamais
-          modifié par l&apos;import</strong> (il se gère dans Achats / Ventes /
-          Contrôle de stock).
+          <br />• Nom <strong>déjà là</strong> → on met à jour seulement ce que tu as
+          rempli. Le <strong>stock d&apos;un produit existant n&apos;est jamais modifié
+          par l&apos;import</strong> (il se gère dans Achats / Ventes / Contrôle).
+        </div>
+
+        <div className="field" style={{ marginTop: 12, marginBottom: 4 }}>
+          <label>
+            Choisir un fichier <span className="sub">(.csv, .tsv, .txt — depuis Excel ou Sauvegarde)</span>
+          </label>
+          <input
+            className="input"
+            type="file"
+            accept=".csv,.tsv,.txt,text/csv,text/tab-separated-values,text/plain"
+            onChange={onFichier}
+          />
         </div>
 
         <form action={formAction}>
@@ -128,6 +150,12 @@ export default function ImportProduits({ existants }: { existants: string[] }) {
           {rows.length > 200
             ? ` (aperçu des 200 premiers ; les ${rows.length} seront importés)`
             : ""}
+          <br />
+          {rows.length === 0
+            ? null
+            : result.avecEntete
+            ? `Colonnes reconnues : ${result.colonnes.join(", ")}.`
+            : "Aucun en-tête reconnu — colonnes lues dans l'ordre : Nom, Prix d'achat, Frais, Prix de vente, Stock, Seuil, Catégorie. (Astuce : ajoute une 1re ligne d'en-tête.)"}
         </div>
         {nbDoublons > 0 || nbSansPrix > 0 ? (
           <div className="note" style={{ color: "var(--accent)" }}>

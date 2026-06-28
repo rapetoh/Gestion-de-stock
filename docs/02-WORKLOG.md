@@ -7,6 +7,21 @@
 
 ## 2026-06-27
 
+### Import rendu SOUPLE (en-tête mappé + fichier) — pas un format imposé
+- **What:** Reworked the import to stop imposing one rigid column order. Now it reads a **header
+  row and maps columns by name** — any order, any subset, synonyms + accents/case tolerant
+  (Produit/Nom, Quantité/Stock, Prix de vente/Prix, Catégorie, …); unknown columns ignored; only
+  Nom required. A plain list with **no header still works** (positional fallback — nothing breaks).
+  Added **file upload** (.csv/.tsv/.txt) that flows through the same parser. The preview now shows
+  **"Colonnes reconnues : …"** for transparency.
+- **Why:** The dev rightly called out that forcing a non-standard fixed order on a non-technical
+  user is bad engineering — support the standard, flexible way (header-mapped CSV, files + paste).
+  Recorded as a working principle ([[feedback-flexible-not-rigid]] in memory). Keeps D-016 safety
+  (blank = leave, never clobber existing stock).
+- **Result:** `npm test` **54/54** (header mapping, synonyms, subset, positional fallback);
+  build clean; **browser-verified**: uploading a CSV with reordered/synonym headers fills the
+  import and maps correctly.
+
 ### Import en masse rendu sûr, cohérent et clair (question du dev)
 - **What:** Reviewed the import for flexibility/consistency/clarity. Fixes: a **blank cell now means
   "ne pas toucher"** (never silently 0); an **existing** product is updated **only on the columns
