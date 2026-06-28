@@ -7,6 +7,34 @@
 
 ## 2026-06-27
 
+### Verification audit + fixes (P0–P2) — see docs/05-AUDIT-VERIFICATION.md
+- **What:** Deep adversarial verification ("is this safe to use daily?"), then fixed every confirmed
+  issue. **P0:** (1) **dépenses récurrentes** now actually recur each month — the flag was a no-op,
+  silently inflating marge réelle (`lib/repo/depenses.ts`, computed on read, no row duplication);
+  (2) **réconciliation** now **calcule** the `attendu` per account (dernier comptage + ventes du
+  compte − dépenses espèces), shows the breakdown, stays editable (`lib/repo/comptes.ts`,
+  `ReconciliationForm.tsx`) — the marquee anti-theft feature finally does her arithmetic instead of
+  asking her to type both numbers; (3) **stock à la caisse** : visible dans le sélecteur + panier,
+  avertissement « tu vends plus que le stock » **sans bloquer**, stock négatif signalé
+  (`VenteCaisse.tsx`, `stock/page.tsx`). **P1:** restock prévient avant de changer le prix de vente
+  (`AchatForm.tsx`); nouveau module **Commissions Mobile Money** (revenu → marge réelle :
+  `lib/repo/commissions.ts`, `app/(app)/commissions/*`, intégré à Bénéfices + Sauvegarde CSV);
+  **fuseau unifié** Africa/Lomé via `lib/periodes.ts` (tous les modules); **amorçage non destructif**
+  (comptes + propriétaire si absents) + mot de passe initial via `OWNER_INITIAL_PASSWORD`, fin du
+  mot de passe public (`lib/db.ts`, `scripts/seed.ts`). **P2:** noms produits normalisés
+  (`normaliserNom`), saisies négatives → 0 (`parseCFA`), note ventes à crédit, rapports groupés par
+  `produit_id` (renommage ne scinde plus la ligne — `benefices.ts`, `stats.ts`), page d'erreur calme
+  (`app/(app)/error.tsx`).
+- **Why:** Pré-décembre : l'appli doit être fiable au quotidien, sans nombre faux, sans perte de
+  données, sans blocage. L'audit a confirmé que P0-1/P0-3/P0-4 et le revenu mobile money manquaient
+  encore (les autres points avaient déjà été traités les jours précédents).
+- **Result:** `npm test` **50/50** (+15 : récurrentes, réconciliation calculée, fuseau non-UTC,
+  groupement, clamp) ; **build de production OK** (16 routes, /commissions incluse) ; **test à chaud**
+  de l'appli réelle : auth + toutes les pages 200, et l'« attendu » espèces pré-rempli à 6 250 (ventes
+  du jour) — la réconciliation automatique marche bout en bout.
+- **Next:** exploitation (hors code) : hébergement à **disque persistant** + **sauvegarde
+  automatique hors-site** (P0-2) ; puis **Phase 5 (rôle vendeuse)** avant décembre.
+
 ### Fix: stray underlines on links/buttons (missing global link reset)
 - **What:** Links (incl. anchors styled as buttons: "Nouvelle vente", "Importer une liste", the
   Sauvegarde downloads, "← Retour"…) showed the browser's default underline — only `.nav-item` had

@@ -1,6 +1,7 @@
 // Repository ventes — une vente baisse le stock dans une transaction. Aucune caisse à ouvrir.
 import { all, one, run, tx, nowIso } from "../db";
 import { journaliser } from "./activite";
+import { bornesJour } from "../periodes";
 
 export type Paiement = "especes" | "tmoney" | "flooz" | "credit";
 
@@ -27,15 +28,8 @@ export type LigneVente = {
 
 export type VenteAvecLignes = Vente & { lignes: LigneVente[] };
 
-function bornesDuJour(): { debut: string; fin: string } {
-  const d = new Date();
-  const debut = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0);
-  const fin = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1, 0, 0, 0, 0);
-  return { debut: debut.toISOString(), fin: fin.toISOString() };
-}
-
 export function listVentesDuJour(): VenteAvecLignes[] {
-  const { debut, fin } = bornesDuJour();
+  const { debut, fin } = bornesJour();
   const ventes = all<Vente>(
     `SELECT * FROM vente WHERE date >= ? AND date < ? ORDER BY date DESC, id DESC`,
     debut,

@@ -1,5 +1,29 @@
 # 05 — Audit de vérification (avant mise en service)
 
+> ## ✅ Statut de résolution — 2026-06-27
+> Tous les points P0, P1 et P2 ci-dessous ont été **corrigés et vérifiés** (50 tests verts, build de
+> production OK, test à chaud de l'appll réelle : pages + réconciliation automatique confirmées).
+> Résumé des corrections :
+> - **P0-1** Dépenses récurrentes reportées chaque mois (marge réelle juste). *(lib/repo/depenses.ts)*
+> - **P0-2** Sauvegarde/export : déjà livré par ailleurs (copie .db + CSV), commissions incluses.
+> - **P0-3** Réconciliation : l'« attendu » est **calculé** (dernier comptage + ventes − dépenses),
+>   avec le détail affiché ; corrigeable. *(lib/repo/comptes.ts, ReconciliationForm.tsx)*
+> - **P0-4** Stock visible à la caisse + avertissement « tu vends plus que le stock » (jamais bloquant) ;
+>   stock négatif signalé. *(VenteCaisse.tsx, stock/page.tsx)*
+> - **P1-5** L'achat prévient avant de changer le prix de vente d'un produit existant (ré-étiquetage).
+> - **P1-6** Nouveau module **Commissions Mobile Money** : revenu ajouté à la marge réelle. *(nouveau)*
+> - **P1-7** Bornes jour/mois unifiées sur Africa/Lomé (UTC+0) partout. *(lib/periodes.ts)*
+> - **P1-8 / P1-9** Import en masse & responsive : déjà livrés par ailleurs.
+> - **P1-10** Amorçage non destructif (comptes + propriétaire si absents) ; mot de passe initial via
+>   `OWNER_INITIAL_PASSWORD`, plus de mot de passe public. *(lib/db.ts)*
+> - **P2** Suppression confirmée + retours de formulaire (déjà livrés) ; noms de produits normalisés ;
+>   saisies négatives ramenées à 0 ; note sur les ventes à crédit ; rapports groupés par produit (pas
+>   par nom) ; page d'erreur calme en français. *(money.ts, produits.ts, benefices.ts, stats.ts, error.tsx)*
+> - **P3** laissés tels quels (mineurs) ; **Phase 5 (rôle vendeuse)** reste à faire avant décembre.
+>
+> Reste à faire côté exploitation (hors code) : choisir un hébergement à **disque persistant** et
+> brancher la **sauvegarde automatique hors-site** (voir P0-2).
+
 > **Date :** 2026-06-27 · **Type :** vérification approfondie, pas de nouvelles fonctionnalités.
 > **Question posée :** « Est-ce que le logiciel est vraiment prêt à être utilisé tous les jours, sans
 > bug, sans perte de données, sans nombre faux, sans blocage qui frustre la propriétaire ? »

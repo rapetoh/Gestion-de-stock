@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { getSession } from "@/lib/auth";
 import { exporterBase } from "@/lib/db";
-import { produitsCsv, ventesCsv, depensesCsv } from "@/lib/repo/export";
+import { produitsCsv, ventesCsv, depensesCsv, commissionsCsv } from "@/lib/repo/export";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -47,6 +47,9 @@ export async function GET(req: Request): Promise<Response> {
   } else if (type === "depenses") {
     csv = depensesCsv();
     nom = `depenses-${today}.csv`;
+  } else if (type === "commissions") {
+    csv = commissionsCsv();
+    nom = `commissions-${today}.csv`;
   } else {
     return new Response("Type inconnu", { status: 400 });
   }

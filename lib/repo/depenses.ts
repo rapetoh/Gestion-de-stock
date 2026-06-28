@@ -1,7 +1,13 @@
 // Repository dépenses — tout ce qui sort de la caisse (loyer, salaires, transport, taxes…).
 // Sert à calculer la marge RÉELLE : marge sur marchandise − dépenses du mois.
+//
+// Dépenses récurrentes (« revient chaque mois ») : on ne les ressaisit PAS chaque mois.
+// Une dépense cochée récurrente compte dans son mois de départ ET dans tous les mois suivants
+// (loyer, salaires, électricité…). C'est calculé à la lecture (`date < fin du mois`), sans
+// recopier de lignes ni toucher le passé. La supprimer l'enlève des mois suivants.
 import { all, one, run, nowIso } from "../db";
 import { journaliser } from "./activite";
+import { bornesMois } from "../periodes";
 
 export type Depense = {
   id: number;
@@ -12,13 +18,6 @@ export type Depense = {
   date: string;
   user_id: number | null;
 };
-
-function bornesDuMois(year: number, month: number): { debut: string; fin: string } {
-  // month : 1–12. Le Togo est à GMT, donc heure locale = UTC (pas de décalage).
-  const debut = new Date(year, month - 1, 1, 0, 0, 0, 0);
-  const fin = new Date(year, month, 1, 0, 0, 0, 0);
-  return { debut: debut.toISOString(), fin: fin.toISOString() };
-}
 
 export type CreateDepenseInput = {
   libelle: string;
@@ -105,21 +104,30 @@ export function deleteDepense(id: number, userId?: number | null): void {
   });
 }
 
+// Une dépense compte dans le mois si :
+//   - ponctuelle (recurrente = 0) et datée DANS le mois, OU
+//   - récurrente (recurrente = 1) et démarrée AVANT la fin du mois (donc reportée tous les mois).
+const CLAUSE_MOIS =
+  "((recurrente = 0 AND date >= ? AND date < ?) OR (recurrente = 1 AND date < ?))";
+
 export function depensesDuMois(year: number, month: number): Depense[] {
-  const { debut, fin } = bornesDuMois(year, month);
+  const { debut, fin } = bornesMois(year, month);
   return all<Depense>(
-    `SELECT * FROM depense WHERE date >= ? AND date < ? ORDER BY date DESC, id DESC`,
+    `SELECT * FROM depense WHERE ${CLAUSE_MOIS}
+      ORDER BY recurrente DESC, date DESC, id DESC`,
     debut,
+    fin,
     fin
   );
 }
 
 export function totalDepensesMois(year: number, month: number): number {
-  const { debut, fin } = bornesDuMois(year, month);
+  const { debut, fin } = bornesMois(year, month);
   return (
     one<{ total: number }>(
-      `SELECT COALESCE(SUM(montant), 0) AS total FROM depense WHERE date >= ? AND date < ?`,
+      `SELECT COALESCE(SUM(montant), 0) AS total FROM depense WHERE ${CLAUSE_MOIS}`,
       debut,
+      fin,
       fin
     )?.total ?? 0
   );

@@ -5,7 +5,8 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 function badge(stock: number, seuil: number) {
-  if (stock <= 0) return <span className="badge bad">fini</span>;
+  if (stock < 0) return <span className="badge bad">manquant</span>;
+  if (stock === 0) return <span className="badge bad">fini</span>;
   if (stock <= seuil) return <span className="badge warn">bas</span>;
   return <span className="badge ok">ok</span>;
 }
@@ -51,7 +52,7 @@ export default function StockPage() {
                   <tr key={p.id} className={bas ? "flag-row" : undefined}>
                     <td className="prod">{p.nom}</td>
                     <td className="muted">{p.categorie ?? "—"}</td>
-                    <td className="num">{p.stock}</td>
+                    <td className={`num${p.stock < 0 ? " neg" : ""}`}>{p.stock}</td>
                     <td className="num muted">{p.seuil_stock}</td>
                     <td className="num">{formatCFA(p.prix_vente)}</td>
                     <td>{badge(p.stock, p.seuil_stock)}</td>

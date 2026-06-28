@@ -2,26 +2,26 @@
 
 import { formatCFA } from "@/lib/money";
 import { jourCourt } from "@/lib/dates";
-import type { Depense } from "@/lib/repo/depenses";
+import type { Commission } from "@/lib/repo/commissions";
 import SubmitButton from "@/components/SubmitButton";
-import { modifierDepense, supprimerDepense } from "./actions";
-import { CATEGORIES } from "./categories";
+import { modifierCommission, supprimerCommission } from "./actions";
+import { CANAUX } from "./canaux";
 
-export default function DepenseRow({
-  d,
+export default function CommissionRow({
+  c,
   editing,
   onEdit,
   onClose,
 }: {
-  d: Depense;
+  c: Commission;
   editing: boolean;
   onEdit: () => void;
   onClose: () => void;
 }) {
-  const dateJour = d.date.slice(0, 10);
+  const dateJour = c.date.slice(0, 10);
 
   async function enregistrer(formData: FormData) {
-    await modifierDepense(formData);
+    await modifierCommission(formData);
     onClose();
   }
 
@@ -30,31 +30,27 @@ export default function DepenseRow({
       <tr>
         <td colSpan={5}>
           <form action={enregistrer}>
-            <input type="hidden" name="id" value={d.id} />
+            <input type="hidden" name="id" value={c.id} />
             <div className="row3" style={{ marginBottom: 12 }}>
               <div className="field" style={{ margin: 0 }}>
                 <label>Libellé</label>
-                <input className="input" name="libelle" defaultValue={d.libelle} />
+                <input className="input" name="libelle" defaultValue={c.libelle} />
               </div>
               <div className="field" style={{ margin: 0 }}>
                 <label>Montant</label>
                 <input
                   className="input"
                   name="montant"
-                  defaultValue={d.montant}
+                  defaultValue={c.montant}
                   inputMode="numeric"
                 />
               </div>
               <div className="field" style={{ margin: 0 }}>
-                <label>Catégorie</label>
-                <select
-                  className="input"
-                  name="categorie"
-                  defaultValue={d.categorie ?? "Autre"}
-                >
-                  {CATEGORIES.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
+                <label>Canal</label>
+                <select className="input" name="canal" defaultValue={c.canal ?? "Autre"}>
+                  {CANAUX.map((x) => (
+                    <option key={x} value={x}>
+                      {x}
                     </option>
                   ))}
                 </select>
@@ -63,24 +59,7 @@ export default function DepenseRow({
             <div className="row2" style={{ marginBottom: 12 }}>
               <div className="field" style={{ margin: 0 }}>
                 <label>Date</label>
-                <input
-                  className="input"
-                  type="date"
-                  name="date"
-                  defaultValue={dateJour}
-                />
-              </div>
-              <div className="field" style={{ margin: 0, justifyContent: "flex-end" }}>
-                <label
-                  style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}
-                >
-                  <input
-                    type="checkbox"
-                    name="recurrente"
-                    defaultChecked={d.recurrente === 1}
-                  />
-                  Revient chaque mois
-                </label>
+                <input className="input" type="date" name="date" defaultValue={dateJour} />
               </div>
             </div>
             <div style={{ display: "flex", gap: 10 }}>
@@ -97,26 +76,24 @@ export default function DepenseRow({
 
   return (
     <tr>
-      <td className="muted">
-        {d.recurrente === 1 ? "Chaque mois" : jourCourt(d.date)}
-      </td>
-      <td className="prod">{d.libelle}</td>
-      <td>{d.categorie ?? "—"}</td>
-      <td className="num neg">{formatCFA(d.montant)}</td>
+      <td className="muted">{jourCourt(c.date)}</td>
+      <td className="prod">{c.libelle}</td>
+      <td>{c.canal ?? "—"}</td>
+      <td className="num pos">{formatCFA(c.montant)}</td>
       <td className="num">
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
           <button type="button" className="btn ghost" onClick={onEdit}>
             Modifier
           </button>
           <form
-            action={supprimerDepense}
+            action={supprimerCommission}
             onSubmit={(e) => {
-              if (!confirm(`Supprimer la dépense « ${d.libelle} » ? Cette action est définitive.`)) {
+              if (!confirm(`Supprimer la commission « ${c.libelle} » ? Cette action est définitive.`)) {
                 e.preventDefault();
               }
             }}
           >
-            <input type="hidden" name="id" value={d.id} />
+            <input type="hidden" name="id" value={c.id} />
             <button type="submit" className="btn danger">
               Supprimer
             </button>

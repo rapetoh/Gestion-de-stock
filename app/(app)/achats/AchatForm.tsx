@@ -12,6 +12,7 @@ export default function AchatForm({ produits }: { produits: Produit[] }) {
   const [prixAchat, setPrixAchat] = useState("0");
   const [frais, setFrais] = useState("0");
   const [prixVente, setPrixVente] = useState("0");
+  const [actuel, setActuel] = useState<Produit | null>(null); // produit existant correspondant
   const [flash, setFlash] = useState<string | null>(null);
 
   async function soumettre(formData: FormData) {
@@ -29,9 +30,9 @@ export default function AchatForm({ produits }: { produits: Produit[] }) {
   // Pré-remplissage si le nom correspond à un produit existant.
   function onNomChange(v: string) {
     setNom(v);
-    const found = produits.find(
-      (p) => p.nom.toLowerCase() === v.trim().toLowerCase()
-    );
+    const found =
+      produits.find((p) => p.nom.toLowerCase() === v.trim().toLowerCase()) ?? null;
+    setActuel(found);
     if (found) {
       setPrixAchat(String(found.prix_achat));
       setPrixVente(String(found.prix_vente));
@@ -47,6 +48,10 @@ export default function AchatForm({ produits }: { produits: Produit[] }) {
     const marge = pv - cout;
     return { cout, marge, pv };
   }, [quantite, prixAchat, frais, prixVente]);
+
+  // Restock d'un produit existant à un NOUVEAU prix de vente : on prévient (ré-étiquetage).
+  const changePrix =
+    actuel != null && calc.pv > 0 && calc.pv !== actuel.prix_vente;
 
   return (
     <form action={soumettre} onChange={() => flash && setFlash(null)}>
@@ -136,6 +141,16 @@ export default function AchatForm({ produits }: { produits: Produit[] }) {
           onChange={(e) => setPrixVente(e.target.value)}
           inputMode="numeric"
         />
+        {changePrix ? (
+          <div
+            className="hint"
+            style={{ marginTop: 4, borderLeft: "3px solid var(--warn, #e0a100)", paddingLeft: 10 }}
+          >
+            ⚠️ Le prix de vente passe de {formatCFA(actuel!.prix_vente)} à{" "}
+            {formatCFA(calc.pv)}. Le stock déjà en rayon sera vendu à ce nouveau
+            prix — pense à ré-étiqueter.
+          </div>
+        ) : null}
       </div>
 
       <div className="field">

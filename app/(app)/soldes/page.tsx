@@ -4,6 +4,7 @@ import {
 } from "@/lib/repo/comptes";
 import { formatCFA } from "@/lib/money";
 import { jourCourt } from "@/lib/dates";
+import { aujourdhuiLome } from "@/lib/periodes";
 import ReconciliationForm from "./ReconciliationForm";
 
 export const runtime = "nodejs";
@@ -18,7 +19,7 @@ export default async function SoldesPage({
   const jour =
     jourParam && /^\d{4}-\d{2}-\d{2}$/.test(jourParam)
       ? jourParam
-      : new Date().toISOString().slice(0, 10);
+      : aujourdhuiLome();
 
   const reco = reconciliationDuJour(jour);
   const historique = historiqueReconciliations(14);

@@ -1,9 +1,9 @@
-import { depensesDuMois, totalDepensesMois } from "@/lib/repo/depenses";
+import { commissionsDuMois, totalCommissionsMois } from "@/lib/repo/commissions";
 import { formatCFA } from "@/lib/money";
 import { moisAnnee } from "@/lib/dates";
 import { anneeMoisCourants } from "@/lib/periodes";
-import DepenseForm from "./DepenseForm";
-import DepensesRows from "./DepensesRows";
+import CommissionForm from "./CommissionForm";
+import CommissionsRows from "./CommissionsRows";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -20,7 +20,7 @@ function dernierMois(): { value: string; label: string }[] {
   return out;
 }
 
-export default async function DepensesPage({
+export default async function CommissionsPage({
   searchParams,
 }: {
   searchParams: Promise<{ mois?: string }>;
@@ -35,8 +35,8 @@ export default async function DepensesPage({
     month = m;
   }
 
-  const depenses = depensesDuMois(year, month);
-  const total = totalDepensesMois(year, month);
+  const commissions = commissionsDuMois(year, month);
+  const total = totalCommissionsMois(year, month);
   const options = dernierMois();
   const selected = `${year}-${String(month).padStart(2, "0")}`;
 
@@ -44,9 +44,10 @@ export default async function DepensesPage({
     <>
       <div className="topbar">
         <div>
-          <h1>Dépenses</h1>
+          <h1>Commissions Mobile Money</h1>
           <div className="when">
-            Loyer, salaire, transport, taxes… tout ce qui sort de la caisse.
+            TMoney, Flooz, crédit… ce que le mobile money te rapporte, en plus de
+            la marchandise.
           </div>
         </div>
         <div className="right">
@@ -75,14 +76,14 @@ export default async function DepensesPage({
         style={{ gridTemplateColumns: "420px 1fr", alignItems: "start" }}
       >
         <div className="card">
-          <h2>Nouvelle dépense</h2>
-          <DepenseForm />
+          <h2>Nouvelle commission</h2>
+          <CommissionForm />
         </div>
 
         <div className="card">
-          <h2>Dépenses de {moisAnnee(year, month)}</h2>
+          <h2>Commissions de {moisAnnee(year, month)}</h2>
           <div className="hint">
-            Total du mois : <strong>{formatCFA(total)}</strong> — retiré de ta
+            Total du mois : <strong>{formatCFA(total)}</strong> — ajouté à ta
             marge dans Bénéfices.
           </div>
           <table>
@@ -90,27 +91,27 @@ export default async function DepensesPage({
               <tr>
                 <th>Date</th>
                 <th>Libellé</th>
-                <th>Catégorie</th>
+                <th>Canal</th>
                 <th className="num">Montant</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
-              {depenses.length === 0 ? (
+              {commissions.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="muted">
-                    Aucune dépense ce mois-ci.
+                    Aucune commission ce mois-ci.
                   </td>
                 </tr>
               ) : (
-                <DepensesRows depenses={depenses} />
+                <CommissionsRows commissions={commissions} />
               )}
             </tbody>
-            {depenses.length > 0 ? (
+            {commissions.length > 0 ? (
               <tfoot>
                 <tr>
                   <td colSpan={3}>Total</td>
-                  <td className="num neg">{formatCFA(total)}</td>
+                  <td className="num pos">{formatCFA(total)}</td>
                   <td></td>
                 </tr>
               </tfoot>

@@ -33,10 +33,16 @@ export function getProduit(id: number): Produit | undefined {
   return one<Produit>(`SELECT * FROM produit WHERE id = ?`, id);
 }
 
+// Normalise un nom : espaces multiples réduits à un seul, bords coupés. Évite les faux doublons
+// « Eau de source » vs « Eau de  source » qui scinderaient le stock et fausseraient le contrôle.
+export function normaliserNom(nom: string): string {
+  return nom.replace(/\s+/g, " ").trim();
+}
+
 export function getProduitParNom(nom: string): Produit | undefined {
   return one<Produit>(
     `SELECT * FROM produit WHERE actif = 1 AND nom = ? COLLATE NOCASE LIMIT 1`,
-    nom.trim()
+    normaliserNom(nom)
   );
 }
 
@@ -57,7 +63,7 @@ export function createProduit(data: ProduitInput, userId?: number | null): numbe
     `INSERT INTO produit
        (nom, categorie, prix_achat, frais, prix_vente, stock, seuil_stock, code_barre, actif, cree_le, maj_le)
      VALUES (?,?,?,?,?,?,?,?,1,?,?)`,
-    data.nom.trim(),
+    normaliserNom(data.nom),
     data.categorie ?? null,
     data.prixAchat ?? 0,
     data.frais ?? 0,
@@ -72,7 +78,7 @@ export function createProduit(data: ProduitInput, userId?: number | null): numbe
     userId,
     action: "creation",
     entite: "produit",
-    details: `Produit créé : ${data.nom.trim()}`,
+    details: `Produit créé : ${normaliserNom(data.nom)}`,
     refId: r.lastId,
   });
   return r.lastId;
@@ -88,7 +94,7 @@ export function updateProduit(
        nom = ?, categorie = ?, prix_achat = ?, frais = ?, prix_vente = ?,
        stock = ?, seuil_stock = ?, code_barre = ?, maj_le = ?
      WHERE id = ?`,
-    data.nom.trim(),
+    normaliserNom(data.nom),
     data.categorie ?? null,
     data.prixAchat ?? 0,
     data.frais ?? 0,
@@ -103,7 +109,7 @@ export function updateProduit(
     userId,
     action: "modification",
     entite: "produit",
-    details: `Produit modifié : ${data.nom.trim()}`,
+    details: `Produit modifié : ${normaliserNom(data.nom)}`,
     refId: id,
   });
 }
@@ -132,7 +138,7 @@ export function importerProduits(
     let maj = 0;
     const now = nowIso();
     for (const r of rows) {
-      const nom = r.nom.trim();
+      const nom = normaliserNom(r.nom);
       if (!nom) continue;
       const existant = one<{ id: number }>(
         `SELECT id FROM produit WHERE actif = 1 AND nom = ? COLLATE NOCASE`,

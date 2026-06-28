@@ -75,9 +75,9 @@ export default function ReconciliationForm({
       <div className="card">
         <h2>Compte par compte</h2>
         <div className="hint">
-          « Attendu » = ce qui devrait être là (ton capital). « Compté » = ce
-          qu&apos;il y a vraiment. Laisse vide un compte que tu ne vérifies pas
-          aujourd&apos;hui.
+          « Attendu » est calculé tout seul : dernier comptage + ventes du jour −
+          dépenses. Tu peux le corriger. « Compté » = ce que tu comptes
+          vraiment. Laisse vide un compte que tu ne vérifies pas aujourd&apos;hui.
         </div>
         <table style={{ marginTop: 6 }}>
           <thead>
@@ -91,7 +91,22 @@ export default function ReconciliationForm({
           <tbody>
             {calc.parLigne.map(({ l, ecart, c }) => (
               <tr key={l.compte_id}>
-                <td className="prod">{l.nom}</td>
+                <td className="prod">
+                  {l.nom}
+                  {l.detail ? (
+                    <div className="muted" style={{ fontSize: 12, fontWeight: 400 }}>
+                      {l.detail.baselineJour
+                        ? `Dernier compté ${formatCFA(l.detail.baseline)}`
+                        : "Départ 0"}
+                      {l.detail.ventes
+                        ? ` + ventes ${formatCFA(l.detail.ventes)}`
+                        : ""}
+                      {l.detail.depenses
+                        ? ` − dépenses ${formatCFA(l.detail.depenses)}`
+                        : ""}
+                    </div>
+                  ) : null}
+                </td>
                 <td className="num">
                   <input
                     className="input"

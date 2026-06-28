@@ -78,6 +78,10 @@ export default function DepenseForm() {
           </label>
         </div>
       </div>
+      <div className="hint" style={{ marginTop: 4 }}>
+        « Revient chaque mois » : à saisir une seule fois (loyer, salaire…). Elle
+        compte automatiquement les mois suivants — pas besoin de la ressaisir.
+      </div>
 
       <SubmitButton className="btn primary big" style={{ width: "100%" }}>
         Enregistrer la dépense

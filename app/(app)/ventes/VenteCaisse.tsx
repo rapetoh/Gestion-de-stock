@@ -6,7 +6,13 @@ import type { Produit } from "@/lib/repo/produits";
 import SubmitButton from "@/components/SubmitButton";
 import { encaisserVente } from "./actions";
 
-type Ligne = { produitId: number; nom: string; prix: number; quantite: number };
+type Ligne = {
+  produitId: number;
+  nom: string;
+  prix: number;
+  quantite: number;
+  stock: number; // stock connu au moment de l'ajout — pour avertir, jamais bloquer
+};
 type Paiement = "especes" | "tmoney" | "flooz" | "credit";
 
 const PAY: { id: Paiement; ic: string; label: string }[] = [
@@ -44,7 +50,7 @@ export default function VenteCaisse({ produits }: { produits: Produit[] }) {
       }
       return [
         ...prev,
-        { produitId: p.id, nom: p.nom, prix: p.prix_vente, quantite: 1 },
+        { produitId: p.id, nom: p.nom, prix: p.prix_vente, quantite: 1, stock: p.stock },
       ];
     });
     setRecherche("");
@@ -72,6 +78,12 @@ export default function VenteCaisse({ produits }: { produits: Produit[] }) {
     if (!s) return [];
     return produits.filter((p) => p.nom.toLowerCase().includes(s)).slice(0, 8);
   }, [recherche, produits]);
+
+  // Lignes où l'on vend plus que le stock connu — autorisé, mais signalé.
+  const surventes = useMemo(
+    () => lignes.filter((l) => l.quantite > l.stock),
+    [lignes]
+  );
 
   const payload = JSON.stringify(
     lignes.map((l) => ({ produitId: l.produitId, quantite: l.quantite }))
@@ -112,7 +124,12 @@ export default function VenteCaisse({ produits }: { produits: Produit[] }) {
                   style={{ width: "100%", justifyContent: "space-between" }}
                   onClick={() => ajouter(p)}
                 >
-                  <span>{p.nom}</span>
+                  <span>
+                    {p.nom}{" "}
+                    <span className={p.stock <= 0 ? "badge bad" : "muted"} style={{ fontSize: 12 }}>
+                      {p.stock <= 0 ? "rupture" : `reste ${p.stock}`}
+                    </span>
+                  </span>
                   <span className="muted">{formatCFA(p.prix_vente)}</span>
                 </button>
               ))}
@@ -140,7 +157,14 @@ export default function VenteCaisse({ produits }: { produits: Produit[] }) {
             ) : (
               lignes.map((l) => (
                 <tr key={l.produitId}>
-                  <td className="prod">{l.nom}</td>
+                  <td className="prod">
+                    {l.nom}
+                    {l.quantite > l.stock ? (
+                      <span className="badge warn" style={{ marginLeft: 8, fontSize: 12 }}>
+                        {l.stock <= 0 ? "rupture" : `il reste ${l.stock}`}
+                      </span>
+                    ) : null}
+                  </td>
                   <td className="num">
                     <input
                       className="input"
@@ -195,7 +219,7 @@ export default function VenteCaisse({ produits }: { produits: Produit[] }) {
         >
           Payé comment ?
         </label>
-        <div className="paygrid" style={{ marginBottom: 16 }}>
+        <div className="paygrid" style={{ marginBottom: paiement === "credit" ? 8 : 16 }}>
           {PAY.map((p) => (
             <button
               key={p.id}
@@ -207,6 +231,24 @@ export default function VenteCaisse({ produits }: { produits: Produit[] }) {
             </button>
           ))}
         </div>
+        {paiement === "credit" ? (
+          <div className="hint" style={{ marginBottom: 16 }}>
+            Crédit : la marchandise sort et le gain est compté, mais l&apos;argent
+            n&apos;est pas encore reçu. Note bien qui te doit.
+          </div>
+        ) : null}
+
+        {surventes.length > 0 ? (
+          <div
+            className="hint"
+            style={{ marginBottom: 10, borderLeft: "3px solid var(--warn, #e0a100)", paddingLeft: 10 }}
+          >
+            ⚠️ Tu vends plus que le stock pour{" "}
+            <strong>{surventes.map((l) => l.nom).join(", ")}</strong>. La vente
+            est permise — le stock passera en négatif (à vérifier au Contrôle de
+            stock).
+          </div>
+        ) : null}
 
         <form ref={formRef} action={encaisser}>
           <input type="hidden" name="paiement" value={paiement} />

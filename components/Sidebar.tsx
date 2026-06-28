@@ -21,6 +21,7 @@ const NAV_JOUR = [
 const NAV_CONTROLE = [
   { href: "/controle", ic: "⊙", label: "Contrôle de stock" },
   { href: "/soldes", ic: "⚖", label: "Soldes du jour" },
+  { href: "/commissions", ic: "📲", label: "Commissions" },
   { href: "/depenses", ic: "▦", label: "Dépenses" },
   { href: "/benefices", ic: "★", label: "Bénéfices" },
   { href: "/activite", ic: "≣", label: "Activité" },

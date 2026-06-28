@@ -1,19 +1,15 @@
 // Repository statistiques — données agrégées pour le tableau de bord.
 import { all, one } from "../db";
 import { produitsARecommander } from "./produits";
+import { bornesJour, bornesMois, anneeMoisCourants } from "../periodes";
 
 function bornesDuJour(): { debut: string; fin: string } {
-  const d = new Date();
-  const debut = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0);
-  const fin = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1, 0, 0, 0, 0);
-  return { debut: debut.toISOString(), fin: fin.toISOString() };
+  return bornesJour();
 }
 
 function bornesDuMois(): { debut: string; fin: string } {
-  const d = new Date();
-  const debut = new Date(d.getFullYear(), d.getMonth(), 1, 0, 0, 0, 0);
-  const fin = new Date(d.getFullYear(), d.getMonth() + 1, 1, 0, 0, 0, 0);
-  return { debut: debut.toISOString(), fin: fin.toISOString() };
+  const { year, month } = anneeMoisCourants();
+  return bornesMois(year, month);
 }
 
 export type TopProduit = {
@@ -52,14 +48,15 @@ export function dashboard(): Dashboard {
   );
 
   const top = all<TopProduit>(
-    `SELECT lv.nom_produit AS nom,
+    `SELECT COALESCE(p.nom, lv.nom_produit) AS nom,
             SUM(lv.quantite) AS qte,
             SUM(lv.total) AS recette,
             SUM((lv.prix_unitaire - lv.cout_unitaire - lv.frais_unitaire) * lv.quantite) AS marge
        FROM ligne_vente lv
        JOIN vente v ON v.id = lv.vente_id
+       LEFT JOIN produit p ON p.id = lv.produit_id
       WHERE v.date >= ? AND v.date < ?
-      GROUP BY lv.nom_produit
+      GROUP BY lv.produit_id, COALESCE(p.nom, lv.nom_produit)
       ORDER BY qte DESC
       LIMIT 5`,
     mois.debut,

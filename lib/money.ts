@@ -9,12 +9,15 @@ export function formatCFA(n: number): string {
   return `${sign}${digits} F`;
 }
 
-// Parse user input like "1 500", "1.500", "1500 F" -> 1500
+// Parse user input like "1 500", "1.500", "1500 F" -> 1500.
+// Jamais négatif : un prix, une quantité ou un montant ne l'est pas (sinon on perdrait du stock/argent
+// en silence). Une saisie négative ou illisible devient 0 — visible, jamais un nombre faux caché.
 export function parseCFA(input: string | number): number {
-  if (typeof input === "number") return Math.round(input);
-  const cleaned = (input || "").toString().replace(/[^\d-]/g, "");
-  const n = parseInt(cleaned, 10);
-  return Number.isFinite(n) ? n : 0;
+  const n =
+    typeof input === "number"
+      ? Math.round(input)
+      : parseInt((input || "").toString().replace(/[^\d-]/g, ""), 10);
+  return Number.isFinite(n) && n > 0 ? n : 0;
 }
 
 // Cost of goods (coût de revient) per unit when receiving a purchase:

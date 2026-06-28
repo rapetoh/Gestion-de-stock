@@ -8,7 +8,7 @@ function clear() {
     "activite",
     "ligne_vente", "vente", "achat", "mouvement_stock",
     "ligne_controle", "controle_stock", "solde_journalier",
-    "depense", "compte", "produit", "utilisateur",
+    "depense", "commission", "compte", "produit", "utilisateur",
   ]) {
     db.exec(`DELETE FROM ${t};`);
     db.exec(`DELETE FROM sqlite_sequence WHERE name='${t}';`);
@@ -19,12 +19,14 @@ function seed() {
   clear();
   const now = nowIso();
 
-  // Owner
-  const hash = bcrypt.hashSync("maman2026", 10);
+  // Owner — mot de passe depuis l'environnement, repli "maman2026" pour le dev seulement.
+  const login = process.env.OWNER_LOGIN || "maman";
+  const motDePasse = process.env.OWNER_INITIAL_PASSWORD || "maman2026";
+  const hash = bcrypt.hashSync(motDePasse, 10);
   run(
     `INSERT INTO utilisateur (nom, login, mot_de_passe, role, actif, cree_le)
      VALUES (?,?,?,?,1,?)`,
-    "Maman", "maman", hash, "proprietaire", now
+    "Maman", login, hash, "proprietaire", now
   );
 
   // Comptes (money buckets for reconciliation)

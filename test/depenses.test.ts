@@ -37,6 +37,49 @@ describe("dépenses", () => {
     expect(depensesDuMois(2026, 6)[0].recurrente).toBe(1);
   });
 
+  it("une dépense récurrente compte chaque mois suivant, sans la ressaisir", () => {
+    // Saisie une seule fois en juin.
+    createDepense({ libelle: "Loyer", montant: 30000, recurrente: true, date: "2026-06-01" });
+    createDepense({ libelle: "Salaire", montant: 25000, recurrente: true, date: "2026-06-01" });
+    // Une ponctuelle de juin qui NE doit PAS suivre en juillet.
+    createDepense({ libelle: "Transport", montant: 2000, date: "2026-06-20" });
+
+    // Juin : loyer + salaire + transport.
+    expect(totalDepensesMois(2026, 6)).toBe(57000);
+    // Juillet : loyer + salaire reportés ; transport non.
+    expect(totalDepensesMois(2026, 7)).toBe(55000);
+    expect(depensesDuMois(2026, 7).map((d) => d.libelle).sort()).toEqual(["Loyer", "Salaire"]);
+    // Décembre : toujours reportés.
+    expect(totalDepensesMois(2026, 12)).toBe(55000);
+    // Avant le mois de départ (mai) : rien.
+    expect(totalDepensesMois(2026, 5)).toBe(0);
+  });
+
+  it("supprimer une dépense récurrente l'arrête pour les mois suivants", () => {
+    const id = createDepense({ libelle: "Internet", montant: 10000, recurrente: true, date: "2026-06-01" });
+    expect(totalDepensesMois(2026, 8)).toBe(10000);
+    deleteDepense(id);
+    expect(totalDepensesMois(2026, 8)).toBe(0);
+  });
+
+  it("la marge regroupe par produit même après un renommage", async () => {
+    const { updateProduit } = await import("../lib/repo/produits");
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = now.getMonth() + 1;
+
+    const pid = createProduit({ nom: "Eau", prixAchat: 100, frais: 0, prixVente: 150, stock: 10 });
+    createVente({ paiement: "especes", lignes: [{ produitId: pid, quantite: 1 }] }); // figé "Eau"
+    updateProduit(pid, { nom: "Eau minérale", prixVente: 150 }); // renommage
+    createVente({ paiement: "especes", lignes: [{ produitId: pid, quantite: 1 }] }); // figé "Eau minérale"
+
+    const b = parProduit(y, m);
+    // Une seule ligne produit (groupée par id), pas deux à cause du renommage.
+    expect(b.lignes).toHaveLength(1);
+    expect(b.lignes[0].qteVendue).toBe(2);
+    expect(b.lignes[0].nom).toBe("Eau minérale"); // nom actuel
+  });
+
   it("marge réelle = marge sur marchandise − dépenses du mois", () => {
     const now = new Date();
     const y = now.getFullYear();

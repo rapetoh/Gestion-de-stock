@@ -71,3 +71,13 @@ export function depensesCsv(): string {
     rows.map((d) => [d.date, d.libelle, d.categorie, d.montant])
   );
 }
+
+export function commissionsCsv(): string {
+  const rows = all<{ date: string; libelle: string; canal: string | null; montant: number }>(
+    `SELECT date, libelle, canal, montant FROM commission ORDER BY date DESC`
+  );
+  return toCsv(
+    ["Date", "Libellé", "Canal", "Montant"],
+    rows.map((c) => [c.date, c.libelle, c.canal, c.montant])
+  );
+}

@@ -55,6 +55,9 @@ export default function SauvegardePage() {
             <a href="/sauvegarde/export?type=depenses" className="btn ghost" download>
               Mes dépenses (CSV)
             </a>
+            <a href="/sauvegarde/export?type=commissions" className="btn ghost" download>
+              Mes commissions (CSV)
+            </a>
           </div>
         </div>
       </div>

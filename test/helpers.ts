@@ -12,6 +12,7 @@ const TABLES = [
   "controle_stock",
   "solde_journalier",
   "depense",
+  "commission",
   "compte",
   "produit",
   "utilisateur",

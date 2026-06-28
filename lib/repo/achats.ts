@@ -68,7 +68,11 @@ export function createAchat(input: CreateAchatInput): number {
       input.userId ?? null
     ).lastId;
 
-    // Le produit prend les derniers prix et son stock augmente.
+    // Le produit reflète le DERNIER achat : coût (prix_achat + frais unitaires) et prix de vente.
+    // Le formulaire pré-remplit ces valeurs avec celles du produit et prévient si le prix de vente
+    // change (ré-étiquetage), donc cette mise à jour est volontaire, jamais une surprise silencieuse.
+    // NB : modifier un achat passé (updateAchat) ne réécrit PAS le prix courant du produit — sinon
+    // corriger une vieille ligne changerait le prix d'aujourd'hui.
     run(
       `UPDATE produit SET
          prix_achat = ?, frais = ?, prix_vente = ?, stock = ?, maj_le = ?

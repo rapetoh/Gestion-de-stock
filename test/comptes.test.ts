@@ -73,4 +73,39 @@ describe("soldes — réconciliation quotidienne", () => {
   it("refuse une réconciliation sans aucun solde compté", () => {
     expect(() => enregistrerReconciliation({ jour: "2026-06-27", lignes: [] })).toThrow();
   });
+
+  it("calcule l'attendu : dernier compté + ventes du compte − dépenses (espèces)", () => {
+    const esp = compte("Espèces", "especes");
+    // Hier : caisse comptée à 50 000.
+    enregistrerReconciliation({ jour: "2026-06-27", lignes: [{ compteId: esp, attendu: 50000, compte: 50000 }] });
+    // Une vente AVANT/SUR le jour compté ne doit PAS recompter (déjà dans le solde).
+    run("INSERT INTO vente (date, paiement, total) VALUES (?,?,?)", "2026-06-27T16:00:00.000Z", "especes", 9999);
+    // Aujourd'hui : 8 000 de ventes espèces et 2 000 de dépense sortie de caisse.
+    run("INSERT INTO vente (date, paiement, total) VALUES (?,?,?)", "2026-06-28T10:00:00.000Z", "especes", 8000);
+    run("INSERT INTO vente (date, paiement, total) VALUES (?,?,?)", "2026-06-28T10:30:00.000Z", "tmoney", 5000); // autre compte, ignoré
+    run("INSERT INTO depense (libelle, montant, date) VALUES (?,?,?)", "Transport", 2000, "2026-06-28T11:00:00.000Z");
+
+    const ligne = reconciliationDuJour("2026-06-28").lignes.find((l) => l.compte_id === esp)!;
+    expect(ligne.attendu).toBe(56000); // 50000 + 8000 − 2000 (la vente du 27 et le tmoney sont exclus)
+    expect(ligne.compte).toBeNull();
+    expect(ligne.detail).toMatchObject({ baseline: 50000, ventes: 8000, depenses: 2000 });
+  });
+
+  it("attendu TMoney = dernier compté + ventes TMoney (pas de dépenses retirées)", () => {
+    const tm = compte("TMoney", "tmoney");
+    enregistrerReconciliation({ jour: "2026-06-27", lignes: [{ compteId: tm, attendu: 100000, compte: 100000 }] });
+    run("INSERT INTO vente (date, paiement, total) VALUES (?,?,?)", "2026-06-28T09:00:00.000Z", "tmoney", 5000);
+    run("INSERT INTO depense (libelle, montant, date) VALUES (?,?,?)", "Loyer", 3000, "2026-06-28T09:00:00.000Z");
+
+    const ligne = reconciliationDuJour("2026-06-28").lignes.find((l) => l.compte_id === tm)!;
+    expect(ligne.attendu).toBe(105000); // dépense non retirée d'un compte mobile
+  });
+
+  it("premier jour sans comptage : attendu = ventes − dépenses depuis zéro", () => {
+    const esp = compte("Espèces", "especes");
+    run("INSERT INTO vente (date, paiement, total) VALUES (?,?,?)", "2026-06-27T10:00:00.000Z", "especes", 3000);
+    const ligne = reconciliationDuJour("2026-06-27").lignes.find((l) => l.compte_id === esp)!;
+    expect(ligne.attendu).toBe(3000);
+    expect(ligne.detail).toMatchObject({ baseline: 0, baselineJour: null });
+  });
 });

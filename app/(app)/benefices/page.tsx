@@ -1,20 +1,22 @@
 import Link from "next/link";
 import { parProduit } from "@/lib/repo/benefices";
 import { totalDepensesMois } from "@/lib/repo/depenses";
+import { totalCommissionsMois } from "@/lib/repo/commissions";
 import { formatCFA } from "@/lib/money";
 import { moisAnnee } from "@/lib/dates";
+import { anneeMoisCourants } from "@/lib/periodes";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// Liste des 12 derniers mois pour le sélecteur.
+// Liste des 12 derniers mois pour le sélecteur (heure de Lomé / UTC).
 function dernierMois(): { value: string; label: string }[] {
   const out: { value: string; label: string }[] = [];
-  const now = new Date();
+  const { year, month } = anneeMoisCourants();
   for (let i = 0; i < 12; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const y = d.getFullYear();
-    const m = d.getMonth() + 1;
+    const d = new Date(Date.UTC(year, month - 1 - i, 1));
+    const y = d.getUTCFullYear();
+    const m = d.getUTCMonth() + 1;
     out.push({ value: `${y}-${String(m).padStart(2, "0")}`, label: moisAnnee(y, m) });
   }
   return out;
@@ -26,9 +28,9 @@ export default async function BeneficesPage({
   searchParams: Promise<{ mois?: string }>;
 }) {
   const { mois } = await searchParams;
-  const now = new Date();
-  let year = now.getFullYear();
-  let month = now.getMonth() + 1;
+  const courant = anneeMoisCourants();
+  let year = courant.year;
+  let month = courant.month;
   if (mois && /^\d{4}-\d{2}$/.test(mois)) {
     const [y, m] = mois.split("-").map(Number);
     year = y;
@@ -37,7 +39,9 @@ export default async function BeneficesPage({
 
   const { lignes, totaux } = parProduit(year, month);
   const depensesMois = totalDepensesMois(year, month);
-  const margeReelle = totaux.marge - depensesMois;
+  const commissionsMois = totalCommissionsMois(year, month);
+  // Marge réelle = marge marchandise + commissions Mobile Money − dépenses du mois.
+  const margeReelle = totaux.marge + commissionsMois - depensesMois;
   const options = dernierMois();
   const selected = `${year}-${String(month).padStart(2, "0")}`;
 
@@ -121,6 +125,15 @@ export default async function BeneficesPage({
           </div>
           <div className="calcline">
             <span>
+              + Commissions Mobile Money{" "}
+              <Link href={`/commissions?mois=${selected}`} className="lien">
+                (voir / modifier)
+              </Link>
+            </span>
+            <span className="pos">{formatCFA(commissionsMois)}</span>
+          </div>
+          <div className="calcline">
+            <span>
               − Dépenses du mois{" "}
               <Link href={`/depenses?mois=${selected}`} className="lien">
                 (voir / modifier)
@@ -164,7 +177,7 @@ export default async function BeneficesPage({
               </tr>
             ) : (
               lignes.map((l) => (
-                <tr key={l.nom}>
+                <tr key={l.produitId ?? l.nom}>
                   <td className="prod">{l.nom}</td>
                   <td className="num">{l.qteVendue}</td>
                   <td className="num">{formatCFA(l.achete)}</td>

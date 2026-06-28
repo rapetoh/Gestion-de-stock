@@ -7,6 +7,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import bcrypt from "bcryptjs";
 
 // Load the built-in SQLite via process.getBuiltinModule — the bundler-proof way to
 // reach a Node core module. A static `import ... from "node:sqlite"` gets re-externalized
@@ -234,6 +235,18 @@ function migrate(database: DatabaseSync): void {
     CREATE INDEX IF NOT EXISTS idx_depense_date ON depense(date);
     CREATE INDEX IF NOT EXISTS idx_solde_date ON solde_journalier(date);
 
+    -- Commissions Mobile Money (TMoney, Flooz, crédit) : un REVENU à part de la marge marchandise.
+    -- C'est la moitié de l'activité ; elles comptent dans la marge réelle du mois.
+    CREATE TABLE IF NOT EXISTS commission (
+      id            INTEGER PRIMARY KEY AUTOINCREMENT,
+      libelle       TEXT    NOT NULL,
+      montant       INTEGER NOT NULL,
+      canal         TEXT,             -- 'tmoney' | 'flooz' | 'credit' | 'autre'
+      date          TEXT    NOT NULL,
+      user_id       INTEGER REFERENCES utilisateur(id)
+    );
+    CREATE INDEX IF NOT EXISTS idx_commission_date ON commission(date);
+
     -- Journal d'activité : qui a fait quoi, et quand. La trace pour les comptes et le contrôle.
     CREATE TABLE IF NOT EXISTS activite (
       id            INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -251,6 +264,51 @@ function migrate(database: DatabaseSync): void {
   // Migrations additives idempotentes (un ALTER n'est pas couvert par CREATE TABLE IF NOT EXISTS).
   // attendu = ce qui DEVRAIT être sur le compte ce jour-là (capital/float), à côté du solde compté.
   ajouterColonneSiAbsente(database, "solde_journalier", "attendu", "INTEGER NOT NULL DEFAULT 0");
+
+  amorcerDonneesInitiales(database);
+}
+
+// Amorçage NON destructif au premier démarrage : ne crée que ce qui manque, ne supprime JAMAIS rien.
+// (À ne pas confondre avec scripts/seed.ts qui, lui, vide tout et n'est QUE pour le développement.)
+function amorcerDonneesInitiales(database: DatabaseSync): void {
+  // 1) Comptes de réconciliation : sans eux l'écran « Soldes » est vide. Aucun risque de sécurité.
+  const nbComptes =
+    (database.prepare("SELECT COUNT(*) AS c FROM compte").get() as { c: number }).c;
+  if (nbComptes === 0) {
+    const ins = database.prepare("INSERT INTO compte (nom, type, actif) VALUES (?,?,1)");
+    const comptes: [string, string][] = [
+      ["Espèces (caisse)", "especes"],
+      ["TMoney", "tmoney"],
+      ["Flooz", "flooz"],
+      ["Crédit", "credit"],
+    ];
+    for (const [nom, type] of comptes) ins.run(nom, type);
+  }
+
+  // 2) Propriétaire : créé au premier démarrage UNIQUEMENT à partir des variables d'environnement,
+  //    pour ne JAMAIS livrer un mot de passe public. En dev on tolère un mot de passe de repli.
+  const nbUsers =
+    (database.prepare("SELECT COUNT(*) AS c FROM utilisateur").get() as { c: number }).c;
+  if (nbUsers === 0) {
+    const login = process.env.OWNER_LOGIN || "maman";
+    const motDePasse =
+      process.env.OWNER_INITIAL_PASSWORD ||
+      (process.env.NODE_ENV !== "production" ? "maman2026" : "");
+    if (motDePasse) {
+      const hash = bcrypt.hashSync(motDePasse, 10);
+      database
+        .prepare(
+          `INSERT INTO utilisateur (nom, login, mot_de_passe, role, actif, cree_le)
+           VALUES (?,?,?,?,1,?)`
+        )
+        .run("Propriétaire", login, hash, "proprietaire", new Date().toISOString());
+    } else {
+      console.warn(
+        "[amorçage] Aucun propriétaire et OWNER_INITIAL_PASSWORD non défini : " +
+          "définis OWNER_INITIAL_PASSWORD (et OWNER_LOGIN) puis redémarre pour créer le compte."
+      );
+    }
+  }
 }
 
 function ajouterColonneSiAbsente(
