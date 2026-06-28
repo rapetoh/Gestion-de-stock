@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { resetDb } from "./helpers";
 import { parseProduitsTexte } from "../lib/import";
-import { importerProduits, listProduits, createProduit } from "../lib/repo/produits";
+import { importerProduits, listProduits, createProduit, getProduit } from "../lib/repo/produits";
 import { listActivite } from "../lib/repo/activite";
 
 beforeEach(resetDb);
@@ -33,11 +33,17 @@ describe("parseProduitsTexte", () => {
     expect(rows[0].nom).toBe("Savon");
   });
 
-  it("accepte un nom seul (le reste à 0)", () => {
+  it("une case vide reste 'non fournie' (undefined), pas 0", () => {
     const [r] = parseProduitsTexte("Bonbons");
     expect(r.nom).toBe("Bonbons");
-    expect(r.prixVente).toBe(0);
-    expect(r.categorie).toBeNull();
+    expect(r.prixVente).toBeUndefined();
+    expect(r.stock).toBeUndefined();
+    expect(r.categorie).toBeUndefined();
+
+    const [r2] = parseProduitsTexte("Eau;;;120"); // seul le prix de vente est rempli
+    expect(r2.prixAchat).toBeUndefined();
+    expect(r2.prixVente).toBe(120);
+    expect(r2.stock).toBeUndefined();
   });
 
   it("nettoie les nombres avec espaces", () => {
@@ -49,17 +55,33 @@ describe("parseProduitsTexte", () => {
 });
 
 describe("importerProduits", () => {
-  it("crée les nouveaux et met à jour les existants (par nom, insensible à la casse)", () => {
-    createProduit({ nom: "Eau", prixAchat: 50, frais: 0, prixVente: 100, stock: 1 });
-    const rows = parseProduitsTexte("eau;60;0;120;20;5;Eau\nSavon;450;30;750;50;5;Cosmétique");
-    const res = importerProduits(rows, null);
-    expect(res).toEqual({ crees: 1, maj: 1 });
+  it("crée les nouveaux (stock de départ pris dans l'import)", () => {
+    const res = importerProduits(parseProduitsTexte("Neuf;10;0;20;7;3;Divers"), null);
+    expect(res).toEqual({ crees: 1, maj: 0, ignores: 0 });
+    const p = listProduits()[0];
+    expect(p).toMatchObject({ nom: "Neuf", prix_vente: 20, stock: 7 });
+  });
 
-    const tous = listProduits();
-    expect(tous).toHaveLength(2);
-    const eau = tous.find((p) => p.nom.toLowerCase() === "eau")!;
-    expect(eau.prix_vente).toBe(120);
-    expect(eau.stock).toBe(20);
+  it("met à jour SEULEMENT les colonnes remplies d'un produit existant", () => {
+    const id = createProduit({ nom: "Eau", prixAchat: 50, frais: 0, prixVente: 100, stock: 5, seuilStock: 3 });
+    importerProduits(parseProduitsTexte("eau;;;120"), null); // seul le prix de vente
+    const eau = getProduit(id)!;
+    expect(eau.prix_vente).toBe(120); // mis à jour
+    expect(eau.prix_achat).toBe(50); // inchangé
+    expect(eau.seuil_stock).toBe(3); // inchangé
+  });
+
+  it("ne met JAMAIS à 0 ni n'écrase le stock d'un produit existant", () => {
+    const id = createProduit({ nom: "Eau", prixAchat: 50, frais: 0, prixVente: 100, stock: 5 });
+    // nom seul : rien à changer
+    let res = importerProduits(parseProduitsTexte("Eau"), null);
+    expect(res).toEqual({ crees: 0, maj: 0, ignores: 1 });
+    expect(getProduit(id)!.stock).toBe(5);
+    expect(getProduit(id)!.prix_vente).toBe(100);
+
+    // même avec une colonne stock, le stock d'un produit existant n'est pas touché
+    res = importerProduits(parseProduitsTexte("Eau;;;;999"), null);
+    expect(getProduit(id)!.stock).toBe(5);
   });
 
   it("ne crée pas de doublon au ré-import et journalise un résumé", () => {

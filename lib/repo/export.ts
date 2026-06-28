@@ -26,17 +26,18 @@ export function produitsCsv(): string {
     `SELECT nom, categorie, prix_achat, frais, prix_vente, stock, seuil_stock, code_barre
        FROM produit WHERE actif = 1 ORDER BY nom`
   );
+  // Même ordre de colonnes que l'import (Produits → Importer une liste), pour que l'aller-retour
+  // export → ré-import fonctionne sans réarranger les colonnes.
   return toCsv(
-    ["Produit", "Catégorie", "Prix d'achat", "Frais", "Prix de vente", "Stock", "Seuil", "Code-barres"],
+    ["Nom", "Prix d'achat", "Frais", "Prix de vente", "Stock", "Seuil", "Catégorie"],
     rows.map((p) => [
       p.nom,
-      p.categorie,
       p.prix_achat,
       p.frais,
       p.prix_vente,
       p.stock,
       p.seuil_stock,
-      p.code_barre,
+      p.categorie,
     ])
   );
 }

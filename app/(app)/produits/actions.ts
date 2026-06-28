@@ -65,6 +65,7 @@ export type ImportState = {
   ok?: boolean;
   crees?: number;
   maj?: number;
+  ignores?: number;
   error?: string;
 } | null;
 
@@ -80,5 +81,5 @@ export async function importerProduitsAction(
   const res = importerProduits(rows, session?.userId ?? null);
   revalidatePath("/produits");
   revalidatePath("/stock");
-  return { ok: true, crees: res.crees, maj: res.maj };
+  return { ok: true, crees: res.crees, maj: res.maj, ignores: res.ignores };
 }

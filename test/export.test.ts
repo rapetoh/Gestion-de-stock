@@ -15,7 +15,8 @@ describe("export CSV", () => {
   it("produitsCsv : en-tête + lignes", () => {
     createProduit({ nom: "Savon Paris", prixAchat: 100, frais: 20, prixVente: 200, stock: 5 });
     const csv = produitsCsv();
-    expect(csv.split("\r\n")[0]).toContain("Produit");
+    // En-tête = mêmes colonnes/ordre que l'import (aller-retour export → ré-import).
+    expect(csv.split("\r\n")[0]).toBe("Nom;Prix d'achat;Frais;Prix de vente;Stock;Seuil;Catégorie");
     expect(csv).toContain("Savon Paris");
     expect(csv).toContain("200");
   });

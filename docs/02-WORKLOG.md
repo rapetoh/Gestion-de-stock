@@ -7,6 +7,19 @@
 
 ## 2026-06-27
 
+### Import en masse rendu sûr, cohérent et clair (question du dev)
+- **What:** Reviewed the import for flexibility/consistency/clarity. Fixes: a **blank cell now means
+  "ne pas toucher"** (never silently 0); an **existing** product is updated **only on the columns
+  filled**, and its **stock is never overwritten by import** (managed by Achats/Ventes/Contrôle);
+  new products still take their import stock as the opening count. **Export `produits.csv` reordered
+  to match the import columns** so export → re-import round-trips. UI: clearer instructions, preview
+  shows "inchangé" for existing stock and **warns** about duplicate names in the list and new
+  products with no sale price; a "sans changement" count was added. See **D-016**.
+- **Why:** Re-importing could silently zero prices or clobber live stock, and export/import column
+  orders didn't match — the "import messes up the software" risk the dev flagged.
+- **Result:** `npm test` **52/52** (+ blank-safe + stock-protected tests); tsc/build clean; live
+  verified (page explains the rules; export header == import columns).
+
 ### Verification audit + fixes (P0–P2) — see docs/05-AUDIT-VERIFICATION.md
 - **What:** Deep adversarial verification ("is this safe to use daily?"), then fixed every confirmed
   issue. **P0:** (1) **dépenses récurrentes** now actually recur each month — the flag was a no-op,

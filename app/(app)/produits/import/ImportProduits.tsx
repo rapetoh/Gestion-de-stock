@@ -22,8 +22,23 @@ export default function ImportProduits({ existants }: { existants: string[] }) {
   );
 
   const rows = useMemo(() => parseProduitsTexte(texte), [texte]);
+
+  // Compte les noms en double DANS la liste collée (le dernier l'emporterait sinon).
+  const occurrences = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const r of rows) {
+      const k = r.nom.toLowerCase();
+      m.set(k, (m.get(k) ?? 0) + 1);
+    }
+    return m;
+  }, [rows]);
+
   const nbNouveaux = rows.filter((r) => !dejaLa.has(r.nom.toLowerCase())).length;
   const nbMaj = rows.length - nbNouveaux;
+  const nbDoublons = [...occurrences.values()].filter((n) => n > 1).length;
+  const nbSansPrix = rows.filter(
+    (r) => !dejaLa.has(r.nom.toLowerCase()) && !r.prixVente
+  ).length;
 
   return (
     <div className="grid" style={{ gridTemplateColumns: "1fr 1fr", alignItems: "start" }}>
@@ -35,8 +50,13 @@ export default function ImportProduits({ existants }: { existants: string[] }) {
           <br />
           <code>Nom ; Prix d&apos;achat ; Frais ; Prix de vente ; Stock ; Seuil ; Catégorie</code>
           <br />
-          Seul le nom est obligatoire. Un nom qui existe déjà met le produit à
-          jour (au lieu d&apos;en créer un nouveau).
+          <strong>Seul le nom est obligatoire.</strong> Une case laissée vide
+          n&apos;est pas touchée (elle ne devient pas 0).
+          <br />• <strong>Nouveau</strong> nom → produit créé.
+          <br />• Nom <strong>déjà là</strong> → on met à jour seulement ce que tu
+          as rempli. Le <strong>stock d&apos;un produit existant n&apos;est jamais
+          modifié par l&apos;import</strong> (il se gère dans Achats / Ventes /
+          Contrôle de stock).
         </div>
 
         <form action={formAction}>
@@ -82,6 +102,12 @@ export default function ImportProduits({ existants }: { existants: string[] }) {
               <span>Produits mis à jour</span>
               <span>{state.maj}</span>
             </div>
+            {state.ignores ? (
+              <div className="calcline">
+                <span>Sans changement</span>
+                <span className="muted">{state.ignores}</span>
+              </div>
+            ) : null}
             <div className="calcline total">
               <span>Terminé</span>
               <span>
@@ -103,6 +129,14 @@ export default function ImportProduits({ existants }: { existants: string[] }) {
             ? ` (aperçu des 200 premiers ; les ${rows.length} seront importés)`
             : ""}
         </div>
+        {nbDoublons > 0 || nbSansPrix > 0 ? (
+          <div className="note" style={{ color: "var(--accent)" }}>
+            {nbDoublons > 0 ? `⚠ ${nbDoublons} nom(s) en double dans ta liste. ` : ""}
+            {nbSansPrix > 0
+              ? `⚠ ${nbSansPrix} nouveau(x) produit(s) sans prix de vente — tu ne pourras pas les vendre tant que tu n'auras pas mis un prix.`
+              : ""}
+          </div>
+        ) : null}
         <table style={{ marginTop: 6 }}>
           <thead>
             <tr>
@@ -123,12 +157,36 @@ export default function ImportProduits({ existants }: { existants: string[] }) {
             ) : (
               rows.slice(0, 200).map((r, i) => {
                 const maj = dejaLa.has(r.nom.toLowerCase());
+                const dup = (occurrences.get(r.nom.toLowerCase()) ?? 0) > 1;
+                const achatProvided = r.prixAchat !== undefined || r.frais !== undefined;
+                const cout = (r.prixAchat ?? 0) + (r.frais ?? 0);
                 return (
                   <tr key={`${r.nom}-${i}`}>
-                    <td className="prod">{r.nom}</td>
-                    <td className="num">{formatCFA(r.prixAchat + r.frais)}</td>
-                    <td className="num">{formatCFA(r.prixVente)}</td>
-                    <td className="num">{r.stock}</td>
+                    <td className="prod">
+                      {r.nom}
+                      {dup ? (
+                        <span className="badge bad" style={{ marginLeft: 8 }}>
+                          en double
+                        </span>
+                      ) : null}
+                    </td>
+                    <td className="num">
+                      {achatProvided ? formatCFA(cout) : maj ? "—" : formatCFA(0)}
+                    </td>
+                    <td className="num">
+                      {r.prixVente !== undefined
+                        ? formatCFA(r.prixVente)
+                        : maj
+                        ? "—"
+                        : formatCFA(0)}
+                    </td>
+                    <td className="num">
+                      {maj ? (
+                        <span className="muted">inchangé</span>
+                      ) : (
+                        r.stock ?? 0
+                      )}
+                    </td>
                     <td className="num">
                       {maj ? (
                         <span className="badge warn">mise à jour</span>

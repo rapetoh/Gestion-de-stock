@@ -5,6 +5,18 @@
 
 ---
 
+## D-016 · Import is additive & non-destructive (blank = leave; never overwrite existing stock)
+**Decision:** The parser keeps a blank cell as `undefined` ("not provided"), never 0. On import:
+a **new** name is created (its import stock = opening count); an **existing** name is updated **only
+for the columns actually filled**, and its **stock is never touched by import** (stock is managed by
+Achats/Ventes/Contrôle). The Sauvegarde "produits.csv" now uses the **same column order as import**
+so export → re-import round-trips. The preview shows "inchangé" for an existing product's stock and
+warns about duplicate names in the pasted list and new products with no sale price.
+**Reasoning:** A pasted/edited list is partial and stale by the time it's typed. Treating blanks as
+0, or overwriting a live stock from a static list, would silently corrupt data — exactly the
+"import messes up the software" risk. Additive-only + stock-protected makes re-import safe; column
+parity removes a foot-gun. Refines D-015.
+
 ## D-015 · Bulk import = paste + upsert-by-name, shared pure parser, one log line
 **Decision:** Products are imported by **pasting** rows (tab from Excel, or `;` / `,`), fixed column
 order, name-only allowed. An existing name **updates** that product (régularisation), otherwise it

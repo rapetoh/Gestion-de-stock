@@ -2,19 +2,27 @@
 // Partagé par l'aperçu côté client et l'action serveur, pour une seule logique de lecture.
 import { parseCFA } from "./money";
 
+// Un champ non rempli reste `undefined` (= « ne pas toucher »), à ne pas confondre avec 0.
 export type ImportRow = {
   nom: string;
-  prixAchat: number;
-  frais: number;
-  prixVente: number;
-  stock: number;
-  seuilStock: number;
-  categorie: string | null;
+  prixAchat?: number;
+  frais?: number;
+  prixVente?: number;
+  stock?: number;
+  seuilStock?: number;
+  categorie?: string | null;
 };
+
+// Cellule vide -> undefined ; sinon nombre nettoyé.
+function maybeNum(cell?: string): number | undefined {
+  const s = (cell ?? "").trim();
+  return s === "" ? undefined : parseCFA(s);
+}
 
 // Une ligne = un produit. Colonnes, dans l'ordre :
 //   Nom ; Prix d'achat ; Frais ; Prix de vente ; Stock ; Seuil ; Catégorie
 // Séparateur détecté par ligne : tabulation (copier d'Excel), sinon « ; », sinon « , ».
+// Une cellule laissée vide n'est PAS prise en compte (ni mise à 0).
 export function parseProduitsTexte(texte: string): ImportRow[] {
   const rows: ImportRow[] = [];
   for (const brute of (texte ?? "").split(/\r?\n/)) {
@@ -31,12 +39,12 @@ export function parseProduitsTexte(texte: string): ImportRow[] {
 
     rows.push({
       nom,
-      prixAchat: parseCFA(cols[1] ?? "0"),
-      frais: parseCFA(cols[2] ?? "0"),
-      prixVente: parseCFA(cols[3] ?? "0"),
-      stock: parseCFA(cols[4] ?? "0"),
-      seuilStock: parseCFA(cols[5] ?? "0"),
-      categorie: (cols[6] ?? "").trim() || null,
+      prixAchat: maybeNum(cols[1]),
+      frais: maybeNum(cols[2]),
+      prixVente: maybeNum(cols[3]),
+      stock: maybeNum(cols[4]),
+      seuilStock: maybeNum(cols[5]),
+      categorie: (cols[6] ?? "").trim() || undefined,
     });
   }
   return rows;
