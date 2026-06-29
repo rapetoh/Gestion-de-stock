@@ -33,6 +33,53 @@ export function getProduit(id: number): Produit | undefined {
   return one<Produit>(`SELECT * FROM produit WHERE id = ?`, id);
 }
 
+// Liste filtrée + paginée — pour que les pages Produits/Stock tiennent la route à des milliers d'articles
+// (on n'affiche qu'une page à la fois, filtrable par nom, catégorie et « stock bas »).
+export type FiltreProduits = {
+  recherche?: string;
+  categorie?: string | null;
+  basStock?: boolean; // stock <= seuil
+  limit?: number;
+  offset?: number;
+};
+
+export function listProduitsFiltres(
+  f: FiltreProduits
+): { produits: Produit[]; total: number } {
+  const where: string[] = ["actif = 1"];
+  const params: unknown[] = [];
+  const s = (f.recherche ?? "").trim();
+  if (s) {
+    where.push("nom LIKE ?");
+    params.push(`%${s}%`);
+  }
+  if (f.categorie) {
+    where.push("categorie = ?");
+    params.push(f.categorie);
+  }
+  if (f.basStock) where.push("stock <= seuil_stock");
+  const clause = where.join(" AND ");
+
+  const total = one<{ n: number }>(`SELECT COUNT(*) AS n FROM produit WHERE ${clause}`, ...params)?.n ?? 0;
+  const limit = f.limit ?? 50;
+  const offset = f.offset ?? 0;
+  const produits = all<Produit>(
+    `SELECT * FROM produit WHERE ${clause} ORDER BY nom LIMIT ? OFFSET ?`,
+    ...params,
+    limit,
+    offset
+  );
+  return { produits, total };
+}
+
+export function listCategories(): string[] {
+  return all<{ categorie: string }>(
+    `SELECT DISTINCT categorie FROM produit
+      WHERE actif = 1 AND categorie IS NOT NULL AND categorie != ''
+      ORDER BY categorie`
+  ).map((r) => r.categorie);
+}
+
 // Recherche bornée pour l'autocomplétion (caisse, achats, contrôle) — on N'ENVOIE PAS tout le
 // catalogue au téléphone : seulement les quelques produits qui correspondent à ce qu'elle tape.
 export function chercherProduits(q: string, limit = 15): Produit[] {

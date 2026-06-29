@@ -137,6 +137,9 @@ function migrate(database: DatabaseSync): void {
     );
     CREATE INDEX IF NOT EXISTS idx_produit_nom ON produit(nom);
     CREATE UNIQUE INDEX IF NOT EXISTS idx_produit_code ON produit(code_barre) WHERE code_barre IS NOT NULL;
+    -- Accélère le « stock bas » (tableau de bord + filtres Produits/Stock) et le filtre par catégorie.
+    CREATE INDEX IF NOT EXISTS idx_produit_stock ON produit(stock, seuil_stock);
+    CREATE INDEX IF NOT EXISTS idx_produit_categorie ON produit(categorie);
 
     CREATE TABLE IF NOT EXISTS achat (
       id            INTEGER PRIMARY KEY AUTOINCREMENT,

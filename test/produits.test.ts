@@ -8,6 +8,8 @@ import {
   getProduitParNom,
   normaliserNom,
   chercherProduits,
+  listProduitsFiltres,
+  listCategories,
 } from "../lib/repo/produits";
 
 beforeEach(resetDb);
@@ -53,5 +55,21 @@ describe("produits — anti-doublon", () => {
     expect(chercherProduits("eau")).toHaveLength(1);
     const savons = chercherProduits("savon", 15);
     expect(savons.length).toBe(15); // borné à la limite, pas les 50
+  });
+
+  it("listProduitsFiltres : catégorie, stock bas, et pagination", () => {
+    createProduit({ nom: "Coca", categorie: "Boisson", stock: 1, seuilStock: 5 }); // bas
+    createProduit({ nom: "Fanta", categorie: "Boisson", stock: 20, seuilStock: 5 });
+    createProduit({ nom: "Savon", categorie: "Cosmétique", stock: 0, seuilStock: 3 }); // bas
+
+    expect(listProduitsFiltres({ categorie: "Boisson" }).total).toBe(2);
+    expect(listProduitsFiltres({ basStock: true }).total).toBe(2); // Coca + Savon
+    expect(listProduitsFiltres({ categorie: "Boisson", basStock: true }).total).toBe(1); // Coca
+    expect(listCategories()).toEqual(["Boisson", "Cosmétique"]);
+
+    // Pagination : page de 2 sur 3 produits → 2 puis 1.
+    expect(listProduitsFiltres({ limit: 2, offset: 0 }).produits).toHaveLength(2);
+    expect(listProduitsFiltres({ limit: 2, offset: 2 }).produits).toHaveLength(1);
+    expect(listProduitsFiltres({ limit: 2, offset: 0 }).total).toBe(3);
   });
 });
