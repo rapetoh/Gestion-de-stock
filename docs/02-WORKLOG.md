@@ -7,6 +7,31 @@
 
 ## 2026-06-28
 
+### Revue système (cohésion & fiabilité) + correctifs T1–T3
+- **What:** Revue de tout le système (passage à l'échelle, cohérence inter-fonctions, complétude), puis
+  correction des vrais problèmes. **T1 (bugs inter-fonctions) :** `createProduit` réutilise/réactive une
+  ligne du même nom au lieu d'en créer une 2e — supprimer puis racheter « Eau » ne scinde plus stock et
+  historique ; les **commissions Mobile Money alimentent enfin la réconciliation** (attendu TMoney/Flooz
+  = dernier comptage + ventes + **commissions** − dépenses), elles n'apparaissaient que dans la marge.
+  **T2 (échelle, 2000+ produits) :** la caisse, les achats et le contrôle ne reçoivent plus tout le
+  catalogue — **recherche serveur débouncée** (`chercherProduits`) ; **Produits/Stock** sont **filtrés
+  (nom, catégorie, stock bas) et paginés** (50/page) via `listProduitsFiltres` ; index
+  `produit(stock, seuil_stock)` et `produit(categorie)`. **T3 :** les **ventes d'un jour passé** sont de
+  nouveau accessibles et modifiables (sélecteur de date sur Ventes), conformément à « tout est
+  modifiable ».
+- **Why:** Le dev voulait être sûr que l'ensemble tient la route à l'échelle réelle (catalogue visé :
+  2000+ produits) et que rien ne casse une autre fonction. La revue a confirmé que les fondations sont
+  saines ; ces points étaient les vrais risques.
+- **Volontairement écarté (sur-ingénierie pour elle) :** registre de crédit client (le crédit est rare/
+  familial — reporté), canal de paiement par dépense (espèces par défaut, corrigeable), export CSV borné
+  par dates (inutile à ~30 ventes/jour ; la sauvegarde .db est l'export complet), tableaux de bord
+  vendeuse / drill-down marges.
+- **Result:** `npm test` **74/74** (+ doublon produit, commission→réconciliation, recherche bornée,
+  filtres+pagination, vente jour passé) ; **build OK** ; **tests à chaud** : avec **2000 produits**,
+  /ventes·/achats·/contrôle ≈ 15 KB (catalogue plus envoyé), /produits paginée (50 lignes, « page 1/41 »),
+  filtres catégorie/stock bas exacts, et /ventes?jour=… affiche un jour passé.
+- **Next:** exploitation (hors code) — hébergement à disque persistant + sauvegarde automatique hors-site.
+
 ### Phase 5 — Connexion vendeuse (rôles & droits) : l'anti-vol devient nominatif
 - **What:** Chaque personne au comptoir a désormais **son propre login**. Le propriétaire crée/gère les
   comptes vendeuse depuis une nouvelle page **/equipe** (créer, désactiver/réactiver — jamais supprimer,
