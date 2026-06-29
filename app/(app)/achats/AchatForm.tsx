@@ -1,13 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { formatCFA, parseCFA, coutDeRevientUnitaire } from "@/lib/money";
 import type { Produit } from "@/lib/repo/produits";
 import SubmitButton from "@/components/SubmitButton";
 import { enregistrerAchat } from "./actions";
+import { rechercherPourAchat } from "../produits/recherche";
 
-export default function AchatForm({ produits }: { produits: Produit[] }) {
+export default function AchatForm() {
   const [nom, setNom] = useState("");
+  const [suggestions, setSuggestions] = useState<Produit[]>([]);
   const [quantite, setQuantite] = useState("1");
   const [prixAchat, setPrixAchat] = useState("0");
   const [frais, setFrais] = useState("0");
@@ -24,19 +26,42 @@ export default function AchatForm({ produits }: { produits: Produit[] }) {
     setPrixAchat("0");
     setFrais("0");
     setPrixVente("0");
+    setActuel(null);
+    setSuggestions([]);
     setFlash(`Achat de « ${n} » enregistré ✓`);
   }
 
-  // Pré-remplissage si le nom correspond à un produit existant.
+  // Recherche serveur débouncée (pas tout le catalogue dans la page).
+  useEffect(() => {
+    const s = nom.trim();
+    if (!s || actuel?.nom === s) {
+      setSuggestions([]);
+      return;
+    }
+    let annule = false;
+    const t = setTimeout(async () => {
+      const res = await rechercherPourAchat(s);
+      if (!annule) setSuggestions(res);
+    }, 180);
+    return () => {
+      annule = true;
+      clearTimeout(t);
+    };
+  }, [nom, actuel]);
+
+  // Quand elle tape, on n'a plus de correspondance confirmée tant qu'elle n'a pas choisi.
   function onNomChange(v: string) {
     setNom(v);
-    const found =
-      produits.find((p) => p.nom.toLowerCase() === v.trim().toLowerCase()) ?? null;
-    setActuel(found);
-    if (found) {
-      setPrixAchat(String(found.prix_achat));
-      setPrixVente(String(found.prix_vente));
-    }
+    if (actuel && actuel.nom.toLowerCase() !== v.trim().toLowerCase()) setActuel(null);
+  }
+
+  // Choix d'un produit existant dans la liste : pré-remplit les prix.
+  function choisir(p: Produit) {
+    setNom(p.nom);
+    setActuel(p);
+    setPrixAchat(String(p.prix_achat));
+    setPrixVente(String(p.prix_vente));
+    setSuggestions([]);
   }
 
   const calc = useMemo(() => {
@@ -55,23 +80,36 @@ export default function AchatForm({ produits }: { produits: Produit[] }) {
 
   return (
     <form action={soumettre} onChange={() => flash && setFlash(null)}>
-      <div className="field">
+      <div className="field" style={{ position: "relative" }}>
         <label>Produit</label>
         <input
           className="input big"
           name="nom"
-          list="liste-produits"
           value={nom}
           onChange={(e) => onNomChange(e.target.value)}
           placeholder="Tape le nom du produit…"
           autoComplete="off"
           required
         />
-        <datalist id="liste-produits">
-          {produits.map((p) => (
-            <option key={p.id} value={p.nom} />
-          ))}
-        </datalist>
+        {suggestions.length > 0 ? (
+          <div
+            className="card"
+            style={{ position: "absolute", zIndex: 10, left: 0, right: 0, marginTop: 4, padding: 6 }}
+          >
+            {suggestions.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                className="nav-item"
+                style={{ width: "100%", justifyContent: "space-between" }}
+                onClick={() => choisir(p)}
+              >
+                <span>{p.nom}</span>
+                <span className="muted">{formatCFA(p.prix_vente)}</span>
+              </button>
+            ))}
+          </div>
+        ) : null}
       </div>
 
       <div className="row2">

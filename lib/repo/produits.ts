@@ -33,6 +33,18 @@ export function getProduit(id: number): Produit | undefined {
   return one<Produit>(`SELECT * FROM produit WHERE id = ?`, id);
 }
 
+// Recherche bornée pour l'autocomplétion (caisse, achats, contrôle) — on N'ENVOIE PAS tout le
+// catalogue au téléphone : seulement les quelques produits qui correspondent à ce qu'elle tape.
+export function chercherProduits(q: string, limit = 15): Produit[] {
+  const s = q.trim();
+  if (!s) return [];
+  return all<Produit>(
+    `SELECT * FROM produit WHERE actif = 1 AND nom LIKE ? ORDER BY nom LIMIT ?`,
+    `%${s}%`,
+    limit
+  );
+}
+
 // Normalise un nom : espaces multiples réduits à un seul, bords coupés. Évite les faux doublons
 // « Eau de source » vs « Eau de  source » qui scinderaient le stock et fausseraient le contrôle.
 export function normaliserNom(nom: string): string {

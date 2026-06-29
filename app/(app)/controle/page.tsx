@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { listProduits } from "@/lib/repo/produits";
 import { listControles } from "@/lib/repo/controle";
 import { formatCFA } from "@/lib/money";
 import { jourCourt, heure } from "@/lib/dates";
@@ -9,7 +8,6 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export default function ControlePage() {
-  const produits = listProduits();
   const controles = listControles(10);
 
   return (
@@ -24,7 +22,7 @@ export default function ControlePage() {
         </div>
       </div>
 
-      <ControleForm produits={produits} />
+      <ControleForm />
 
       <div className="section-gap"></div>
 

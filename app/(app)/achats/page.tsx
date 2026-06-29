@@ -1,4 +1,3 @@
-import { listProduits } from "@/lib/repo/produits";
 import { listAchats } from "@/lib/repo/achats";
 import AchatForm from "./AchatForm";
 import AchatsRows from "./AchatsRows";
@@ -7,7 +6,6 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export default function AchatsPage() {
-  const produits = listProduits();
   const achats = listAchats(20);
 
   return (
@@ -31,7 +29,7 @@ export default function AchatsPage() {
             Tape le nom du produit. S&apos;il existe déjà, il se complète tout
             seul. Sinon il sera créé.
           </div>
-          <AchatForm produits={produits} />
+          <AchatForm />
         </div>
 
         <div className="card">

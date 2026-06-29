@@ -1,10 +1,10 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { formatCFA } from "@/lib/money";
-import type { Produit } from "@/lib/repo/produits";
 import SubmitButton from "@/components/SubmitButton";
 import { encaisserVente } from "./actions";
+import { rechercherPourVente, type ProduitVente } from "../produits/recherche";
 
 type Ligne = {
   produitId: number;
@@ -22,12 +22,31 @@ const PAY: { id: Paiement; ic: string; label: string }[] = [
   { id: "credit", ic: "⏳", label: "Crédit (plus tard)" },
 ];
 
-export default function VenteCaisse({ produits }: { produits: Produit[] }) {
+export default function VenteCaisse() {
   const [recherche, setRecherche] = useState("");
+  const [suggestions, setSuggestions] = useState<ProduitVente[]>([]);
   const [lignes, setLignes] = useState<Ligne[]>([]);
   const [paiement, setPaiement] = useState<Paiement>("especes");
   const [flash, setFlash] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
+
+  // Recherche serveur (débouncée) : on ne charge jamais tout le catalogue dans le téléphone.
+  useEffect(() => {
+    const s = recherche.trim();
+    if (!s) {
+      setSuggestions([]);
+      return;
+    }
+    let annule = false;
+    const t = setTimeout(async () => {
+      const res = await rechercherPourVente(s);
+      if (!annule) setSuggestions(res);
+    }, 180);
+    return () => {
+      annule = true;
+      clearTimeout(t);
+    };
+  }, [recherche]);
 
   async function encaisser(formData: FormData) {
     if (!lignes.length) return;
@@ -39,7 +58,7 @@ export default function VenteCaisse({ produits }: { produits: Produit[] }) {
     setFlash(`Vente enregistrée ✓ — ${formatCFA(montant)}`);
   }
 
-  function ajouter(p: Produit) {
+  function ajouter(p: ProduitVente) {
     setFlash(null);
     setLignes((prev) => {
       const existing = prev.find((l) => l.produitId === p.id);
@@ -72,12 +91,6 @@ export default function VenteCaisse({ produits }: { produits: Produit[] }) {
     () => lignes.reduce((s, l) => s + l.prix * l.quantite, 0),
     [lignes]
   );
-
-  const suggestions = useMemo(() => {
-    const s = recherche.trim().toLowerCase();
-    if (!s) return [];
-    return produits.filter((p) => p.nom.toLowerCase().includes(s)).slice(0, 8);
-  }, [recherche, produits]);
 
   // Lignes où l'on vend plus que le stock connu — autorisé, mais signalé.
   const surventes = useMemo(

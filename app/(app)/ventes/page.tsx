@@ -1,4 +1,3 @@
-import { listProduits } from "@/lib/repo/produits";
 import { listVentesDuJour } from "@/lib/repo/ventes";
 import { formatCFA } from "@/lib/money";
 import { getSession } from "@/lib/auth";
@@ -11,7 +10,6 @@ export const dynamic = "force-dynamic";
 export default async function VentesPage() {
   const session = await getSession();
   const peutGerer = session?.role === "proprietaire"; // seule la propriétaire modifie/supprime
-  const produits = listProduits();
   const ventes = listVentesDuJour();
   const totalJour = ventes.reduce((s, v) => s + v.total, 0);
 
@@ -27,7 +25,7 @@ export default async function VentesPage() {
         </div>
       </div>
 
-      <VenteCaisse produits={produits} />
+      <VenteCaisse />
 
       <div className="section-gap"></div>
 

@@ -1,34 +1,79 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { formatCFA } from "@/lib/money";
-import type { Produit } from "@/lib/repo/produits";
 import SubmitButton from "@/components/SubmitButton";
 import { enregistrerControleAction } from "./actions";
+import { rechercherPourAchat } from "../produits/recherche";
 
-export default function ControleForm({ produits }: { produits: Produit[] }) {
+type Ligne = { id: number; nom: string; stock: number; cout: number };
+
+export default function ControleForm() {
   const [recherche, setRecherche] = useState("");
+  const [resultats, setResultats] = useState<Ligne[]>([]);
   // produitId -> quantité comptée (texte). Vide = pas encore compté (on ignore).
   const [comptes, setComptes] = useState<Record<number, string>>({});
+  // On retient les infos des produits rencontrés, pour garder une ligne comptée visible hors recherche.
+  const [connus, setConnus] = useState<Record<number, Ligne>>({});
   const [flash, setFlash] = useState<string | null>(null);
 
-  function coutUnit(p: Produit) {
-    return p.prix_achat + p.frais;
-  }
+  // Recherche serveur débouncée (pas tout le catalogue dans la page).
+  useEffect(() => {
+    const s = recherche.trim();
+    if (!s) {
+      setResultats([]);
+      return;
+    }
+    let annule = false;
+    const t = setTimeout(async () => {
+      const res = await rechercherPourAchat(s);
+      if (annule) return;
+      const lignes: Ligne[] = res.map((p) => ({
+        id: p.id,
+        nom: p.nom,
+        stock: p.stock,
+        cout: p.prix_achat + p.frais,
+      }));
+      setResultats(lignes);
+      setConnus((prev) => {
+        const n = { ...prev };
+        for (const l of lignes) n[l.id] = l;
+        return n;
+      });
+    }, 180);
+    return () => {
+      annule = true;
+      clearTimeout(t);
+    };
+  }, [recherche]);
 
-  // Une ligne est "comptée" seulement si l'utilisatrice a tapé un nombre >= 0.
+  // Produits affichés = résultats de recherche + ceux déjà comptés (pour ne pas les perdre de vue).
+  const visibles = useMemo(() => {
+    const map = new Map<number, Ligne>();
+    for (const l of resultats) map.set(l.id, l);
+    for (const idStr of Object.keys(comptes)) {
+      const id = Number(idStr);
+      if ((comptes[id] ?? "").trim() !== "" && !map.has(id) && connus[id]) {
+        map.set(id, connus[id]);
+      }
+    }
+    return [...map.values()];
+  }, [resultats, comptes, connus]);
+
   const comptees = useMemo(() => {
-    return produits
-      .map((p) => {
-        const brut = (comptes[p.id] ?? "").trim();
+    return Object.keys(comptes)
+      .map((idStr) => {
+        const id = Number(idStr);
+        const brut = (comptes[id] ?? "").trim();
         if (brut === "") return null;
         const compte = Number(brut);
-        if (!Number.isFinite(compte) || compte < 0) return null;
-        const ecart = compte - p.stock;
-        return { p, compte, ecart, valeur: ecart * coutUnit(p) };
+        const info = connus[id];
+        if (!Number.isFinite(compte) || compte < 0 || !info) return null;
+        const ecart = compte - info.stock;
+        return { id, nom: info.nom, compte, ecart, valeur: ecart * info.cout };
       })
       .filter((x): x is NonNullable<typeof x> => x !== null);
-  }, [comptes, produits]);
+  }, [comptes, connus]);
 
   const resume = useMemo(() => {
     let manque = 0;
@@ -40,14 +85,8 @@ export default function ControleForm({ produits }: { produits: Produit[] }) {
     return { nb: comptees.length, manque, surplus };
   }, [comptees]);
 
-  const visibles = useMemo(() => {
-    const s = recherche.trim().toLowerCase();
-    if (!s) return produits;
-    return produits.filter((p) => p.nom.toLowerCase().includes(s));
-  }, [recherche, produits]);
-
   const payload = JSON.stringify(
-    comptees.map((c) => ({ produitId: c.p.id, compte: c.compte }))
+    comptees.map((c) => ({ produitId: c.id, compte: c.compte }))
   );
 
   async function soumettre(formData: FormData) {
@@ -55,6 +94,8 @@ export default function ControleForm({ produits }: { produits: Produit[] }) {
     const m = resume.manque;
     await enregistrerControleAction(formData);
     setComptes({});
+    setResultats([]);
+    setRecherche("");
     setFlash(
       m > 0
         ? `Contrôle enregistré ✓ — manque de ${formatCFA(m)}`
@@ -69,16 +110,12 @@ export default function ControleForm({ produits }: { produits: Produit[] }) {
   }
 
   return (
-    <div
-      className="grid"
-      style={{ gridTemplateColumns: "1fr 360px", alignItems: "start" }}
-    >
+    <div className="grid" style={{ gridTemplateColumns: "1fr 360px", alignItems: "start" }}>
       <div className="card">
         <h2>Compter l&apos;étagère</h2>
         <div className="hint">
-          Tape ce que tu comptes vraiment, produit par produit. Laisse vide ce
-          que tu ne comptes pas aujourd&apos;hui — tu peux n&apos;en vérifier que
-          quelques-uns.
+          Cherche un produit, tape ce que tu comptes vraiment. Tu peux n&apos;en
+          vérifier que quelques-uns — ceux que tu as comptés restent affichés.
         </div>
 
         <div className="field" style={{ marginTop: 10 }}>
@@ -105,7 +142,7 @@ export default function ControleForm({ produits }: { produits: Produit[] }) {
             {visibles.length === 0 ? (
               <tr>
                 <td colSpan={5} className="muted">
-                  Aucun produit trouvé.
+                  Cherche un produit pour commencer à compter.
                 </td>
               </tr>
             ) : (
@@ -121,19 +158,12 @@ export default function ControleForm({ produits }: { produits: Produit[] }) {
                     <td className="num">
                       <input
                         className="input"
-                        style={{
-                          width: 80,
-                          padding: "6px 8px",
-                          textAlign: "right",
-                        }}
+                        style={{ width: 80, padding: "6px 8px", textAlign: "right" }}
                         value={comptes[p.id] ?? ""}
                         inputMode="numeric"
                         placeholder="—"
                         onChange={(e) =>
-                          setComptes((prev) => ({
-                            ...prev,
-                            [p.id]: e.target.value,
-                          }))
+                          setComptes((prev) => ({ ...prev, [p.id]: e.target.value }))
                         }
                       />
                     </td>
@@ -143,9 +173,7 @@ export default function ControleForm({ produits }: { produits: Produit[] }) {
                         compteValide && ecart < 0 ? "neg" : ecart > 0 ? "pos" : ""
                       }`}
                     >
-                      {compteValide && ecart !== 0
-                        ? formatCFA(ecart * coutUnit(p))
-                        : "—"}
+                      {compteValide && ecart !== 0 ? formatCFA(ecart * p.cout) : "—"}
                     </td>
                   </tr>
                 );

@@ -7,6 +7,7 @@ import {
   getProduit,
   getProduitParNom,
   normaliserNom,
+  chercherProduits,
 } from "../lib/repo/produits";
 
 beforeEach(resetDb);
@@ -42,5 +43,15 @@ describe("produits — anti-doublon", () => {
 
   it("normaliserNom réduit les espaces", () => {
     expect(normaliserNom("  Eau   de  source ")).toBe("Eau de source");
+  });
+
+  it("chercherProduits renvoie les correspondances bornées (jamais tout le catalogue)", () => {
+    for (let i = 0; i < 50; i++) createProduit({ nom: `Savon ${i}`, prixVente: 100 });
+    createProduit({ nom: "Eau", prixVente: 200 });
+
+    expect(chercherProduits("")).toHaveLength(0); // vide = rien (pas tout)
+    expect(chercherProduits("eau")).toHaveLength(1);
+    const savons = chercherProduits("savon", 15);
+    expect(savons.length).toBe(15); // borné à la limite, pas les 50
   });
 });
