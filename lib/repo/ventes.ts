@@ -28,8 +28,9 @@ export type LigneVente = {
 
 export type VenteAvecLignes = Vente & { lignes: LigneVente[] };
 
-export function listVentesDuJour(): VenteAvecLignes[] {
-  const { debut, fin } = bornesJour();
+// jour = YYYY-MM-DD ; par défaut aujourd'hui. Permet de revoir/corriger un jour passé.
+export function listVentesDuJour(jour?: string): VenteAvecLignes[] {
+  const { debut, fin } = bornesJour(jour);
   const ventes = all<Vente>(
     `SELECT * FROM vente WHERE date >= ? AND date < ? ORDER BY date DESC, id DESC`,
     debut,
