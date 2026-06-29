@@ -6,6 +6,7 @@ import {
   enregistrerReconciliation,
   historiqueReconciliations,
 } from "../lib/repo/comptes";
+import { createCommission } from "../lib/repo/commissions";
 
 beforeEach(resetDb);
 
@@ -99,6 +100,19 @@ describe("soldes — réconciliation quotidienne", () => {
 
     const ligne = reconciliationDuJour("2026-06-28").lignes.find((l) => l.compte_id === tm)!;
     expect(ligne.attendu).toBe(105000); // dépense non retirée d'un compte mobile
+  });
+
+  it("les commissions Mobile Money grossissent l'attendu du compte mobile", () => {
+    const tm = compte("TMoney", "tmoney");
+    enregistrerReconciliation({ jour: "2026-06-27", lignes: [{ compteId: tm, attendu: 100000, compte: 100000 }] });
+    // Une commission TMoney gagnée aujourd'hui.
+    createCommission({ libelle: "Comm TMoney", montant: 5000, canal: "TMoney", date: "2026-06-28" });
+    // Une commission Flooz ne doit PAS toucher le compte TMoney.
+    createCommission({ libelle: "Comm Flooz", montant: 900, canal: "Flooz", date: "2026-06-28" });
+
+    const ligne = reconciliationDuJour("2026-06-28").lignes.find((l) => l.compte_id === tm)!;
+    expect(ligne.attendu).toBe(105000); // 100000 + 5000 commission TMoney
+    expect(ligne.detail).toMatchObject({ commissions: 5000 });
   });
 
   it("premier jour sans comptage : attendu = ventes − dépenses depuis zéro", () => {

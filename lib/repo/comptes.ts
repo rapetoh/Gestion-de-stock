@@ -14,11 +14,12 @@ export type Compte = {
   actif: number;
 };
 
-// D'où vient l'attendu calculé : dernier comptage + ventes du compte − dépenses (espèces) depuis.
+// D'où vient l'attendu calculé : dernier comptage + ventes + commissions − dépenses (espèces).
 export type AttenduDetail = {
   baseline: number; // dernier solde réellement compté
   baselineJour: string | null; // jour de ce dernier comptage (YYYY-MM-DD), null si jamais
   ventes: number; // ventes encaissées sur ce compte depuis
+  commissions: number; // commissions Mobile Money gagnées sur ce compte depuis (TMoney/Flooz/Crédit)
   depenses: number; // dépenses sorties de la caisse depuis (espèces uniquement)
 };
 
@@ -66,6 +67,25 @@ function sommeDepenses(debut: string, fin: string): number {
   );
 }
 
+// Commissions Mobile Money gagnées sur un canal dans [debut, fin). Elles grossissent le float du compte.
+function sommeCommissions(canal: string, debut: string, fin: string): number {
+  return (
+    one<{ t: number }>(
+      `SELECT COALESCE(SUM(montant), 0) AS t FROM commission WHERE canal = ? AND date >= ? AND date < ?`,
+      canal,
+      debut,
+      fin
+    )?.t ?? 0
+  );
+}
+
+// Canal de commission correspondant à chaque compte mobile (mêmes libellés que app/(app)/commissions/canaux.ts).
+const CANAL_PAR_TYPE: Record<string, string | undefined> = {
+  tmoney: "TMoney",
+  flooz: "Flooz",
+  credit: "Crédit / Airtime",
+};
+
 // Attendu CALCULÉ pour un compte un jour donné : on part du dernier solde réellement compté,
 // puis on ajoute les ventes de ce compte et on retire les dépenses (espèces) survenues depuis.
 // C'est ça qui répond vraiment à « est-ce que ça tombe juste ? » sans qu'elle calcule à la main.
@@ -90,9 +110,11 @@ function attenduCalcule(compte: Compte, jour: string): {
 
   const ventes = sommeVentes(compte.type, fenetreDebut, finJour);
   const depenses = compte.type === "especes" ? sommeDepenses(fenetreDebut, finJour) : 0;
-  const attendu = baseline + ventes - depenses;
+  const canal = CANAL_PAR_TYPE[compte.type];
+  const commissions = canal ? sommeCommissions(canal, fenetreDebut, finJour) : 0;
+  const attendu = baseline + ventes + commissions - depenses;
 
-  return { attendu, detail: { baseline, baselineJour, ventes, depenses } };
+  return { attendu, detail: { baseline, baselineJour, ventes, commissions, depenses } };
 }
 
 // État d'un jour : pour chaque compte actif, l'attendu (celui du jour s'il existe, sinon le

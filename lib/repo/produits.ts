@@ -59,11 +59,34 @@ export type ProduitInput = {
 
 export function createProduit(data: ProduitInput, userId?: number | null): number {
   const now = nowIso();
+  const nom = normaliserNom(data.nom);
+
+  // Anti-doublon : si un produit du même nom existe DÉJÀ (même supprimé), on réutilise sa ligne au lieu
+  // d'en créer une seconde — sinon supprimer puis racheter « Eau » scinderait stock et historique en deux.
+  // On ne touche pas au stock (géré par achats/ventes/contrôle) ; on réactive juste si besoin.
+  const existant = one<Produit>(
+    `SELECT * FROM produit WHERE nom = ? COLLATE NOCASE LIMIT 1`,
+    nom
+  );
+  if (existant) {
+    if (!existant.actif) {
+      run(`UPDATE produit SET actif = 1, maj_le = ? WHERE id = ?`, now, existant.id);
+      journaliser({
+        userId,
+        action: "modification",
+        entite: "produit",
+        details: `Produit réactivé : ${nom}`,
+        refId: existant.id,
+      });
+    }
+    return existant.id;
+  }
+
   const r = run(
     `INSERT INTO produit
        (nom, categorie, prix_achat, frais, prix_vente, stock, seuil_stock, code_barre, actif, cree_le, maj_le)
      VALUES (?,?,?,?,?,?,?,?,1,?,?)`,
-    normaliserNom(data.nom),
+    nom,
     data.categorie ?? null,
     data.prixAchat ?? 0,
     data.frais ?? 0,

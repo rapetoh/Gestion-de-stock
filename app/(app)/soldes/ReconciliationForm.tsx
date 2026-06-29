@@ -101,6 +101,9 @@ export default function ReconciliationForm({
                       {l.detail.ventes
                         ? ` + ventes ${formatCFA(l.detail.ventes)}`
                         : ""}
+                      {l.detail.commissions
+                        ? ` + commissions ${formatCFA(l.detail.commissions)}`
+                        : ""}
                       {l.detail.depenses
                         ? ` − dépenses ${formatCFA(l.detail.depenses)}`
                         : ""}
