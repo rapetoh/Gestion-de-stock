@@ -2,7 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { parseCFA } from "@/lib/money";
-import { parseProduitsTexte } from "@/lib/import";
+import {
+  parseProduitsTexte,
+  parseGrille,
+  construireRows,
+  type Champ,
+  type ImportRow,
+} from "@/lib/import";
 import { getSession } from "@/lib/auth";
 import {
   createProduit,
@@ -69,13 +75,54 @@ export type ImportState = {
   error?: string;
 } | null;
 
+const CHAMPS_VALIDES = new Set<Champ>([
+  "nom",
+  "prixAchat",
+  "frais",
+  "prixVente",
+  "stock",
+  "seuilStock",
+  "categorie",
+]);
+
 export async function importerProduitsAction(
   _prev: ImportState,
   formData: FormData
 ): Promise<ImportState> {
-  const { rows } = parseProduitsTexte(String(formData.get("texte") ?? ""));
+  const texte = String(formData.get("texte") ?? "");
+
+  // Mapping explicite confirmé par l'utilisateur (colonne → champ) + ligne d'en-tête.
+  // Le serveur reconstruit les lignes lui-même : on ne fait jamais confiance à des lignes
+  // déjà construites côté client, et on revalide tout (Nom obligatoire).
+  let mapping: (Champ | null)[] | null = null;
+  try {
+    const brut = JSON.parse(String(formData.get("mapping") ?? "null"));
+    if (Array.isArray(brut)) {
+      mapping = brut.map((x) => (CHAMPS_VALIDES.has(x as Champ) ? (x as Champ) : null));
+    }
+  } catch {
+    mapping = null;
+  }
+
+  let rows: ImportRow[];
+  if (mapping) {
+    if (!mapping.includes("nom")) {
+      return { error: "Indique quelle colonne contient le Nom du produit (obligatoire)." };
+    }
+    const enteteIndex = Number(formData.get("enteteIndex"));
+    const { lignes } = parseGrille(texte);
+    rows = construireRows(
+      lignes,
+      Number.isFinite(enteteIndex) ? enteteIndex : -1,
+      mapping
+    );
+  } else {
+    // Pas de mapping fourni (rétrocompat) : détection automatique.
+    rows = parseProduitsTexte(texte).rows;
+  }
+
   if (!rows.length) {
-    return { error: "Aucun produit à importer. Colle une liste ou choisis un fichier." };
+    return { error: "Aucun produit à importer. Choisis un fichier et vérifie l'aperçu." };
   }
   const session = await getSession();
   const res = importerProduits(rows, session?.userId ?? null);

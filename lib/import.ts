@@ -1,9 +1,11 @@
-// Parseur d'import de produits — souple et standard, partagé par l'aperçu (client) et l'action.
+// Parseur d'import de produits — générique, partagé par l'aperçu (client) et l'action (serveur).
 //
-// Idéal : une 1re ligne d'EN-TÊTE qui nomme les colonnes (Nom, Prix de vente, Stock, Catégorie…)
-// dans N'IMPORTE QUEL ordre, avec des synonymes courants. Les colonnes inconnues sont ignorées,
-// seul « Nom » est requis. Sans en-tête reconnu, on retombe sur un ordre par défaut (rétrocompat).
-// Une cellule vide reste « non fournie » (undefined), jamais 0.
+// Principe : on ne suppose RIEN de la structure du fichier. On lit les colonnes telles qu'elles
+// arrivent (2 ou 30, dans n'importe quel ordre, avec colonnes en trop, ligne de titre au-dessus,
+// colonnes en double…). L'utilisateur confirme, colonne par colonne, ce que chacune représente
+// (« mapping »). Une détection automatique propose un mapping de départ, toujours corrigeable.
+// Seul « Nom » est requis ; les colonnes non assignées sont ignorées. Une cellule vide reste
+// « non fournie » (undefined), jamais 0.
 import { parseCFA } from "./money";
 
 export type ImportRow = {
@@ -25,11 +27,16 @@ export type Champ =
   | "seuilStock"
   | "categorie";
 
-export type ImportResult = {
-  rows: ImportRow[];
-  colonnes: string[]; // libellés des colonnes reconnues (mode en-tête), pour l'aperçu
-  avecEntete: boolean;
-};
+// Tous les champs assignables, dans l'ordre où on les présente à l'utilisateur.
+export const CHAMPS: Champ[] = [
+  "nom",
+  "prixAchat",
+  "frais",
+  "prixVente",
+  "stock",
+  "seuilStock",
+  "categorie",
+];
 
 export const LABELS: Record<Champ, string> = {
   nom: "Nom",
@@ -41,8 +48,8 @@ export const LABELS: Record<Champ, string> = {
   categorie: "Catégorie",
 };
 
-// Ordre par défaut quand il n'y a pas d'en-tête (rétrocompatible avec l'ancien format).
-const ORDRE_DEFAUT: Champ[] = [
+// Ordre par défaut quand il n'y a pas d'en-tête (rétrocompatible avec l'ancien format positionnel).
+export const ORDRE_DEFAUT: Champ[] = [
   "nom",
   "prixAchat",
   "frais",
@@ -59,7 +66,7 @@ const SYNONYMES: [Champ, string[]][] = [
   ["prixAchat", ["prix d achat", "prix achat", "achat", "cout de revient", "prix de revient", "cout", "cost", "purchase"]],
   ["frais", ["frais", "transport", "livraison", "shipping"]],
   ["prixVente", ["prix de vente", "prix vente", "prix unitaire", "vente", "prix", "price", "sell"]],
-  ["seuilStock", ["seuil de stock", "seuil", "alerte", "minimum", "reorder"]],
+  ["seuilStock", ["seuil de stock", "stock minimum", "seuil", "minimum", "reorder"]],
   ["stock", ["stock", "quantite", "qte", "quantity", "qty", "disponible"]],
   ["categorie", ["categorie", "category", "rayon", "famille", "groupe", "type"]],
 ];
@@ -95,27 +102,64 @@ function detecterDelim(ligne: string): string {
   return ligne.includes("\t") ? "\t" : ligne.includes(";") ? ";" : ",";
 }
 
-export function parseProduitsTexte(texte: string): ImportResult {
-  const lignes = (texte ?? "")
-    .replace(/^﻿/, "") // BOM éventuel (Excel / notre propre export)
+// ── Primitives génériques ────────────────────────────────────────────────────
+
+export type Grille = { lignes: string[][]; delim: string };
+
+// Découpe le texte en grille de cellules (BOM enlevé, lignes vides ignorées, délimiteur auto :
+// tabulation, point-virgule, ou virgule). Aucune hypothèse sur l'en-tête ici.
+export function parseGrille(texte: string): Grille {
+  const brutes = (texte ?? "")
+    .replace(/^﻿/, "")
     .split(/\r?\n/)
     .filter((l) => l.trim() !== "");
-  if (!lignes.length) return { rows: [], colonnes: [], avecEntete: false };
+  if (!brutes.length) return { lignes: [], delim: "," };
+  const delim = detecterDelim(brutes[0]);
+  const lignes = brutes.map((l) => l.split(delim).map((c) => c.trim()));
+  return { lignes, delim };
+}
 
-  const delim = detecterDelim(lignes[0]);
-  const cellsDe = (l: string) => l.split(delim).map((c) => c.trim());
+// Propose un champ pour chaque colonne d'une ligne d'en-tête. Chaque champ n'est attribué
+// QU'UNE fois (la 1re colonne qui correspond gagne) — ainsi « En stock » l'emporte sur
+// « Total en stock » / « Qté », et « Prix d'achat unit. » sur une colonne « Prix d'achat » vide.
+export function autoMapper(entete: string[]): (Champ | null)[] {
+  const vus = new Set<Champ>();
+  return entete.map((cell) => {
+    const champ = champPourEntete(cell);
+    if (!champ || vus.has(champ)) return null;
+    vus.add(champ);
+    return champ;
+  });
+}
 
-  // La 1re ligne est-elle un en-tête ? (≥2 colonnes reconnues, ou la 1re = Nom + au moins une autre)
-  const mapEntete = cellsDe(lignes[0]).map(champPourEntete);
-  const nbReconnus = mapEntete.filter(Boolean).length;
-  const avecEntete = nbReconnus >= 2 || (mapEntete[0] === "nom" && nbReconnus >= 1);
+// Devine quelle ligne est l'en-tête : parmi les premières lignes, celle qui reconnaît le plus de
+// champs (≥ 2). Saute ainsi une ligne de titre (« Gestion des produits… ») posée au-dessus.
+// Renvoie -1 si aucun en-tête crédible (→ mode positionnel par défaut).
+export function devinerEnteteIndex(lignes: string[][]): number {
+  const N = Math.min(lignes.length, 8);
+  let best = 0;
+  let bestCount = -1;
+  for (let i = 0; i < N; i++) {
+    const c = autoMapper(lignes[i]).filter(Boolean).length;
+    if (c > bestCount) {
+      bestCount = c;
+      best = i;
+    }
+  }
+  return bestCount >= 2 ? best : -1;
+}
 
-  const mapping: (Champ | null)[] = avecEntete ? mapEntete : ORDRE_DEFAUT;
-  const donnees = avecEntete ? lignes.slice(1) : lignes;
-
+// Construit les lignes-produit à partir d'un mapping EXPLICITE (champ par index de colonne) et de
+// l'index de la ligne d'en-tête (-1 = pas d'en-tête : les données commencent à la 1re ligne).
+// Les colonnes non mappées (null) sont ignorées. Une ligne sans nom est sautée.
+export function construireRows(
+  lignes: string[][],
+  enteteIndex: number,
+  mapping: (Champ | null)[]
+): ImportRow[] {
+  const donnees = enteteIndex >= 0 ? lignes.slice(enteteIndex + 1) : lignes;
   const rows: ImportRow[] = [];
-  for (const ligne of donnees) {
-    const cols = cellsDe(ligne);
+  for (const cols of donnees) {
     const row: ImportRow = { nom: "" };
     mapping.forEach((champ, i) => {
       if (!champ) return;
@@ -127,13 +171,45 @@ export function parseProduitsTexte(texte: string): ImportResult {
     const nom = row.nom.trim();
     if (!nom) continue;
     // En mode sans en-tête, ignore une ligne d'en-tête restée par mégarde.
-    if (!avecEntete && /^(nom|produit)$/i.test(nom)) continue;
+    if (enteteIndex < 0 && /^(nom|produit)$/i.test(nom)) continue;
     rows.push(row);
   }
+  return rows;
+}
 
-  const colonnes = avecEntete
-    ? (mapEntete.filter(Boolean) as Champ[]).map((c) => LABELS[c])
+// ── Détection automatique de bout en bout (aperçu par défaut, action sans mapping) ───────────
+
+export type ImportResult = {
+  rows: ImportRow[];
+  colonnes: string[]; // libellés des champs reconnus, pour l'aperçu
+  avecEntete: boolean;
+  // Mapping résolu, champ ← colonne source : pour montrer ce que l'import a compris
+  // (« Nom ← Produit », « Stock ← En stock »…) avant de valider.
+  mapping: { champ: Champ; source: string }[];
+};
+
+export function parseProduitsTexte(texte: string): ImportResult {
+  const { lignes } = parseGrille(texte);
+  if (!lignes.length) return { rows: [], colonnes: [], avecEntete: false, mapping: [] };
+
+  const enteteIndex = devinerEnteteIndex(lignes);
+  const avecEntete = enteteIndex >= 0;
+  const mapping: (Champ | null)[] = avecEntete
+    ? autoMapper(lignes[enteteIndex])
+    : ORDRE_DEFAUT;
+
+  const rows = construireRows(lignes, avecEntete ? enteteIndex : -1, mapping);
+
+  const champsMap = avecEntete
+    ? (mapping
+        .map((c, i) => (c ? { champ: c, source: lignes[enteteIndex][i] || LABELS[c] } : null))
+        .filter(Boolean) as { champ: Champ; source: string }[])
     : [];
 
-  return { rows, colonnes, avecEntete };
+  return {
+    rows,
+    colonnes: champsMap.map((c) => LABELS[c.champ]),
+    avecEntete,
+    mapping: champsMap,
+  };
 }

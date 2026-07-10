@@ -1,6 +1,12 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { resetDb } from "./helpers";
-import { parseProduitsTexte } from "../lib/import";
+import {
+  parseProduitsTexte,
+  parseGrille,
+  autoMapper,
+  devinerEnteteIndex,
+  construireRows,
+} from "../lib/import";
 import { importerProduits, listProduits, createProduit, getProduit } from "../lib/repo/produits";
 import { listActivite } from "../lib/repo/activite";
 
@@ -56,6 +62,76 @@ describe("parseProduitsTexte — en-tête souple", () => {
   it("nettoie les nombres avec espaces", () => {
     const [r] = parse("Nom;Prix de vente\nCarton;2 000");
     expect(r.prixVente).toBe(2000);
+  });
+});
+
+describe("fichier Excel réel et brouillon (titre, colonne Code/XX, doublons, Qté=1)", () => {
+  // Reproduit la vraie feuille : 1re ligne = titre fusionné ; vraie colonne « Produit » en 2e ;
+  // colonnes en double (Total en stock, Qté pour code, Prix d'achat/vente vides) qui pourraient
+  // écraser les bonnes valeurs si on n'était pas prudent.
+  const fichier = [
+    "Gestion des produit version courte;;;;;;;;;;;;;;;",
+    "Code;Produit;En stock;Prix d'achat unit.;Prix Unit.;Transport;TVA;CHK_COMPOSE;Total en stock;DCI;Prix Unit. Don;Code à bars;Qté. pour Code à bars;Peremption Alerte (Jours);Prix d'achat;Prix de vente",
+    "XX;GRAINE DE COURGE;0;600;850;0;;0;0;;0;;1;;0;0",
+    "XX;GINO RIZ 900 G;14;700;950;0;;0;14;;0;3760100682434;1;;0;0",
+  ].join("\n");
+
+  it("saute le titre, lit le Nom dans « Produit » (jamais « XX » de la colonne Code)", () => {
+    const res = parseProduitsTexte(fichier);
+    expect(res.avecEntete).toBe(true);
+    expect(res.rows).toHaveLength(2);
+    expect(res.rows.map((r) => r.nom)).toEqual(["GRAINE DE COURGE", "GINO RIZ 900 G"]);
+  });
+
+  it("prend les VRAIES colonnes (pas les doublons vides ni la Qté=1)", () => {
+    const [a, b] = parseProduitsTexte(fichier).rows;
+    // achat ← « Prix d'achat unit. » (600/700), PAS la colonne « Prix d'achat » vide (0)
+    expect(a).toMatchObject({ prixAchat: 600, prixVente: 850, stock: 0 });
+    // stock ← « En stock » (14), PAS « Qté. pour Code à bars » (=1)
+    expect(b).toMatchObject({ prixAchat: 700, prixVente: 950, stock: 14 });
+  });
+
+  it("montre la correspondance résolue pour l'aperçu", () => {
+    const res = parseProduitsTexte(fichier);
+    const par = Object.fromEntries(res.mapping.map((m) => [m.champ, m.source]));
+    expect(par.nom).toBe("Produit");
+    expect(par.stock).toBe("En stock");
+    expect(par.prixAchat).toBe("Prix d'achat unit.");
+    expect(par.prixVente).toBe("Prix Unit.");
+    // « Péremption Alerte (Jours) » ne doit PAS être pris pour le seuil de stock.
+    expect(par.seuilStock).toBeUndefined();
+  });
+
+  it("importe sans créer de produit « XX » ni « Code »", () => {
+    const res = importerProduits(parseProduitsTexte(fichier).rows, null);
+    expect(res.crees).toBe(2);
+    const noms = listProduits().map((p) => p.nom).sort();
+    expect(noms).toEqual(["GINO RIZ 900 G", "GRAINE DE COURGE"]);
+  });
+});
+
+describe("primitives génériques (mapping explicite, ré-utilisable pour tout fichier)", () => {
+  it("parseGrille découpe en cellules et auto-détecte le séparateur", () => {
+    const g = parseGrille("a;b;c\n1;2;3");
+    expect(g.delim).toBe(";");
+    expect(g.lignes).toEqual([["a", "b", "c"], ["1", "2", "3"]]);
+  });
+
+  it("autoMapper n'attribue chaque champ qu'une fois (1re colonne gagnante)", () => {
+    const m = autoMapper(["Produit", "En stock", "Total en stock", "Prix de vente", "Prix"]);
+    // stock seulement sur « En stock » ; prixVente seulement sur « Prix de vente »
+    expect(m).toEqual(["nom", "stock", null, "prixVente", null]);
+  });
+
+  it("devinerEnteteIndex saute une ligne de titre au-dessus du vrai en-tête", () => {
+    const { lignes } = parseGrille("Titre;;;\nNom;Stock;Prix de vente\nA;5;700");
+    expect(devinerEnteteIndex(lignes)).toBe(1);
+  });
+
+  it("construireRows respecte un mapping imposé par l'utilisateur", () => {
+    const { lignes } = parseGrille("ignore;le nom;le prix\nzzz;Savon;750");
+    const rows = construireRows(lignes, 0, [null, "nom", "prixVente"]);
+    expect(rows).toEqual([{ nom: "Savon", prixVente: 750 }]);
   });
 });
 

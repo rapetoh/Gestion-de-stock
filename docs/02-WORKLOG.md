@@ -7,6 +7,31 @@
 
 ## 2026-06-28
 
+### Import produits générique : mapping de colonnes (fichier Excel réel), aperçu & validation
+- **What:** Réécrit l'import pour ne **plus supposer aucune structure de fichier**. L'utilisateur
+  charge n'importe quel CSV, l'app lit **toutes les colonnes** (2 ou 30, dans n'importe quel ordre,
+  colonnes en trop, ligne de titre au-dessus, colonnes en double) et lui demande, colonne par
+  colonne via un menu, **ce que chacune représente** (Nom obligatoire, Prix d'achat, Frais, Prix de
+  vente, Stock, Seuil, Catégorie). Une **détection auto** propose un mapping de départ *corrigeable* ;
+  choix de la **ligne d'en-tête** ; **aperçu exact** de ce qui sera enregistré + contrôles (Nom requis,
+  doublons, produits sans prix) ; on **enregistre seulement après confirmation**. `lib/import.ts`
+  factorisé en primitives génériques (`parseGrille`, `autoMapper` avec **unicité des champs**,
+  `devinerEnteteIndex` qui saute une ligne de titre, `construireRows` à mapping explicite). L'action
+  reconstruit les lignes côté serveur à partir du mapping (jamais des lignes venues du client) et
+  revalide que le Nom est mappé.
+- **Why:** Le vrai fichier de la boutique (`PRODUITS A IMPORTER AVEC CODES BARRES.xlsx`) a une ligne
+  de titre fusionnée, une colonne A « Code » remplie de « XX », le nom en colonne B « Produit », et
+  des colonnes en double (Total en stock, Qté=1, Prix d'achat/vente vides). L'ancien import
+  **corrompait en silence** (produits nommés « XX », prix à 0, stock à 1). Surtout : coder pour *un*
+  fichier ne passe pas à l'échelle — chaque nouveau fichier aurait exigé du code. Le mapping confirmé
+  par l'utilisateur règle l'ambiguïté une fois, pour **n'importe quel fichier**, sans code par fichier.
+- **Result:** `npm test` **67/67** (dont un test qui **rejoue le vrai fichier** : titre + colonne
+  XX + doublons → Nom depuis « Produit », prix depuis les vraies colonnes, stock depuis « En stock »,
+  jamais de produit « XX »). tsc/lint/build OK. **Vérifié à chaud** (Chrome headless, base jetable) :
+  la 1re ligne arrive « GRAINE DE COURGE — Achat 600 F, Vente 850 F, Stock 0 », mapping auto correct,
+  colonnes parasites ignorées, import = 3 créés / 0 « XX ». Note : `.xlsx` non lu directement —
+  étape standard « Enregistrer sous → CSV » indiquée à l'écran.
+
 ### Revue système (cohésion & fiabilité) + correctifs T1–T3
 - **What:** Revue de tout le système (passage à l'échelle, cohérence inter-fonctions, complétude), puis
   correction des vrais problèmes. **T1 (bugs inter-fonctions) :** `createProduit` réutilise/réactive une
