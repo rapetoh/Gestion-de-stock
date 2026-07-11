@@ -7,6 +7,23 @@
 
 ## 2026-07-11
 
+### Aide refondue : des QUESTIONS d'utilisatrice, pas des descriptions d'écrans (+ recherche)
+- **What:** Critique juste de l'utilisateur : « comment je supprime le produit X ? » ne trouvait
+  pas de réponse — l'aide décrivait les écrans au lieu de répondre aux questions. Refonte de
+  `app/(app)/aide/page.tsx` en **FAQ par tâches** : 8 sections / **42 questions** propriétaire
+  (« Comment je supprime un produit ? », « Je me suis trompée sur une vente ? », « Il manque de
+  l'argent dans les soldes ? », « Elle a oublié son mot de passe ? », « J'ai perdu mon
+  téléphone ? »…), 8 questions vendeuse. **Chaque réponse vérifiée contre le code réel** — y
+  compris les réponses honnêtes « appelle Roch » (changer SON mot de passe et restaurer une
+  sauvegarde n'existent pas dans l'app ; vendeuse ne peut pas corriger une vente → « préviens la
+  propriétaire »). Ajout d'une **recherche** (`components/AideFiltre.tsx`) : filtre pendant la
+  frappe, accents ignorés, questions correspondantes ouvertes automatiquement, sections vides
+  masquées. Impression et « Revoir le guide » conservés.
+- **Result:** 81/81 tests, tsc/lint/build OK. Vérifié en navigateur : 42 questions propriétaire ;
+  « supprimer » → 5 réponses ouvertes dont la suppression de produit ; « depense » sans accent
+  trouve ; vendeuse (compte réel) → 8 questions, aucune section propriétaire, « préviens la
+  propriétaire » présent. Déployé sur monpanier.fly.dev.
+
 ### Import : le VRAI fichier de l'ancien logiciel révèle 3 défauts — corrigés avant l'import réel
 - **What:** L'utilisateur a fourni l'export CSV complet de l'ancien logiciel avant de l'importer.
   Dry-run contre le code : 3 défauts qui auraient corrompu les données. (1) **Prix flottants**

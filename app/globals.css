@@ -221,6 +221,10 @@ tfoot td { padding: 14px 12px; font-weight: 800; font-size: 15.5px; border-top: 
 }
 
 /* ---------- Aide (page dépliable) ---------- */
+.aide-cat {
+  font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase; font-weight: 800;
+  color: var(--ink-soft); padding: 18px 2px 8px;
+}
 .aide-item { margin-bottom: 12px; padding: 16px 18px; }
 .aide-item summary {
   cursor: pointer; font-weight: 800; font-size: 16px; list-style: none;
