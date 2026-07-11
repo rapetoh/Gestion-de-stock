@@ -12,7 +12,7 @@ type Step = { titre: string; corps: string; cible?: string };
 
 const OWNER: Step[] = [
   {
-    titre: "Bienvenue dans Ma Boutique 👋",
+    titre: "Bienvenue dans Mon Panier 👋",
     corps:
       "Ce petit guide te montre l'essentiel en 30 secondes. Tu pourras le revoir quand tu veux depuis le bouton Aide.",
   },

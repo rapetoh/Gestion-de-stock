@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Ma Boutique",
+  title: "Mon Panier",
   description: "Gestion simple de la boutique",
 };
 

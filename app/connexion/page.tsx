@@ -18,10 +18,9 @@ export default function ConnexionPage() {
           className="brand"
           style={{ justifyContent: "center", paddingBottom: 22 }}
         >
-          <div className="logo">B</div>
+          <div className="logo">P</div>
           <div>
-            <div className="name">Ma Boutique</div>
-            <div className="sub">Clinique St-Joseph</div>
+            <div className="name">Mon Panier</div>
           </div>
         </div>
         <ConnexionForm />

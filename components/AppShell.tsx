@@ -27,7 +27,7 @@ export default function AppShell({
         >
           ☰
         </button>
-        <span className="mt-brand">Ma Boutique</span>
+        <span className="mt-brand">Mon Panier</span>
       </div>
 
       {open ? (

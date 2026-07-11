@@ -66,10 +66,9 @@ export default function Sidebar({ nom, role, open = false, onNavigate }: Props) 
   return (
     <aside className={`sidebar${open ? " open" : ""}`}>
       <div className="brand">
-        <div className="logo">B</div>
+        <div className="logo">P</div>
         <div>
-          <div className="name">Ma Boutique</div>
-          <div className="sub">Clinique St-Joseph</div>
+          <div className="name">Mon Panier</div>
         </div>
       </div>
 
