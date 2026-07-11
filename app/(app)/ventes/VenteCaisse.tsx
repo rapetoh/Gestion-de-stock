@@ -33,15 +33,15 @@ export default function VenteCaisse() {
   // Recherche serveur (débouncée) : on ne charge jamais tout le catalogue dans le téléphone.
   useEffect(() => {
     const s = recherche.trim();
-    if (!s) {
-      setSuggestions([]);
-      return;
-    }
     let annule = false;
     const t = setTimeout(async () => {
+      if (!s) {
+        if (!annule) setSuggestions([]);
+        return;
+      }
       const res = await rechercherPourVente(s);
       if (!annule) setSuggestions(res);
-    }, 180);
+    }, s ? 180 : 0);
     return () => {
       annule = true;
       clearTimeout(t);

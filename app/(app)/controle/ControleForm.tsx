@@ -20,12 +20,12 @@ export default function ControleForm() {
   // Recherche serveur débouncée (pas tout le catalogue dans la page).
   useEffect(() => {
     const s = recherche.trim();
-    if (!s) {
-      setResultats([]);
-      return;
-    }
     let annule = false;
     const t = setTimeout(async () => {
+      if (!s) {
+        if (!annule) setResultats([]);
+        return;
+      }
       const res = await rechercherPourAchat(s);
       if (annule) return;
       const lignes: Ligne[] = res.map((p) => ({
@@ -40,7 +40,7 @@ export default function ControleForm() {
         for (const l of lignes) n[l.id] = l;
         return n;
       });
-    }, 180);
+    }, s ? 180 : 0);
     return () => {
       annule = true;
       clearTimeout(t);

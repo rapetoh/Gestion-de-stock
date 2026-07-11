@@ -34,15 +34,16 @@ export default function AchatForm() {
   // Recherche serveur débouncée (pas tout le catalogue dans la page).
   useEffect(() => {
     const s = nom.trim();
-    if (!s || actuel?.nom === s) {
-      setSuggestions([]);
-      return;
-    }
+    const vide = !s || actuel?.nom === s;
     let annule = false;
     const t = setTimeout(async () => {
+      if (vide) {
+        if (!annule) setSuggestions([]);
+        return;
+      }
       const res = await rechercherPourAchat(s);
       if (!annule) setSuggestions(res);
-    }, 180);
+    }, vide ? 0 : 180);
     return () => {
       annule = true;
       clearTimeout(t);
