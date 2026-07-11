@@ -2,7 +2,7 @@
 # 1 machine + 1 volume qui garde la base de données. HTTPS automatique.
 # Remplace le nom ci-dessous par le tien après `fly launch --no-deploy`.
 
-app = "ma-boutique"
+app = "ma-boutique-togo"
 # Paris : la meilleure connectivité vers le Togo. (Alternative : "jnb" = Johannesburg.)
 primary_region = "cdg"
 
