@@ -65,6 +65,18 @@ export default function AchatForm() {
     setSuggestions([]);
   }
 
+  // Douchette code-barres (= clavier qui tape le code puis Entrée) : Entrée dans ce champ
+  // ne doit pas soumettre l'achat en cours — on choisit le produit si un seul correspond.
+  async function surEntree(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    const s = nom.trim();
+    if (!s || actuel) return;
+    const res = await rechercherPourAchat(s);
+    if (res.length === 1) choisir(res[0]);
+    else setSuggestions(res);
+  }
+
   const calc = useMemo(() => {
     const q = parseCFA(quantite);
     const pa = parseCFA(prixAchat);
@@ -88,7 +100,8 @@ export default function AchatForm() {
           name="nom"
           value={nom}
           onChange={(e) => onNomChange(e.target.value)}
-          placeholder="Tape le nom du produit…"
+          onKeyDown={surEntree}
+          placeholder="Tape le nom… ou scanne le code-barres"
           autoComplete="off"
           required
         />

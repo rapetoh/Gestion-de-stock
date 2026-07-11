@@ -50,8 +50,8 @@ export function listProduitsFiltres(
   const params: unknown[] = [];
   const s = (f.recherche ?? "").trim();
   if (s) {
-    where.push("nom LIKE ?");
-    params.push(`%${s}%`);
+    where.push("(nom LIKE ? OR code_barre = ?)");
+    params.push(`%${s}%`, s);
   }
   if (f.categorie) {
     where.push("categorie = ?");
@@ -85,9 +85,12 @@ export function listCategories(): string[] {
 export function chercherProduits(q: string, limit = 15): Produit[] {
   const s = q.trim();
   if (!s) return [];
+  // Nom OU code-barres exact : une douchette « tape » le code puis Entrée —
+  // le scan retrouve donc le produit dans la même case de recherche.
   return all<Produit>(
-    `SELECT * FROM produit WHERE actif = 1 AND nom LIKE ? ORDER BY nom LIMIT ?`,
+    `SELECT * FROM produit WHERE actif = 1 AND (nom LIKE ? OR code_barre = ?) ORDER BY nom LIMIT ?`,
     `%${s}%`,
+    s,
     limit
   );
 }
@@ -220,6 +223,20 @@ export function importerProduits(
     let maj = 0;
     let ignores = 0;
     const now = nowIso();
+
+    // code_barre est UNIQUE en base : un code en double (dans le fichier ou déjà pris par
+    // un autre produit) est laissé de côté plutôt que de faire échouer tout l'import.
+    const codesVus = new Set<string>();
+    const codeLibre = (code: string | undefined, saufId?: number): string | null => {
+      const c = (code ?? "").trim();
+      if (!c) return null;
+      if (codesVus.has(c)) return null;
+      const autre = one<{ id: number }>(`SELECT id FROM produit WHERE code_barre = ?`, c);
+      if (autre && autre.id !== saufId) return null;
+      codesVus.add(c);
+      return c;
+    };
+
     for (const r of rows) {
       const nom = normaliserNom(r.nom);
       if (!nom) continue;
@@ -239,6 +256,11 @@ export function importerProduits(
         if (r.frais !== undefined) { sets.push("frais = ?"); vals.push(r.frais); }
         if (r.prixVente !== undefined) { sets.push("prix_vente = ?"); vals.push(r.prixVente); }
         if (r.seuilStock !== undefined) { sets.push("seuil_stock = ?"); vals.push(r.seuilStock); }
+        if (r.codeBarre !== undefined) {
+          const c = codeLibre(r.codeBarre, existant.id);
+          // Un code en conflit n'écrase jamais l'existant ; un code valide s'applique.
+          if (c) { sets.push("code_barre = ?"); vals.push(c); }
+        }
 
         if (sets.length === 0) {
           ignores++; // rien de neuf à appliquer
@@ -261,7 +283,7 @@ export function importerProduits(
           r.prixVente ?? 0,
           r.stock ?? 0,
           r.seuilStock ?? 0,
-          null,
+          codeLibre(r.codeBarre),
           now,
           now
         );

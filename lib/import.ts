@@ -16,6 +16,8 @@ export type ImportRow = {
   stock?: number;
   seuilStock?: number;
   categorie?: string | null;
+  // Toujours du texte (jamais un nombre) : un code-barres garde ses zéros de tête.
+  codeBarre?: string;
 };
 
 export type Champ =
@@ -25,7 +27,8 @@ export type Champ =
   | "prixVente"
   | "stock"
   | "seuilStock"
-  | "categorie";
+  | "categorie"
+  | "codeBarre";
 
 // Tous les champs assignables, dans l'ordre où on les présente à l'utilisateur.
 export const CHAMPS: Champ[] = [
@@ -36,6 +39,7 @@ export const CHAMPS: Champ[] = [
   "stock",
   "seuilStock",
   "categorie",
+  "codeBarre",
 ];
 
 export const LABELS: Record<Champ, string> = {
@@ -46,6 +50,7 @@ export const LABELS: Record<Champ, string> = {
   stock: "Stock",
   seuilStock: "Seuil",
   categorie: "Catégorie",
+  codeBarre: "Code-barres",
 };
 
 // Ordre par défaut quand il n'y a pas d'en-tête (rétrocompatible avec l'ancien format positionnel).
@@ -57,11 +62,15 @@ export const ORDRE_DEFAUT: Champ[] = [
   "stock",
   "seuilStock",
   "categorie",
+  "codeBarre",
 ];
 
 // Synonymes d'en-tête. Ordre des CHAMPS important : on teste « achat/frais » avant « prix »,
 // et « seuil » avant « stock », pour éviter les collisions (« prix d'achat », « seuil de stock »).
 const SYNONYMES: [Champ, string[]][] = [
+  // Testé AVANT « nom » : « Code produit » / « Code article » doivent tomber ici,
+  // pas sur nom (le match est par inclusion).
+  ["codeBarre", ["code barre", "codebarre", "ean", "upc", "barcode", "code"]],
   ["nom", ["nom", "produit", "article", "designation", "libelle", "name", "item"]],
   ["prixAchat", ["prix d achat", "prix achat", "achat", "cout de revient", "prix de revient", "cout", "cost", "purchase"]],
   ["frais", ["frais", "transport", "livraison", "shipping"]],
@@ -166,6 +175,7 @@ export function construireRows(
       const val = cols[i];
       if (champ === "nom") row.nom = (val ?? "").trim();
       else if (champ === "categorie") row.categorie = (val ?? "").trim() || undefined;
+      else if (champ === "codeBarre") row.codeBarre = (val ?? "").trim() || undefined;
       else row[champ] = maybeNum(val);
     });
     const nom = row.nom.trim();

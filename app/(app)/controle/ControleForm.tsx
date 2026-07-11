@@ -123,7 +123,9 @@ export default function ControleForm() {
             className="input big"
             value={recherche}
             onChange={(e) => setRecherche(e.target.value)}
-            placeholder="Cherche un produit… ex : savon, eau"
+            // Douchette : Entrée ne doit pas soumettre le contrôle en cours.
+            onKeyDown={(e) => { if (e.key === "Enter") e.preventDefault(); }}
+            placeholder="Cherche un produit… ou scanne le code-barres"
             autoComplete="off"
           />
         </div>

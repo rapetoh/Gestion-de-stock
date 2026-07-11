@@ -7,6 +7,25 @@
 
 ## 2026-07-11
 
+### Code-barres de bout en bout : import mappable + scan à la caisse (toujours optionnel)
+- **What:** Le champ `code_barre` existait (schéma UNIQUE, formulaires produit) mais **pas dans
+  l'import** (colonne perdue) et **pas dans la recherche** (un scan ne trouvait rien). Ajouté :
+  (1) champ « Code-barres » dans le mapping d'import (`lib/import.ts` — gardé en TEXTE, zéros de
+  tête intacts ; synonymes `code barre/ean/upc/code`, testés AVANT « nom » car le match est par
+  inclusion) ; (2) recherche par code exact en plus du nom (`chercherProduits`,
+  `listProduitsFiltres`) → une douchette (qui « tape » le code + Entrée) retrouve le produit à la
+  caisse, aux achats, au contrôle ; (3) **Entrée ne soumet plus les formulaires** Ventes/Achats/
+  Contrôle depuis la case de recherche — à la caisse, Entrée ajoute le produit si une seule
+  correspondance (2 scans = quantité 2) ; (4) import : les codes en double (fichier ou base) sont
+  laissés de côté au lieu de faire échouer l'import (index UNIQUE).
+- **Bug trouvé en vérifiant :** l'action serveur d'import gardait sa **propre liste recopiée** des
+  champs valides → elle rejetait silencieusement `codeBarre` (import OK mais codes à null).
+  Remplacée par `new Set(CHAMPS)` (source unique). Leçon : pas de liste dupliquée.
+- **Result:** 78/78 tests (4 nouveaux), tsc/lint OK. Vérifié en navigateur (serveur prod local,
+  base jetable) : import avec colonne Code-barres → codes en base ; à la caisse, taper le code +
+  Entrée ajoute le produit sans soumettre la vente ; 2e scan → quantité 2 ; recherche par nom
+  intacte. Déployé sur monpanier.fly.dev.
+
 ### Tableau de bord borné + « Comment ça marche » sur chaque écran
 - **What:** (1) **« À recommander bientôt » était non borné** (remarque juste de l'utilisateur) :
   avec 2 000 produits dont des centaines en stock bas, le tableau de bord aurait déroulé des

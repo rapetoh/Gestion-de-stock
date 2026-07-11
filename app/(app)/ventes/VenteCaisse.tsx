@@ -58,6 +58,19 @@ export default function VenteCaisse() {
     setFlash(`Vente enregistrée ✓ — ${formatCFA(montant)}`);
   }
 
+  // Douchette code-barres = clavier : elle « tape » le code puis envoie Entrée.
+  // Entrée dans la recherche ne doit JAMAIS soumettre la vente : on cherche tout de
+  // suite (sans attendre le debounce) et, si un seul produit correspond, on l'ajoute.
+  async function surEntree(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    const s = recherche.trim();
+    if (!s) return;
+    const res = await rechercherPourVente(s);
+    if (res.length === 1) ajouter(res[0]);
+    else setSuggestions(res);
+  }
+
   function ajouter(p: ProduitVente) {
     setFlash(null);
     setLignes((prev) => {
@@ -114,7 +127,8 @@ export default function VenteCaisse() {
             className="input big"
             value={recherche}
             onChange={(e) => setRecherche(e.target.value)}
-            placeholder="Tape le nom… ex : eau, savon"
+            onKeyDown={surEntree}
+            placeholder="Tape le nom… ou scanne le code-barres"
             autoComplete="off"
           />
           {suggestions.length > 0 ? (

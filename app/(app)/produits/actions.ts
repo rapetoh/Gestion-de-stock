@@ -6,6 +6,7 @@ import {
   parseProduitsTexte,
   parseGrille,
   construireRows,
+  CHAMPS,
   type Champ,
   type ImportRow,
 } from "@/lib/import";
@@ -75,15 +76,9 @@ export type ImportState = {
   error?: string;
 } | null;
 
-const CHAMPS_VALIDES = new Set<Champ>([
-  "nom",
-  "prixAchat",
-  "frais",
-  "prixVente",
-  "stock",
-  "seuilStock",
-  "categorie",
-]);
+// Dérivé de CHAMPS (source unique) : une liste recopiée à la main ici avait déjà
+// silencieusement rejeté un champ ajouté plus tard (codeBarre).
+const CHAMPS_VALIDES = new Set<Champ>(CHAMPS);
 
 export async function importerProduitsAction(
   _prev: ImportState,

@@ -7,7 +7,7 @@ import {
   devinerEnteteIndex,
   construireRows,
 } from "../lib/import";
-import { importerProduits, listProduits, createProduit, getProduit } from "../lib/repo/produits";
+import { importerProduits, listProduits, createProduit, getProduit, chercherProduits } from "../lib/repo/produits";
 import { listActivite } from "../lib/repo/activite";
 
 beforeEach(resetDb);
@@ -167,5 +167,45 @@ describe("importerProduits", () => {
     expect(listProduits()).toHaveLength(2);
     const resume = listActivite().filter((l) => l.details.startsWith("Import"));
     expect(resume.length).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe("code-barres (optionnel, jamais requis)", () => {
+  it("autoMapper reconnaît une colonne code-barres — testée AVANT nom (« Code produit » ≠ nom)", () => {
+    expect(autoMapper(["Code-barres", "Produit", "Prix"])).toEqual([
+      "codeBarre",
+      "nom",
+      "prixVente",
+    ]);
+    expect(autoMapper(["EAN", "Nom"])).toEqual(["codeBarre", "nom"]);
+    expect(autoMapper(["Code produit", "Désignation"])).toEqual(["codeBarre", "nom"]);
+  });
+
+  it("construireRows garde le code en TEXTE (zéros de tête intacts)", () => {
+    const { lignes } = parseGrille("Nom;Code-barres\nSavon;0012345");
+    const rows = construireRows(lignes, 0, ["nom", "codeBarre"]);
+    expect(rows).toEqual([{ nom: "Savon", codeBarre: "0012345" }]);
+  });
+
+  it("import : stocke le code ; les doublons (fichier ou base) sont laissés de côté sans faire échouer", () => {
+    importerProduits(
+      parse("Nom;Code-barres\nSavon;111\nEau;111\nLait;222"),
+      null
+    );
+    const parCode = (c: string) => chercherProduits(c, 5);
+    expect(parCode("111").map((p) => p.nom)).toEqual(["Savon"]); // 1er gagnant, Eau sans code
+    expect(parCode("222").map((p) => p.nom)).toEqual(["Lait"]);
+
+    // Ré-import : un code déjà pris par un AUTRE produit n'écrase rien et ne plante pas.
+    const res = importerProduits(parse("Nom;Code-barres\nDraps;222"), null);
+    expect(res.crees).toBe(1);
+    expect(parCode("222").map((p) => p.nom)).toEqual(["Lait"]);
+  });
+
+  it("scan à la caisse : la recherche trouve par code exact (pas seulement par nom)", () => {
+    importerProduits(parse("Nom;Code-barres;Prix de vente\nDéodorant;61234567;1500"), null);
+    const hits = chercherProduits("61234567", 15);
+    expect(hits).toHaveLength(1);
+    expect(hits[0].nom).toBe("Déodorant");
   });
 });
