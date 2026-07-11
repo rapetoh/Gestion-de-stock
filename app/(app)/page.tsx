@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { dashboard } from "@/lib/repo/stats";
-import { produitsARecommander, listProduits } from "@/lib/repo/produits";
+import { produitsARecommander, nbProduitsActifs } from "@/lib/repo/produits";
 import { formatCFA } from "@/lib/money";
 import { dateLongue } from "@/lib/dates";
 
@@ -16,8 +16,10 @@ function badgeStock(stock: number, seuil: number) {
 
 export default function TableauDeBordPage() {
   const data = dashboard();
-  const aRecommander = produitsARecommander();
-  const boutiqueVide = listProduits().length === 0;
+  // Le tableau de bord montre les 8 plus urgents ; la liste complète est sur
+  // Produits ?bas=1. Jamais tout le catalogue sur cette page.
+  const aRecommander = produitsARecommander(8);
+  const boutiqueVide = nbProduitsActifs() === 0;
 
   return (
     <>
@@ -161,6 +163,14 @@ export default function TableauDeBordPage() {
             )}
           </tbody>
         </table>
+        {data.nbARecommander > aRecommander.length ? (
+          <p style={{ marginTop: 10 }}>
+            <Link className="lien" href="/produits?bas=1">
+              Voir les {data.nbARecommander - aRecommander.length} autres produits à
+              recommander →
+            </Link>
+          </p>
+        ) : null}
       </div>
 
       <div className="section-gap"></div>

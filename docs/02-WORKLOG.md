@@ -7,6 +7,23 @@
 
 ## 2026-07-11
 
+### Tableau de bord borné + « Comment ça marche » sur chaque écran
+- **What:** (1) **« À recommander bientôt » était non borné** (remarque juste de l'utilisateur) :
+  avec 2 000 produits dont des centaines en stock bas, le tableau de bord aurait déroulé des
+  centaines de lignes. `produitsARecommander(limite=8)` + `nbProduitsARecommander()` (COUNT) +
+  lien « Voir les N autres → » vers Produits ?bas=1 (déjà filtrée/paginée). Le KPI garde le vrai
+  total. Aussi : `boutiqueVide` testé par `nbProduitsActifs()` (COUNT) au lieu de charger tout le
+  catalogue. Le « Classement du mois » était déjà borné (LIMIT 5). (2) **Mode d'emploi par page**
+  (`components/GuidePage.tsx`, monté dans AppShell) : carte « Comment ça marche » en haut de
+  chaque écran, ouverte seule à la 1re visite (drapeau localStorage par rôle × page), 2-4 étapes
+  en « tu », « J'ai compris ✓ » la réduit en petit bouton toujours réouvrable. 12 écrans couverts ;
+  masquée à l'impression. Choix design : pas un tour par page (lassitude) — une carte lisible.
+- **Result:** tsc/lint/74 tests OK. Vérifié en navigateur (base jetable, 30 produits dont 12 bas) :
+  tableau de bord montre 8 + « Voir les 4 autres » + KPI 12 ; carte Ventes ouverte à la 1re visite,
+  réduite à la 2e, réouvrable au clic ; capture visuelle du rendu Contrôle. Déployé sur
+  monpanier.fly.dev. Plus tôt le même jour : icônes lucide dans le menu, marque « Mon Panier »,
+  mise en prod Fly.io (voir entrées ci-dessous).
+
 ### Déploiement : packaging Fly.io (Docker + volume), runbook, build autonome
 - **What:** Rendu l'app **déployable en ligne** sans réécriture. L'app garde ses données dans un
   **fichier SQLite** (`node:sqlite`, `data/maboutique.db`), donc l'hébergeur doit offrir un **disque

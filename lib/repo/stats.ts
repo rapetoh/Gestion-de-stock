@@ -1,6 +1,6 @@
 // Repository statistiques — données agrégées pour le tableau de bord.
 import { all, one } from "../db";
-import { produitsARecommander } from "./produits";
+import { nbProduitsARecommander } from "./produits";
 import { bornesJour, bornesMois, anneeMoisCourants } from "../periodes";
 
 function bornesDuJour(): { debut: string; fin: string } {
@@ -63,13 +63,11 @@ export function dashboard(): Dashboard {
     mois.fin
   );
 
-  const aRecommander = produitsARecommander();
-
   return {
     ventesDuJour: venteJour?.total ?? 0,
     nbVentesDuJour: venteJour?.nb ?? 0,
     margeDuMois: marge?.marge ?? 0,
-    nbARecommander: aRecommander.length,
+    nbARecommander: nbProduitsARecommander(),
     topProduits: top,
   };
 }

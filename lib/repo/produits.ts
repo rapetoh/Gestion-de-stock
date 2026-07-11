@@ -278,10 +278,29 @@ export function importerProduits(
   });
 }
 
-export function produitsARecommander(): Produit[] {
+// Le tableau de bord n'affiche que les plus urgents (les plus en dessous du seuil) ;
+// le total réel vient de nbProduitsARecommander(). La liste complète vit sur
+// Produits ?bas=1 (filtrée + paginée) — le tableau de bord ne doit jamais
+// dérouler tout un catalogue.
+export function produitsARecommander(limite = 8): Produit[] {
   return all<Produit>(
     `SELECT * FROM produit
      WHERE actif = 1 AND stock <= seuil_stock
-     ORDER BY (stock - seuil_stock) ASC, nom`
+     ORDER BY (stock - seuil_stock) ASC, nom
+     LIMIT ?`,
+    limite
   );
+}
+
+export function nbProduitsARecommander(): number {
+  return (
+    one<{ n: number }>(
+      `SELECT COUNT(*) AS n FROM produit WHERE actif = 1 AND stock <= seuil_stock`
+    )?.n ?? 0
+  );
+}
+
+// Test « boutique vide » sans charger le catalogue.
+export function nbProduitsActifs(): number {
+  return one<{ n: number }>(`SELECT COUNT(*) AS n FROM produit WHERE actif = 1`)?.n ?? 0;
 }

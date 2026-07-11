@@ -254,9 +254,21 @@ tfoot td { padding: 14px 12px; font-weight: 800; font-size: 15.5px; border-top: 
 .guide-body { font-size: 15px; line-height: 1.5; color: var(--ink); margin-bottom: 16px; }
 .guide-actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 
+/* ---------- « Comment ça marche » (mode d'emploi par page) ---------- */
+.pagetip { border-left: 3px solid var(--primary); margin-bottom: 16px; }
+.pagetip-head { margin-bottom: 8px; }
+.pagetip-steps { margin: 0 0 12px; padding-left: 22px; }
+.pagetip-steps li { margin: 5px 0; font-size: 14.5px; line-height: 1.45; }
+.pagetip-toggle {
+  background: none; border: none; cursor: pointer; padding: 0 0 10px;
+  color: var(--ink-soft); font-size: 13px; font-weight: 600;
+}
+.pagetip-toggle:hover { color: var(--primary-d); text-decoration: underline; }
+
 /* ---------- Impression (mémo papier du guide) ---------- */
 @media print {
   .sidebar, .mobile-topbar, .overlay, .btn, .topbar .right,
+  .pagetip, .pagetip-toggle,
   .guide-catch, .guide-dim, .guide-ring, .guide-card { display: none !important; }
   .app { display: block; }
   .main { padding: 0; max-width: 100%; }
