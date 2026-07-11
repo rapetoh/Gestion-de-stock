@@ -5,6 +5,31 @@
 
 ---
 
+## 2026-07-11
+
+### Aide intégrée : page d'aide par rôle, guide de démarrage (tour), « Commence ici » & impression
+- **What:** L'app n'avait **aucune aide/tutoriel** (seulement des indices en ligne à l'écran). Ajouté,
+  en gardant le style sobre et la voix « tu » : (1) une **page Aide** (`app/(app)/aide/page.tsx`)
+  accessible aux deux rôles, en sections dépliables (`<details>`), **par rôle** — 12 sujets pour la
+  propriétaire, 3 pour la vendeuse (Vendre, Stock, Si tu es bloquée) ; (2) un **tour guidé au 1er
+  login** (`components/GuideTour.tsx`, monté dans `AppShell`) qui surligne les entrées du menu
+  (repli carte centrée sur téléphone/tiroir fermé), **7 étapes propriétaire / 4 vendeuse**, drapeau
+  `localStorage` **par rôle** (sur un même ordinateur, chacune a son tour) ; (3) un panneau
+  **« Commence ici »** sur le tableau de bord quand la boutique est vide (5 étapes : importer →
+  contrôle → vendre → créer la vendeuse → sauvegarder), qui disparaît dès qu'il y a des produits ;
+  (4) **impression** du guide (`components/PrintButton.tsx` + `@media print` : sidebar/boutons masqués,
+  sections dépliées) pour un mémo papier près de la caisse ; « Revoir le guide » (`/?guide=1`) rejoue
+  le tour. `middleware.ts` : `/aide` ajouté à `VENDEUSE_OK`. Contact « Si tu es bloquée » : Roch.
+- **Why:** Remise de l'app dans 2 jours à une utilisatrice non technique **et** une vendeuse toute
+  neuve. Il fallait de quoi apprendre, et de quoi se dépanner quand on **oublie** ou qu'on se demande
+  « par où je commence ? ». Rien ne devait être laissé de côté.
+- **Result:** 74/74 tests, tsc/lint (fichiers modifiés) OK, build OK. **Vérifié à chaud** (Chrome,
+  bases jetables) : propriétaire — tour s'ouvre/défile/se ferme, ne réapparaît pas, Aide 12 sujets,
+  impression masque la sidebar et déplie les sections, rejeu OK ; vendeuse — atterrit sur Ventes, son
+  tour 4 étapes s'ouvre (drapeau séparé), `/aide` accessible (3 sujets), `/benefices` toujours bloqué ;
+  boutique vide — « Commence ici » visible. À noter : 3 erreurs lint pré-existantes hors de ce lot
+  (`AchatForm`, `ControleForm`, `VenteCaisse`, `set-state-in-effect`).
+
 ## 2026-06-28
 
 ### Import produits générique : mapping de colonnes (fichier Excel réel), aperçu & validation

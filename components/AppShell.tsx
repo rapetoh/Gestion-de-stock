@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Sidebar from "./Sidebar";
+import GuideTour from "./GuideTour";
 
 // Coquille de l'app : barre du haut + menu coulissant sur téléphone, sidebar fixe sur ordinateur.
 export default function AppShell({
@@ -36,6 +37,8 @@ export default function AppShell({
       <Sidebar nom={nom} role={role} open={open} onNavigate={() => setOpen(false)} />
 
       <main className="main">{children}</main>
+
+      <GuideTour role={role} />
     </div>
   );
 }

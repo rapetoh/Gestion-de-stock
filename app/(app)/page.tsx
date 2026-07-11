@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { dashboard } from "@/lib/repo/stats";
-import { produitsARecommander } from "@/lib/repo/produits";
+import { produitsARecommander, listProduits } from "@/lib/repo/produits";
 import { formatCFA } from "@/lib/money";
 import { dateLongue } from "@/lib/dates";
 
@@ -16,6 +17,7 @@ function badgeStock(stock: number, seuil: number) {
 export default function TableauDeBordPage() {
   const data = dashboard();
   const aRecommander = produitsARecommander();
+  const boutiqueVide = listProduits().length === 0;
 
   return (
     <>
@@ -33,6 +35,60 @@ export default function TableauDeBordPage() {
           </a>
         </div>
       </div>
+
+      {boutiqueVide ? (
+        <div
+          className="card"
+          style={{ borderColor: "var(--primary)", borderWidth: 2, marginBottom: 18 }}
+        >
+          <h2>Bienvenue 👋 Commence ici</h2>
+          <div className="hint">
+            Cinq étapes pour bien démarrer. Prends-les à ton rythme — ce panneau
+            disparaîtra dès que tu auras ajouté tes produits.
+          </div>
+          <ol className="start-list">
+            <li>
+              <strong>1.</strong>{" "}
+              <Link className="lien" href="/produits/import">
+                Ajoute ou importe tes produits
+              </Link>{" "}
+              — la liste de ce que tu vends.
+            </li>
+            <li>
+              <strong>2.</strong>{" "}
+              <Link className="lien" href="/controle">
+                Fais ton premier contrôle de stock
+              </Link>{" "}
+              — c&apos;est ton inventaire de départ.
+            </li>
+            <li>
+              <strong>3.</strong>{" "}
+              <Link className="lien" href="/ventes">
+                Enregistre une vente
+              </Link>{" "}
+              — dès qu&apos;un client achète.
+            </li>
+            <li>
+              <strong>4.</strong>{" "}
+              <Link className="lien" href="/equipe">
+                Crée le code de ta vendeuse
+              </Link>{" "}
+              — chaque vente portera son nom.
+            </li>
+            <li>
+              <strong>5.</strong>{" "}
+              <Link className="lien" href="/sauvegarde">
+                Sauvegarde
+              </Link>{" "}
+              — pour ne jamais rien perdre.
+            </li>
+          </ol>
+          <div className="note">
+            Besoin d&apos;aide à tout moment ? Le bouton <strong>Aide</strong> est
+            en bas du menu, et tu peux revoir le petit guide de départ depuis là.
+          </div>
+        </div>
+      ) : null}
 
       <div className="grid cols-4" style={{ marginBottom: 18 }}>
         <div className="card kpi">

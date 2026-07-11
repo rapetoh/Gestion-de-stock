@@ -22,7 +22,7 @@ async function lireRole(token: string | undefined): Promise<string | null> {
 
 // Pages autorisées à une vendeuse (rôle limité). Tout le reste — marges, argent, dépenses,
 // commissions, contrôle, équipe, tableau de bord — est réservé au propriétaire.
-const VENDEUSE_OK = ["/ventes", "/stock"];
+const VENDEUSE_OK = ["/ventes", "/stock", "/aide"];
 
 function autorise(role: string, pathname: string): boolean {
   if (role === "proprietaire") return true; // accès complet

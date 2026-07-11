@@ -216,3 +216,50 @@ tfoot td { padding: 14px 12px; font-weight: 800; font-size: 15.5px; border-top: 
   /* Les tableaux larges deviennent défilables horizontalement. */
   .card table { display: block; overflow-x: auto; white-space: nowrap; }
 }
+
+/* ---------- Aide (page dépliable) ---------- */
+.aide-item { margin-bottom: 12px; padding: 16px 18px; }
+.aide-item summary {
+  cursor: pointer; font-weight: 800; font-size: 16px; list-style: none;
+  display: flex; align-items: center; gap: 8px;
+}
+.aide-item summary::-webkit-details-marker { display: none; }
+.aide-item summary::before { content: "▸"; color: var(--primary); font-size: 12px; }
+.aide-item[open] summary::before { content: "▾"; }
+.aide-body { margin-top: 10px; font-size: 15px; line-height: 1.55; color: var(--ink); }
+.aide-body p { margin-bottom: 8px; }
+.aide-body p:last-child { margin-bottom: 0; }
+
+.start-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin: 6px 0 4px; }
+.start-list li { font-size: 15px; line-height: 1.5; }
+
+/* ---------- Guide de démarrage (tour au 1er login) ---------- */
+.guide-catch { position: fixed; inset: 0; z-index: 99; background: transparent; }
+.guide-dim { position: fixed; inset: 0; z-index: 100; background: rgba(15,20,28,.5); }
+.guide-ring {
+  position: fixed; z-index: 100; border: 2px solid var(--primary); border-radius: 12px;
+  box-shadow: 0 0 0 9999px rgba(15,20,28,.5), 0 0 18px 2px rgba(31,122,92,.55);
+  pointer-events: none;
+}
+.guide-card {
+  position: fixed; z-index: 102; width: 330px; max-width: calc(100vw - 24px);
+  background: #fff; border-radius: 14px; box-shadow: 0 12px 44px rgba(0,0,0,.3); padding: 18px;
+}
+.guide-step { font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--ink-soft); font-weight: 700; }
+.guide-title { font-size: 18px; margin: 6px 0 8px; }
+.guide-body { font-size: 15px; line-height: 1.5; color: var(--ink); margin-bottom: 16px; }
+.guide-actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+
+/* ---------- Impression (mémo papier du guide) ---------- */
+@media print {
+  .sidebar, .mobile-topbar, .overlay, .btn, .topbar .right,
+  .guide-catch, .guide-dim, .guide-ring, .guide-card { display: none !important; }
+  .app { display: block; }
+  .main { padding: 0; max-width: 100%; }
+  body { background: #fff; }
+  .card, .aide-item { box-shadow: none; border-color: #ccc; break-inside: avoid; }
+  /* déplie toutes les sections d'aide pour l'impression */
+  details:not([open]) > *:not(summary) { display: block !important; }
+  .aide-item summary::before { content: ""; }
+}

@@ -35,6 +35,9 @@ const NAV_VENDEUSE = [
   { href: "/stock", ic: "▤", label: "Stock" },
 ];
 
+// L'aide est accessible aux deux rôles (rendue tout en bas du menu).
+const AIDE = { href: "/aide", ic: "?", label: "Aide" };
+
 function roleLabel(role: string): string {
   return role === "proprietaire" ? "Propriétaire" : "Vendeuse";
 }
@@ -50,6 +53,7 @@ export default function Sidebar({ nom, role, open = false, onNavigate }: Props) 
       key={item.href}
       href={item.href}
       onClick={onNavigate}
+      data-tour={item.href}
       className={`nav-item${isActive(item.href) ? " active" : ""}`}
     >
       <span className="ic">{item.ic}</span> {item.label}
@@ -83,6 +87,9 @@ export default function Sidebar({ nom, role, open = false, onNavigate }: Props) 
           {NAV_VENDEUSE.map(renderItem)}
         </>
       )}
+
+      <div className="nav-label">Besoin d&apos;aide</div>
+      {renderItem(AIDE)}
 
       <div className="spacer"></div>
 
