@@ -1,0 +1,32 @@
+# Ma Boutique — configuration Fly.io.
+# 1 machine + 1 volume qui garde la base de données. HTTPS automatique.
+# Remplace le nom ci-dessous par le tien après `fly launch --no-deploy`.
+
+app = "ma-boutique"
+# Paris : la meilleure connectivité vers le Togo. (Alternative : "jnb" = Johannesburg.)
+primary_region = "cdg"
+
+[build]
+  dockerfile = "Dockerfile"
+
+# La base de données SQLite vit ici, sur un disque qui survit aux redéploiements.
+[mounts]
+  source = "maboutique_data"
+  destination = "/data"
+
+[env]
+  MABOUTIQUE_DB = "/data/maboutique.db"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  # Boutique = toujours joignable. On ne met pas la machine en veille.
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+# Un volume = une seule machine. Ne pas augmenter le nombre d'instances
+# (SQLite est un fichier unique, non partagé entre machines).
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

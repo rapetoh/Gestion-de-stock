@@ -7,6 +7,26 @@
 
 ## 2026-07-11
 
+### Déploiement : packaging Fly.io (Docker + volume), runbook, build autonome
+- **What:** Rendu l'app **déployable en ligne** sans réécriture. L'app garde ses données dans un
+  **fichier SQLite** (`node:sqlite`, `data/maboutique.db`), donc l'hébergeur doit offrir un **disque
+  persistant** — ce qui exclut le serverless (Vercel/Netlify) mais **pas** internet. Ajouté :
+  `output: "standalone"` (`next.config.ts`) ; **`Dockerfile`** (Node 24, multi-stage, image finale
+  minimale) + `.dockerignore` (jamais de base ni de secret dans l'image) ; **`fly.toml`** (1 machine +
+  volume `maboutique_data` monté sur `/data`, `MABOUTIQUE_DB=/data/maboutique.db`, HTTPS forcé,
+  `min_machines_running=1`, région `cdg`) ; **`docs/DEPLOIEMENT.md`** (runbook pas-à-pas : secrets,
+  volume, déploiement, domaine, sauvegardes, restauration, checklist mise en ligne).
+- **Why:** Question « comment je la mets en ligne ? ». Cible = **accessible par internet** (téléphone).
+  Aucun mot de passe codé en dur : le compte propriétaire n'est créé qu'à partir de `OWNER_LOGIN` /
+  `OWNER_INITIAL_PASSWORD` (le repli `maman2026` est **dev uniquement**), et l'app **refuse** de
+  démarrer en prod sans `AUTH_SECRET`.
+- **Result:** `next build` (standalone) OK. **Vérifié à chaud** : le serveur exact que Docker lance
+  (`.next/standalone/server.js` + static + public) démarre, sert `/connexion` (200), redirige `/`
+  non authentifié vers `/connexion` (307). Amorçage prod vérifié sur base neuve : **avec** env →
+  1 propriétaire `maman` + 4 comptes + **0 produit** (boutique propre) ; **sans** mot de passe →
+  0 utilisateur + avertissement, **aucune** fuite de `maman2026`. Hébergeur recommandé : **Fly.io**
+  (Dockerfile universel → Railway/Render/VPS possibles).
+
 ### Aide intégrée : page d'aide par rôle, guide de démarrage (tour), « Commence ici » & impression
 - **What:** L'app n'avait **aucune aide/tutoriel** (seulement des indices en ligne à l'écran). Ajouté,
   en gardant le style sobre et la voix « tu » : (1) une **page Aide** (`app/(app)/aide/page.tsx`)

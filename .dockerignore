@@ -1,0 +1,17 @@
+# Ne jamais copier dans l'image de build :
+node_modules
+.next
+.git
+.gitignore
+data                 # base de données locale (dev) — la prod utilise le volume
+*.db
+*.db-shm
+*.db-wal
+.env*                # secrets : injectés par l'hébergeur (fly secrets set …)
+npm-debug.log*
+README.md
+docs
+scripts/shoot.mjs
+test
+*.test.ts
+.DS_Store
