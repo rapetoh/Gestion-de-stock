@@ -6,6 +6,7 @@ import {
   autoMapper,
   devinerEnteteIndex,
   construireRows,
+  parseNombreImport,
 } from "../lib/import";
 import { importerProduits, listProduits, createProduit, getProduit, chercherProduits } from "../lib/repo/produits";
 import { listActivite } from "../lib/repo/activite";
@@ -167,6 +168,62 @@ describe("importerProduits", () => {
     expect(listProduits()).toHaveLength(2);
     const resume = listActivite().filter((l) => l.details.startsWith("Import"));
     expect(resume.length).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe("le fichier réel de l'ancien logiciel (07-11-2026)", () => {
+  const ENTETE =
+    "Code,Produit,En stock,Prix d'achat unit.,Prix Unit.,Transport,TVA,CHK_COMPOSE,Total en stock,DCI,Prix Unit. Don,Code à bars,Qté. pour Code à bars,Peremption Alerte (Jours),Prix d'achat,Prix de vente";
+
+  it("mapping : « Code à bars » = code-barres, « Code » (XX/ELECTRO…) ignoré, bons prix/stock", () => {
+    const { lignes } = parseGrille(ENTETE);
+    const m = autoMapper(lignes[0]);
+    expect(m[0]).toBeNull(); // Code (fourre-tout) — ignoré
+    expect(m[1]).toBe("nom"); // Produit
+    expect(m[2]).toBe("stock"); // En stock
+    expect(m[3]).toBe("prixAchat"); // Prix d'achat unit.
+    expect(m[4]).toBe("prixVente"); // Prix Unit.
+    expect(m[5]).toBe("frais"); // Transport
+    expect(m[8]).toBeNull(); // Total en stock (stock déjà pris)
+    expect(m[11]).toBe("codeBarre"); // Code à bars — le VRAI code
+    expect(m[13]).toBeNull(); // Peremption Alerte
+    expect(m[14]).toBeNull(); // Prix d'achat (doublon vide)
+    expect(m[15]).toBeNull(); // Prix de vente (doublon vide)
+  });
+
+  it("lignes réelles : prix flottants arrondis, guillemets+virgule respectés, lignes sans nom sautées", () => {
+    const texte = [
+      ENTETE,
+      "01,,,0,0,0,,,,,0,,,,0,0", // ligne de section — sautée
+      "XXXX,EVER PACK PAPIER ALLUMINIUM  25SQ.FT,0,700,999.9997,0,,0,0,,0,6033000160072,1,,0,0",
+      'XX,"APTA COLOR FIXATEUR DE COULEUR 1,5 L ",0,1785,2300,,,0,0,,0,3250391150250,1,,0,0',
+      "MENAGE,EVER PACK ASSIETTES JETABLES PETITS 50 PCS,5,1600,2133.3328,0,,,5,,0,,1,,0,0",
+      ",,,0,0,0,0,,5,,0,,,,1600,2133.3328", // ligne de lot — sautée
+      "xx,JASMINE RICE USA JAUNE 11.34 KG ,1,16000,18227.856,0,,0,1,,0,,1,,0,0",
+    ].join("\n");
+    const { lignes } = parseGrille(texte);
+    expect(devinerEnteteIndex(lignes)).toBe(0);
+    const rows = construireRows(lignes, 0, autoMapper(lignes[0]));
+    expect(rows).toHaveLength(4); // sections et lignes de lot disparues
+
+    const [alu, apta, assiettes, riz] = rows;
+    expect(alu).toMatchObject({ prixAchat: 700, prixVente: 1000, stock: 0, codeBarre: "6033000160072" });
+    expect(apta.nom).toBe("APTA COLOR FIXATEUR DE COULEUR 1,5 L"); // virgule gardée dans le nom
+    expect(apta).toMatchObject({ prixAchat: 1785, prixVente: 2300, codeBarre: "3250391150250" });
+    expect(assiettes).toMatchObject({ prixVente: 2133, stock: 5 });
+    expect(riz).toMatchObject({ prixAchat: 16000, prixVente: 18228, stock: 1 });
+    expect(riz.codeBarre).toBeUndefined(); // cellule vide = pas de code
+  });
+
+  it("parseNombreImport : décimales arrondies, « 1.500 » à la française = 1500", () => {
+    expect(parseNombreImport("999.9997")).toBe(1000);
+    expect(parseNombreImport("449.9999")).toBe(450);
+    expect(parseNombreImport("2133.3328")).toBe(2133);
+    expect(parseNombreImport("1745.454")).toBe(1745);
+    expect(parseNombreImport("1.500")).toBe(1500); // milliers à la française
+    expect(parseNombreImport("1.234.567")).toBe(1234567);
+    expect(parseNombreImport("1 799,9996")).toBe(1800);
+    expect(parseNombreImport("750")).toBe(750);
   });
 });
 

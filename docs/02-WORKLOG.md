@@ -7,6 +7,24 @@
 
 ## 2026-07-11
 
+### Import : le VRAI fichier de l'ancien logiciel révèle 3 défauts — corrigés avant l'import réel
+- **What:** L'utilisateur a fourni l'export CSV complet de l'ancien logiciel avant de l'importer.
+  Dry-run contre le code : 3 défauts qui auraient corrompu les données. (1) **Prix flottants**
+  (« 999.9997 », « 2133.3328 ») : l'ancien parseur retirait les points → 9 999 997 F. Nouveau
+  `parseNombreImport` (import uniquement, parseCFA de l'UI intact) : décimales arrondies
+  (999.9997→1000), « 1.500 » à la française = 1500, « 1.234.567 » = milliers, « 1 799,9996 »
+  géré. (2) **Colonne « Code » fourre-tout** (XX, ELECTRO…) volait le champ code-barres à la
+  vraie colonne « Code à bars » → autoMapper en **2 passes** (synonymes précis sur toutes les
+  colonnes d'abord, génériques ensuite ; en-tête contenant un mot faible reporté à la 2e passe).
+  (3) **Guillemets CSV non gérés** : « "APTA COLOR… 1,5 L" » cassait les colonnes → découpe
+  RFC-4180 (guillemets, `""` échappé). Déjà correct : lignes de section/lot sans nom sautées,
+  « En stock » vs « Total en stock », doublons de colonnes prix ignorés.
+- **Result:** 81/81 tests (3 nouveaux qui REJOUENT l'en-tête 16 colonnes et des lignes verbatim
+  du fichier), tsc/lint OK. Échantillon de 22 lignes verbatim importé de bout en bout : 16 produits
+  créés, 0 prix aberrant, noms à virgule intacts, EAN stockés (espace de tête nettoyé), scan OK.
+  Déployé sur monpanier.fly.dev. Reste à l'utilisateur : supprimer après import les ~4
+  pseudo-produits de l'ancien système (« A SUPPRIMER », « supprimer dans le systeme »…).
+
 ### Code-barres de bout en bout : import mappable + scan à la caisse (toujours optionnel)
 - **What:** Le champ `code_barre` existait (schéma UNIQUE, formulaires produit) mais **pas dans
   l'import** (colonne perdue) et **pas dans la recherche** (un scan ne trouvait rien). Ajouté :
