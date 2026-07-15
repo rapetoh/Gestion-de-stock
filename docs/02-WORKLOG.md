@@ -5,6 +5,25 @@
 
 ---
 
+## 2026-07-14
+
+### Premier retour terrain (sardines Everyday) : frais de transport « par unité » OU « pour tout le lot »
+- **What:** 3 jours après la remise, la propriétaire signale : elle connaît les frais de
+  transport PAR UNITÉ (100 F la sardine), le champ attend le TOTAL du lot → 1 000 + 100÷10
+  = 1 010 F au lieu de 1 100, puis 1 300 en tâtonnant. Le calcul était juste, le modèle
+  mental non. Correction À LA FRONTIÈRE du formulaire uniquement : radio « pour tout le
+  lot » (défaut, comportement historique intact) / « par unité » sur AchatForm ET AchatRow
+  (édition) ; conversion dans `fraisPourLeLot()` (lib/money.ts) appliquée dans les 2 actions
+  serveur ; le stockage (`achat.frais` = lot, `produit.frais` = unitaire) et TOUT l'aval
+  (marges, bénéfices, contrôle, export, import) inchangés. Nouvelle ligne « Transport (tout
+  le lot) » dans le calcbox → l'erreur de mode devient visible avant d'enregistrer. FAQ :
+  nouvelle section « Tes achats » (3 questions dont celle-ci) ; mode d'emploi /achats mis à jour.
+- **Result:** 83/83 tests (2 nouveaux rejouant les sardines : 100×10 → coût 1 100 ; défaut
+  lot → 1 010 inchangé). E2E navigateur sur le scénario exact : calc 1 100 F, marge +300,
+  base = lot 1 000 / unitaire 100 / stock 10 ; contre-épreuve mode lot → 1 010. (2 faux
+  négatifs du harnais en route : sélection React et overlay du tour guidé qui avalait le
+  clic radio — l'app était correcte.) Déployé sur monpanier.fly.dev.
+
 ## 2026-07-11
 
 ### Aide refondue : des QUESTIONS d'utilisatrice, pas des descriptions d'écrans (+ recherche)

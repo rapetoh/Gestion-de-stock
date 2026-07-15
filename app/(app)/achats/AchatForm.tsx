@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { formatCFA, parseCFA, coutDeRevientUnitaire } from "@/lib/money";
+import { formatCFA, parseCFA, coutDeRevientUnitaire, fraisPourLeLot } from "@/lib/money";
 import type { Produit } from "@/lib/repo/produits";
 import SubmitButton from "@/components/SubmitButton";
 import { enregistrerAchat } from "./actions";
@@ -13,6 +13,10 @@ export default function AchatForm() {
   const [quantite, setQuantite] = useState("1");
   const [prixAchat, setPrixAchat] = useState("0");
   const [frais, setFrais] = useState("0");
+  // Comment elle connaît les frais : « pour tout le lot » (le taxi payé une fois) ou
+  // « par unité » (le fournisseur annonce 100 F la pièce). Converti au lot à l'envoi —
+  // le stockage et tous les calculs en aval ne changent pas.
+  const [fraisMode, setFraisMode] = useState<"lot" | "unite">("lot");
   const [prixVente, setPrixVente] = useState("0");
   const [actuel, setActuel] = useState<Produit | null>(null); // produit existant correspondant
   const [flash, setFlash] = useState<string | null>(null);
@@ -80,12 +84,12 @@ export default function AchatForm() {
   const calc = useMemo(() => {
     const q = parseCFA(quantite);
     const pa = parseCFA(prixAchat);
-    const fr = parseCFA(frais);
+    const fraisLot = fraisPourLeLot(parseCFA(frais), fraisMode, q);
     const pv = parseCFA(prixVente);
-    const cout = coutDeRevientUnitaire(pa, fr, q);
+    const cout = coutDeRevientUnitaire(pa, fraisLot, q);
     const marge = pv - cout;
-    return { cout, marge, pv };
-  }, [quantite, prixAchat, frais, prixVente]);
+    return { cout, marge, pv, fraisLot };
+  }, [quantite, prixAchat, frais, fraisMode, prixVente]);
 
   // Restock d'un produit existant à un NOUVEAU prix de vente : on prévient (ré-étiquetage).
   const changePrix =
@@ -152,9 +156,7 @@ export default function AchatForm() {
       </div>
 
       <div className="field">
-        <label>
-          Frais de transport <span className="sub">(pour tout le lot)</span>
-        </label>
+        <label>Frais de transport</label>
         <input
           className="input"
           name="frais"
@@ -162,9 +164,35 @@ export default function AchatForm() {
           onChange={(e) => setFrais(e.target.value)}
           inputMode="numeric"
         />
+        <div className="frais-mode">
+          <label>
+            <input
+              type="radio"
+              name="fraisMode"
+              value="lot"
+              checked={fraisMode === "lot"}
+              onChange={() => setFraisMode("lot")}
+            />{" "}
+            pour tout le lot
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="fraisMode"
+              value="unite"
+              checked={fraisMode === "unite"}
+              onChange={() => setFraisMode("unite")}
+            />{" "}
+            par unité
+          </label>
+        </div>
       </div>
 
       <div className="calcbox">
+        <div className="calcline">
+          <span>Transport (tout le lot)</span>
+          <span>{formatCFA(calc.fraisLot)}</span>
+        </div>
         <div className="calcline">
           <span>Coût de revient (par unité)</span>
           <span>{formatCFA(calc.cout)}</span>

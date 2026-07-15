@@ -258,6 +258,14 @@ tfoot td { padding: 14px 12px; font-weight: 800; font-size: 15.5px; border-top: 
 .guide-body { font-size: 15px; line-height: 1.5; color: var(--ink); margin-bottom: 16px; }
 .guide-actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 
+/* ---------- Frais d'achat : « pour tout le lot » / « par unité » ---------- */
+.frais-mode { display: flex; gap: 18px; margin-top: 7px; }
+.frais-mode label {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 14px; font-weight: 600; color: var(--ink); cursor: pointer;
+}
+.frais-mode input[type="radio"] { accent-color: var(--primary); width: 16px; height: 16px; }
+
 /* ---------- « Comment ça marche » (mode d'emploi par page) ---------- */
 .pagetip { border-left: 3px solid var(--primary); margin-bottom: 16px; }
 .pagetip-head { margin-bottom: 8px; }

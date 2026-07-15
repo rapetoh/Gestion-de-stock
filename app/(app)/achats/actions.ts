@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { parseCFA } from "@/lib/money";
+import { parseCFA, fraisPourLeLot } from "@/lib/money";
 import { getSession } from "@/lib/auth";
 import { getProduitParNom, createProduit } from "@/lib/repo/produits";
 import { createAchat, updateAchat, deleteAchat } from "@/lib/repo/achats";
@@ -12,7 +12,13 @@ export async function enregistrerAchat(formData: FormData): Promise<void> {
 
   const quantite = parseCFA(String(formData.get("quantite") ?? ""));
   const prixAchat = parseCFA(String(formData.get("prixAchat") ?? ""));
-  const frais = parseCFA(String(formData.get("frais") ?? ""));
+  // Saisis « par unité » ou « pour tout le lot » (fraisMode) — toujours ramenés au lot
+  // ici, à la frontière : le stockage et tous les calculs en aval restent inchangés.
+  const frais = fraisPourLeLot(
+    parseCFA(String(formData.get("frais") ?? "")),
+    String(formData.get("fraisMode") ?? "lot"),
+    quantite
+  );
   const prixVente = parseCFA(String(formData.get("prixVente") ?? ""));
   const fournisseur = String(formData.get("fournisseur") ?? "").trim() || null;
   const note = String(formData.get("note") ?? "").trim() || null;
@@ -56,7 +62,11 @@ export async function modifierAchat(formData: FormData): Promise<void> {
     {
       quantite,
       prixAchat: parseCFA(String(formData.get("prixAchat") ?? "")),
-      frais: parseCFA(String(formData.get("frais") ?? "")),
+      frais: fraisPourLeLot(
+        parseCFA(String(formData.get("frais") ?? "")),
+        String(formData.get("fraisMode") ?? "lot"),
+        quantite
+      ),
       prixVente: parseCFA(String(formData.get("prixVente") ?? "")),
       fournisseur: String(formData.get("fournisseur") ?? "").trim() || null,
       note: String(formData.get("note") ?? "").trim() || null,

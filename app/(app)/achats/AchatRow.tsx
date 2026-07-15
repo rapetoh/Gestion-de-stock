@@ -52,13 +52,22 @@ export default function AchatRow({
                 />
               </div>
               <div className="field" style={{ margin: 0 }}>
-                <label>Frais (tout le lot)</label>
+                <label>Frais de transport</label>
                 <input
                   className="input"
                   name="frais"
                   defaultValue={a.frais}
                   inputMode="numeric"
                 />
+                <div className="frais-mode">
+                  <label>
+                    <input type="radio" name="fraisMode" value="lot" defaultChecked /> pour
+                    tout le lot
+                  </label>
+                  <label>
+                    <input type="radio" name="fraisMode" value="unite" /> par unité
+                  </label>
+                </div>
               </div>
             </div>
             <div className="row2" style={{ marginBottom: 12 }}>

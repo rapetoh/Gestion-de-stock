@@ -102,6 +102,45 @@ const OWNER: Section[] = [
     ],
   },
   {
+    titre: "Tes achats (ravitaillement)",
+    items: [
+      {
+        q: "Comment j'enregistre un achat de marchandise ?",
+        r: (
+          <p>
+            <strong>Achats</strong> → tape le nom du produit (ou crée-le) → quantité
+            reçue, prix d&apos;achat par unité, frais de transport →{" "}
+            <strong>Enregistrer</strong>. Le stock monte tout seul.
+          </p>
+        ),
+        lien: { href: "/achats", label: "Ouvrir Achats" },
+      },
+      {
+        q: "Les frais de transport : par unité ou pour tout le lot ?",
+        r: (
+          <p>
+            Les deux marchent — dis-le simplement à l&apos;app : sous la case des frais,
+            choisis <strong>« pour tout le lot »</strong> (ex : 2 000 F de taxi pour
+            toute la marchandise) ou <strong>« par unité »</strong> (ex : 100 F par
+            sardine). La ligne « Transport (tout le lot) » te montre le total avant
+            d&apos;enregistrer — vérifie-la d&apos;un coup d&apos;œil.
+          </p>
+        ),
+        lien: { href: "/achats", label: "Ouvrir Achats" },
+      },
+      {
+        q: "Je me suis trompée sur un achat (quantité, prix, frais) ?",
+        r: (
+          <p>
+            <strong>Achats</strong> → retrouve la ligne dans « Derniers achats » →{" "}
+            <strong>Modifier</strong> → corrige → Enregistrer. Le stock et le coût se
+            recalculent tout seuls.
+          </p>
+        ),
+      },
+    ],
+  },
+  {
     titre: "Vendre & encaisser",
     items: [
       {

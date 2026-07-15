@@ -22,6 +22,13 @@ export function parseCFA(input: string | number): number {
 
 // Cost of goods (coût de revient) per unit when receiving a purchase:
 // (prix d'achat unitaire) + (frais de transport du lot répartis sur la quantité).
+// Les frais de transport sont STOCKÉS pour le lot entier (contrat de lib/repo/achats.ts).
+// Mais au marché on les connaît parfois « par unité » : cette fonction ramène la saisie
+// au lot — la conversion se fait à la frontière du formulaire, jamais dans le stockage.
+export function fraisPourLeLot(saisie: number, mode: string, quantite: number): number {
+  return mode === "unite" ? saisie * Math.max(quantite, 0) : saisie;
+}
+
 export function coutDeRevientUnitaire(
   prixAchatUnitaire: number,
   fraisLot: number,

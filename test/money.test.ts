@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseCFA, formatCFA } from "../lib/money";
+import { parseCFA, formatCFA, fraisPourLeLot, coutDeRevientUnitaire } from "../lib/money";
 
 const NS = String.fromCharCode(0x202f); // espace fine insécable (séparateur de milliers)
 
@@ -25,5 +25,19 @@ describe("parseCFA", () => {
 describe("formatCFA", () => {
   it("formate avec séparateur de milliers et suffixe F", () => {
     expect(formatCFA(150000)).toBe(`150${NS}000 F`);
+  });
+});
+
+describe("fraisPourLeLot — le cas réel des sardines Everyday", () => {
+  it("« par unité » : 100 F × 10 sardines = 1000 F de lot → coût de revient 1100", () => {
+    const lot = fraisPourLeLot(100, "unite", 10);
+    expect(lot).toBe(1000);
+    expect(coutDeRevientUnitaire(1000, lot, 10)).toBe(1100);
+  });
+
+  it("« pour tout le lot » (défaut) : la saisie passe telle quelle — comportement inchangé", () => {
+    expect(fraisPourLeLot(100, "lot", 10)).toBe(100);
+    expect(coutDeRevientUnitaire(1000, 100, 10)).toBe(1010); // ce qu'elle avait vu
+    expect(fraisPourLeLot(100, "", 10)).toBe(100); // mode absent = lot (rétrocompatible)
   });
 });
