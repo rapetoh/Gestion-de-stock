@@ -100,6 +100,15 @@ const TIPS: Record<string, Tip> = {
       "Fais-le chaque fin de semaine : c'est ta ceinture de sécurité.",
     ],
   },
+  "/stats": {
+    titre: "Tes statistiques",
+    etapes: [
+      "Choisis le mois en haut : les cartes et les graphiques du mois suivent.",
+      "Les valeurs sont écrites sur les barres, rien à survoler.",
+      "« L'argent qui dort » : du stock qui ne se vend plus, pense promotion.",
+      "Bouton « Rapport du mois (PDF) » : une page propre à imprimer ou à garder.",
+    ],
+  },
   "/activite": {
     titre: "Le journal d'activité",
     etapes: [

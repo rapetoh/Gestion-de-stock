@@ -374,6 +374,30 @@ const OWNER: Section[] = [
         ),
         lien: { href: "/benefices", label: "Ouvrir Bénéfices" },
       },
+      {
+        q: "Où je vois la boutique en graphiques (ce qui monte, ce qui dort) ?",
+        r: (
+          <p>
+            Page <strong>Statistiques</strong> : les ventes des 30 derniers jours,
+            l&apos;année en un coup d&apos;œil, comment les clients paient, tes jours
+            forts, ce qui rapporte le plus et le stock qui dort. Les valeurs sont
+            écrites sur les barres.
+          </p>
+        ),
+        lien: { href: "/stats", label: "Ouvrir Statistiques" },
+      },
+      {
+        q: "Comment j'exporte un rapport PDF (contrôle, impôts, banque) ?",
+        r: (
+          <p>
+            <strong>Statistiques</strong> → bouton <strong>« Rapport du mois
+            (PDF) »</strong> → <strong>Exporter en PDF</strong>. La fenêtre
+            d&apos;impression s&apos;ouvre : choisis « Enregistrer au format PDF »
+            (ou imprime sur papier). Une page propre, datée, prête à signer.
+          </p>
+        ),
+        lien: { href: "/stats", label: "Ouvrir Statistiques" },
+      },
     ],
   },
   {

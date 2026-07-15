@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Boxes,
+  ChartColumn,
   CircleHelp,
   ClipboardCheck,
   DatabaseBackup,
@@ -44,6 +45,7 @@ const NAV_CONTROLE = [
   { href: "/commissions", ic: Percent, label: "Commissions" },
   { href: "/depenses", ic: Receipt, label: "Dépenses" },
   { href: "/benefices", ic: TrendingUp, label: "Bénéfices" },
+  { href: "/stats", ic: ChartColumn, label: "Statistiques" },
   { href: "/activite", ic: History, label: "Activité" },
   { href: "/equipe", ic: Users, label: "Équipe" },
   { href: "/sauvegarde", ic: DatabaseBackup, label: "Sauvegarde" },

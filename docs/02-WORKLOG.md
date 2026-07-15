@@ -5,6 +5,32 @@
 
 ---
 
+## 2026-07-15
+
+### Section Statistiques complète : graphiques, tableaux de bord, rapport mensuel PDF
+- **What:** Section demandée par l'utilisateur (graphiques et export PDF prioritaires).
+  (1) **Repo** (`lib/repo/stats.ts`) : 10 agrégats SQL bornés : CA/jour 30 j (série continue,
+  zéros compris), recette+marge/mois 12 mois, paiements du mois (ordre fixe
+  espèces/tmoney/flooz/crédit), top produits par MARGE, moyenne par jour de semaine (fenêtre
+  exacte de N semaines), valeur du stock (coût + revente), produits dormants (stock sans vente
+  depuis 30 j, classés par valeur immobilisée), manques aux contrôles par mois, dépenses par
+  catégorie (mêmes règles récurrentes que Bénéfices), contrôles du mois. (2) **Graphiques**
+  (`components/Charts.tsx`) : SVG/HTML serveur, zéro bibliothèque : barres verticales (1-2 séries
+  groupées, sommets arrondis 4 px carrés à la base, grille fine, étiquettes sélectives max+dernier,
+  info-bulles natives), barres horizontales, légende. Palette **validée par le validateur dataviz**
+  (contraste, daltonisme) : #0e9163 / #2a78d6 / #d97706 / #8a63d2 ; valeurs écrites sur les barres
+  (téléphone, impression). (3) **Page /stats** : sélecteur de mois (chiffres identiques à
+  Bénéfices : mêmes fonctions), 4 tuiles, 8 cartes. (4) **Rapport mensuel /stats/rapport** :
+  page d'audit numérotée (résultat, paiements, top 10, dépenses, contrôles, stock, signatures),
+  bouton « Exporter en PDF » via l'impression navigateur. (5) Sidebar (icône ChartColumn,
+  propriétaire seule via middleware), mode d'emploi de page, 2 questions FAQ.
+- **Result:** 89/89 tests (6 nouveaux sur les agrégats), tsc/lint/build OK. E2E navigateur sur
+  90 jours de données simulées : 4 SVG + 11 barres H rendus, captures desktop/mobile/impression
+  inspectées. Bug attrapé en route : les cartes de la grille refusaient de rétrécir sous la
+  largeur du SVG (min-width:auto) et faisaient déborder la page sur téléphone : corrigé
+  (min-width:0, le graphique défile dans sa carte). Le graphe des manques vérifié avec un manque
+  réel injecté (1 755 F visibles). Déployé sur monpanier.fly.dev.
+
 ## 2026-07-14
 
 ### Achats : « Derniers achats » en journal (2 lignes/entrée) + sélecteur de date
