@@ -19,7 +19,7 @@ function seed() {
   clear();
   const now = nowIso();
 
-  // Owner — mot de passe depuis l'environnement, repli "maman2026" pour le dev seulement.
+  // Owner : mot de passe depuis l'environnement, repli "maman2026" pour le dev seulement.
   const login = process.env.OWNER_LOGIN || "maman";
   const motDePasse = process.env.OWNER_INITIAL_PASSWORD || "maman2026";
   const hash = bcrypt.hashSync(motDePasse, 10);
@@ -43,8 +43,8 @@ function seed() {
   const produits: [string, string, number, number, number, number, number, number][] = [
     ["Eau minérale Awa (carton)", "Eau", 1350, 3000, 20, 2000, 3, 5],
     ["Eau en sachet (paquet)", "Eau", 300, 0, 100, 500, 22, 10],
-    ["Savon Paris — amande", "Cosmétique", 450, 1500, 50, 750, 1, 4],
-    ["Savon Paris — fleur de coton", "Cosmétique", 450, 1500, 50, 750, 18, 4],
+    ["Savon Paris - amande", "Cosmétique", 450, 1500, 50, 750, 1, 4],
+    ["Savon Paris - fleur de coton", "Cosmétique", 450, 1500, 50, 750, 18, 4],
     ["Déodorant Nivea Homme", "Cosmétique", 900, 1500, 12, 1500, 2, 3],
     ["Lait concentré (boîte)", "Alimentation", 350, 2000, 48, 500, 9, 6],
     ["Draps importés (Chine)", "Maison", 9000, 12000, 10, 15000, 7, 2],
@@ -68,7 +68,7 @@ function seed() {
   const lignes: [number, string, number, number, number, number, number][] = [
     [1, "Eau minérale Awa (carton)", 2, 2000, 1350, 150, 4000],
     [2, "Eau en sachet (paquet)", 3, 500, 300, 0, 1500],
-    [3, "Savon Paris — amande", 1, 750, 450, 30, 750],
+    [3, "Savon Paris - amande", 1, 750, 450, 30, 750],
   ];
   for (const [pid, nom2, q, pv, cout, frais, tot] of lignes) {
     run(`INSERT INTO ligne_vente (vente_id, produit_id, nom_produit, quantite, prix_unitaire, cout_unitaire, frais_unitaire, total)

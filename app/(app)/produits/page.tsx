@@ -90,7 +90,7 @@ export default async function ProduitsPage({
 
         <div className="hint" style={{ marginBottom: 10 }}>
           {total} produit{total > 1 ? "s" : ""}
-          {totalPages > 1 ? ` — page ${pageNum} / ${totalPages}` : ""}
+          {totalPages > 1 ? ` (page ${pageNum} / ${totalPages})` : ""}
         </div>
 
         <table>

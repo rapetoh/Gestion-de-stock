@@ -14,7 +14,7 @@ export default function AchatForm() {
   const [prixAchat, setPrixAchat] = useState("0");
   const [frais, setFrais] = useState("0");
   // Comment elle connaît les frais : « pour tout le lot » (le taxi payé une fois) ou
-  // « par unité » (le fournisseur annonce 100 F la pièce). Converti au lot à l'envoi —
+  // « par unité » (le fournisseur annonce 100 F la pièce). Converti au lot à l'envoi :
   // le stockage et tous les calculs en aval ne changent pas.
   const [fraisMode, setFraisMode] = useState<"lot" | "unite">("lot");
   const [prixVente, setPrixVente] = useState("0");
@@ -70,7 +70,7 @@ export default function AchatForm() {
   }
 
   // Douchette code-barres (= clavier qui tape le code puis Entrée) : Entrée dans ce champ
-  // ne doit pas soumettre l'achat en cours — on choisit le produit si un seul correspond.
+  // ne doit pas soumettre l'achat en cours : on choisit le produit si un seul correspond.
   async function surEntree(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key !== "Enter") return;
     e.preventDefault();
@@ -228,7 +228,7 @@ export default function AchatForm() {
           >
             ⚠️ Le prix de vente passe de {formatCFA(actuel!.prix_vente)} à{" "}
             {formatCFA(calc.pv)}. Le stock déjà en rayon sera vendu à ce nouveau
-            prix — pense à ré-étiqueter.
+            prix : pense à ré-étiqueter.
           </div>
         ) : null}
       </div>

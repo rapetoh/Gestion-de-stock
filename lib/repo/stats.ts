@@ -1,4 +1,4 @@
-// Repository statistiques — données agrégées pour le tableau de bord.
+// Repository statistiques : données agrégées pour le tableau de bord.
 import { all, one } from "../db";
 import { nbProduitsARecommander } from "./produits";
 import { bornesJour, bornesMois, anneeMoisCourants } from "../periodes";

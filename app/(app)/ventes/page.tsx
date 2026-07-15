@@ -52,7 +52,7 @@ export default async function VentesPage({
           </form>
         </div>
         <div className="hint">
-          {ventes.length} vente{ventes.length > 1 ? "s" : ""} — {formatCFA(totalJour)}.
+          {ventes.length} vente{ventes.length > 1 ? "s" : ""}, {formatCFA(totalJour)}.
           {peutGerer
             ? " Tu peux corriger une vente même d'un jour passé."
             : ""}

@@ -49,7 +49,7 @@ const NAV_CONTROLE = [
   { href: "/sauvegarde", ic: DatabaseBackup, label: "Sauvegarde" },
 ];
 
-// La vendeuse n'a que sa caisse et le stock — pas les marges, l'argent, ni la gestion.
+// La vendeuse n'a que sa caisse et le stock : pas les marges, l'argent, ni la gestion.
 const NAV_VENDEUSE = [
   { href: "/ventes", ic: ShoppingCart, label: "Ventes" },
   { href: "/stock", ic: Boxes, label: "Stock" },

@@ -1,4 +1,4 @@
-// Repository dépenses — tout ce qui sort de la caisse (loyer, salaires, transport, taxes…).
+// Repository dépenses : tout ce qui sort de la caisse (loyer, salaires, transport, taxes…).
 // Sert à calculer la marge RÉELLE : marge sur marchandise − dépenses du mois.
 //
 // Dépenses récurrentes (« revient chaque mois ») : on ne les ressaisit PAS chaque mois.
@@ -14,7 +14,7 @@ export type Depense = {
   libelle: string;
   montant: number;
   categorie: string | null;
-  recurrente: number; // 0 | 1 — revient chaque mois
+  recurrente: number; // 0 | 1 : revient chaque mois
   date: string;
   user_id: number | null;
 };

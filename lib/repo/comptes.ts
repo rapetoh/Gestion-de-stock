@@ -1,8 +1,8 @@
-// Repository comptes & soldes — la réconciliation quotidienne de l'argent.
+// Repository comptes & soldes : la réconciliation quotidienne de l'argent.
 // Sa question n°1 : "est-ce que ça tombe juste ?" Pour chaque compte (Espèces, TMoney, Flooz,
 // Crédit) on compare ce qui DEVRAIT être là (attendu / capital-float) à ce qui est VRAIMENT là
 // (compté). La somme des manques = perte possible. Pas de journal transaction par transaction
-// (c'est la surcharge qui a tué la 1re appli) — juste les soldes, comme dans son cahier.
+// (c'est la surcharge qui a tué la 1re appli) : juste les soldes, comme dans son cahier.
 import { all, one, run, tx } from "../db";
 import { journaliser } from "./activite";
 import { bornesJour } from "../periodes";
@@ -56,7 +56,7 @@ function sommeVentes(type: string, debut: string, fin: string): number {
   );
 }
 
-// Dépenses sorties de la caisse (espèces) dans [debut, fin) — lignes réelles, pas le report récurrent.
+// Dépenses sorties de la caisse (espèces) dans [debut, fin) : lignes réelles, pas le report récurrent.
 function sommeDepenses(debut: string, fin: string): number {
   return (
     one<{ t: number }>(

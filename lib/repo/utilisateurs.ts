@@ -1,7 +1,7 @@
-// Repository utilisateurs — comptes de connexion. Le propriétaire gère les vendeuses.
+// Repository utilisateurs : comptes de connexion. Le propriétaire gère les vendeuses.
 // Pourquoi : à partir de décembre une nouvelle employée pas encore de confiance tient le comptoir.
 // Avec un login PAR personne, chaque vente/modif est estampillée du vrai auteur (journal d'activité)
-// et la vendeuse n'a pas accès aux marges, à l'argent, ni au droit de supprimer — l'anti-vol devient réel.
+// et la vendeuse n'a pas accès aux marges, à l'argent, ni au droit de supprimer : l'anti-vol devient réel.
 import { all, one, run, nowIso } from "../db";
 import bcrypt from "bcryptjs";
 import { journaliser } from "./activite";

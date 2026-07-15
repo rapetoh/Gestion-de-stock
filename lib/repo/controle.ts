@@ -1,4 +1,4 @@
-// Repository contrôle de stock — l'outil anti-vol.
+// Repository contrôle de stock : l'outil anti-vol.
 // On compte ce qu'il y a vraiment sur l'étagère, on le compare au stock théorique
 // (ce que la machine croit), et l'écart négatif = manque = vol/perte possible, chiffré en CFA.
 // Enregistrer un contrôle corrige aussi le stock pour qu'il redevienne vrai, avec une trace.

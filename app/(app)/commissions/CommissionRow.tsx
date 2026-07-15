@@ -78,7 +78,7 @@ export default function CommissionRow({
     <tr>
       <td className="muted">{jourCourt(c.date)}</td>
       <td className="prod">{c.libelle}</td>
-      <td>{c.canal ?? "—"}</td>
+      <td>{c.canal ?? "-"}</td>
       <td className="num pos">{formatCFA(c.montant)}</td>
       <td className="num">
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>

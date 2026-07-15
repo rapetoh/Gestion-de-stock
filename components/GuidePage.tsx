@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 
 // « Comment ça marche » : un petit mode d'emploi en haut de chaque écran.
 // Ouvert tout seul à la PREMIÈRE visite de la page (drapeau localStorage par rôle
-// et par page), puis réduit en un petit bouton toujours là — jamais perdu, jamais
+// et par page), puis réduit en un petit bouton toujours là : jamais perdu, jamais
 // envahissant. La page Aide reste la référence complète ; ici, juste les gestes.
 
 type Tip = { titre: string; etapes: string[] };
@@ -15,9 +15,9 @@ const TIPS: Record<string, Tip> = {
     titre: "Tes produits",
     etapes: [
       "« Ajouter un produit » : nom, prix d'achat, prix de vente, stock.",
-      "Une longue liste ? Passe par « Importer » — tu vérifies l'aperçu avant d'enregistrer.",
+      "Une longue liste ? Passe par « Importer » : tu vérifies l'aperçu avant d'enregistrer.",
       "Cherche par nom, filtre par catégorie ou stock bas.",
-      "Un prix a changé ? Clique le produit et corrige — rien n'est figé.",
+      "Un prix a changé ? Clique le produit et corrige : rien n'est figé.",
     ],
   },
   "/achats": {
@@ -25,7 +25,7 @@ const TIPS: Record<string, Tip> = {
     etapes: [
       "Tape le nom du produit (ou crée-le s'il est nouveau).",
       "Mets la quantité et le prix d'achat par unité.",
-      "Pour les frais de transport, dis si ton chiffre est « pour tout le lot » ou « par unité » — l'app fait le calcul.",
+      "Pour les frais de transport, dis si ton chiffre est « pour tout le lot » ou « par unité » : l'app fait le calcul.",
       "Enregistre : le stock monte tout seul.",
     ],
   },
@@ -33,7 +33,7 @@ const TIPS: Record<string, Tip> = {
     titre: "Encaisser une vente",
     etapes: [
       "Tape le nom du produit et choisis-le dans la liste.",
-      "Mets la quantité — ajoute d'autres produits si le client en prend plusieurs.",
+      "Mets la quantité, et ajoute d'autres produits si le client en prend plusieurs.",
       "Choisis comment il paie : espèces, TMoney, Flooz ou crédit.",
       "« Encaisser » : c'est fini, le stock baisse tout seul.",
     ],
@@ -42,14 +42,14 @@ const TIPS: Record<string, Tip> = {
     titre: "Voir le stock",
     etapes: [
       "Tu vois ce qu'il reste de chaque produit sur l'étagère.",
-      "En rouge : fini ou presque fini — pense à recommander.",
+      "En rouge : fini ou presque fini : pense à recommander.",
     ],
   },
   "/controle": {
     titre: "Contrôler le stock (anti-vol)",
     etapes: [
       "Compte ce qu'il y a VRAIMENT sur l'étagère, produit par produit.",
-      "Tape le chiffre compté — l'app compare avec ce qu'elle attendait.",
+      "Tape le chiffre compté : l'app compare avec ce qu'elle attendait.",
       "S'il manque des choses, tu vois combien ça vaut en F CFA.",
       "Valide : le stock repart sur le bon chiffre.",
     ],
@@ -59,7 +59,7 @@ const TIPS: Record<string, Tip> = {
     etapes: [
       "Compte l'argent de la caisse, lis tes soldes TMoney et Flooz.",
       "Tape les trois chiffres.",
-      "L'app te dit si tout l'argent est là — un manque qui revient, c'est un signal.",
+      "L'app te dit si tout l'argent est là. Un manque qui revient, c'est un signal.",
     ],
   },
   "/commissions": {
@@ -88,7 +88,7 @@ const TIPS: Record<string, Tip> = {
     titre: "Ta vendeuse",
     etapes: [
       "Crée-lui son propre code : chaque vente portera son nom.",
-      "Elle ne voit que Ventes et Stock — ni les marges, ni l'argent.",
+      "Elle ne voit que Ventes et Stock : ni les marges, ni l'argent.",
       "Si elle part un jour : désactive-la (son historique reste).",
     ],
   },
@@ -97,7 +97,7 @@ const TIPS: Record<string, Tip> = {
     etapes: [
       "Télécharge une copie de toute ta boutique.",
       "Range-la en lieu sûr : clé USB, e-mail, Google Drive.",
-      "Fais-le chaque fin de semaine — c'est ta ceinture de sécurité.",
+      "Fais-le chaque fin de semaine : c'est ta ceinture de sécurité.",
     ],
   },
   "/activite": {
@@ -116,7 +116,7 @@ export default function GuidePage({ role }: { role: string }) {
   const [ouvert, setOuvert] = useState(false);
   const [pret, setPret] = useState(false);
 
-  // Première visite de CETTE page : on ouvre après la peinture (rAF), comme le tour —
+  // Première visite de CETTE page : on ouvre après la peinture (rAF), comme le tour :
   // le 1er rendu reste identique au serveur, et setState n'est pas synchrone dans l'effet.
   useEffect(() => {
     if (!tip) return;
@@ -151,7 +151,7 @@ export default function GuidePage({ role }: { role: string }) {
   return (
     <div className="card pagetip">
       <div className="pagetip-head">
-        <strong>Comment ça marche — {tip.titre}</strong>
+        <strong>Comment ça marche : {tip.titre}</strong>
       </div>
       <ol className="pagetip-steps">
         {tip.etapes.map((e) => (

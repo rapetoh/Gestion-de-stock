@@ -7,6 +7,17 @@
 
 ## 2026-07-14
 
+### Zéro tiret cadratin dans toute l'application (demande explicite de l'utilisateur)
+- **What:** 148 occurrences de « — » (et 2 « – ») dans app/, components/, lib/, middleware.ts,
+  scripts/ : textes visibles (Aide, guides, formulaires, messages flash, confirmations) ET
+  commentaires de code. Remplacements contextuels un par un (deux-points quand le texte explique,
+  virgule quand il enchaîne, point, ou parenthèses), jamais de remplacement aveugle ; les « — »
+  marqueurs de cellule vide dans les tableaux deviennent « - ». Le signe moins mathématique « − »
+  des montants est conservé (c'est un nombre, pas de la prose).
+- **Result:** grep = 0 tiret cadratin/demi-cadratin dans tout le code ; vérification au niveau
+  RENDU : les 15 écrans parcourus en navigateur connecté = 0 occurrence dans le HTML. 83/83
+  tests, tsc/lint/build OK. Déployé sur monpanier.fly.dev.
+
 ### Premier retour terrain (sardines Everyday) : frais de transport « par unité » OU « pour tout le lot »
 - **What:** 3 jours après la remise, la propriétaire signale : elle connaît les frais de
   transport PAR UNITÉ (100 F la sardine), le champ attend le TOTAL du lot → 1 000 + 100÷10

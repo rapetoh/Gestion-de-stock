@@ -1,4 +1,4 @@
-// Repository bénéfices — la marge produit par produit sur un mois donné.
+// Repository bénéfices : la marge produit par produit sur un mois donné.
 import { all } from "../db";
 import { bornesMois } from "../periodes";
 

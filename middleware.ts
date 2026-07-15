@@ -1,12 +1,12 @@
 // Garde d'accès : vérifie le cookie de session (JWT) sur l'edge.
-// Ne touche jamais la base de données ici — uniquement la vérification du jeton.
+// Ne touche jamais la base de données ici, uniquement la vérification du jeton.
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
 function getSecret(): Uint8Array {
   const fromEnv = process.env.AUTH_SECRET;
   if (fromEnv && fromEnv.length > 0) return new TextEncoder().encode(fromEnv);
-  // Repli uniquement pour le développement local — voir lib/auth.ts.
+  // Repli uniquement pour le développement local, voir lib/auth.ts.
   return new TextEncoder().encode("dev-only-insecure-secret-do-not-use-in-prod");
 }
 
@@ -20,8 +20,8 @@ async function lireRole(token: string | undefined): Promise<string | null> {
   }
 }
 
-// Pages autorisées à une vendeuse (rôle limité). Tout le reste — marges, argent, dépenses,
-// commissions, contrôle, équipe, tableau de bord — est réservé au propriétaire.
+// Pages autorisées à une vendeuse (rôle limité). Tout le reste (marges, argent, dépenses,
+// commissions, contrôle, équipe, tableau de bord) est réservé au propriétaire.
 const VENDEUSE_OK = ["/ventes", "/stock", "/aide"];
 
 function autorise(role: string, pathname: string): boolean {

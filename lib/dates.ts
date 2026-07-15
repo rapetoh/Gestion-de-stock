@@ -1,4 +1,4 @@
-// Petits utilitaires de date en français — affichage humain, pas de dépendance externe.
+// Petits utilitaires de date en français : affichage humain, pas de dépendance externe.
 
 const JOURS = [
   "Dimanche",
@@ -30,7 +30,7 @@ export function dateLongue(d = new Date()): string {
 }
 
 export function moisAnnee(year: number, month: number): string {
-  // month : 1–12
+  // month : 1 a 12
   const m = MOIS[month - 1] ?? "";
   return `${m.charAt(0).toUpperCase()}${m.slice(1)} ${year}`;
 }

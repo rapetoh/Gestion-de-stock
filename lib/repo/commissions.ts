@@ -1,7 +1,7 @@
-// Repository commissions — le revenu Mobile Money (TMoney, Flooz, crédit, airtime).
+// Repository commissions : le revenu Mobile Money (TMoney, Flooz, crédit, airtime).
 // La moitié de l'activité de la boutique. Comptabilisé à part de la marge marchandise puis
 // AJOUTÉ à la marge réelle du mois (la marchandise et le mobile money sont deux gains distincts).
-// Volontairement simple : une ligne par saisie, comme dans son grand cahier — pas de journal SMS.
+// Volontairement simple : une ligne par saisie, comme dans son grand cahier, pas de journal SMS.
 import { all, one, run, nowIso } from "../db";
 import { journaliser } from "./activite";
 import { bornesMois } from "../periodes";

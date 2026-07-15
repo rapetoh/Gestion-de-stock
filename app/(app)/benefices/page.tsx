@@ -51,7 +51,7 @@ export default async function BeneficesPage({
         <div>
           <h1>Bénéfices</h1>
           <div className="when">
-            Ce que tu as vraiment gagné — recette moins le coût de la
+            Ce que tu as vraiment gagné : recette moins le coût de la
             marchandise.
           </div>
         </div>

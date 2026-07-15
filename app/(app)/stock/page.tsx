@@ -85,7 +85,7 @@ export default async function StockPage({
 
         <div className="hint" style={{ marginBottom: 10 }}>
           {total} produit{total > 1 ? "s" : ""}
-          {totalPages > 1 ? ` — page ${pageNum} / ${totalPages}` : ""}
+          {totalPages > 1 ? ` (page ${pageNum} / ${totalPages})` : ""}
         </div>
 
         <table>
@@ -112,7 +112,7 @@ export default async function StockPage({
                 return (
                   <tr key={p.id} className={basligne ? "flag-row" : undefined}>
                     <td className="prod">{p.nom}</td>
-                    <td className="muted">{p.categorie ?? "—"}</td>
+                    <td className="muted">{p.categorie ?? "-"}</td>
                     <td className={`num${p.stock < 0 ? " neg" : ""}`}>{p.stock}</td>
                     <td className="num muted">{p.seuil_stock}</td>
                     <td className="num">{formatCFA(p.prix_vente)}</td>

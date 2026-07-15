@@ -164,7 +164,7 @@ export default function VenteRow({
             </form>
           </div>
         ) : (
-          <span className="muted">—</span>
+          <span className="muted">-</span>
         )}
       </td>
     </tr>

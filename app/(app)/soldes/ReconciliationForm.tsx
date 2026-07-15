@@ -50,10 +50,10 @@ export default function ReconciliationForm({
     await enregistrerSoldesAction(formData);
     setFlash(
       e === 0
-        ? "Soldes enregistrés ✓ — ça tombe juste"
+        ? "Soldes enregistrés ✓ : ça tombe juste"
         : e < 0
-        ? `Soldes enregistrés ✓ — il manque ${formatCFA(-e)}`
-        : `Soldes enregistrés ✓ — ${formatCFA(e)} en plus`
+        ? `Soldes enregistrés ✓ : il manque ${formatCFA(-e)}`
+        : `Soldes enregistrés ✓ : ${formatCFA(e)} en plus`
     );
   }
 
@@ -127,7 +127,7 @@ export default function ReconciliationForm({
                     style={{ width: 110, padding: "6px 8px", textAlign: "right" }}
                     value={comptes[l.compte_id] ?? ""}
                     inputMode="numeric"
-                    placeholder="—"
+                    placeholder="-"
                     onChange={(e) =>
                       setComptes((p) => ({ ...p, [l.compte_id]: e.target.value }))
                     }
@@ -139,7 +139,7 @@ export default function ReconciliationForm({
                   }`}
                 >
                   {c == null
-                    ? "—"
+                    ? "-"
                     : ecart === 0
                     ? "0 F"
                     : `${ecart! > 0 ? "+" : ""}${formatCFA(ecart!)}`}

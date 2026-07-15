@@ -29,7 +29,7 @@ export default function ControlePage() {
       <div className="card">
         <h2>Contrôles récents</h2>
         <div className="hint">
-          Chaque contrôle garde l&apos;écart trouvé — utile pour suivre les
+          Chaque contrôle garde l&apos;écart trouvé, utile pour suivre les
           manques dans le temps.
         </div>
         <table>
@@ -56,13 +56,13 @@ export default function ControlePage() {
                   <td className="muted">
                     {jourCourt(c.date)} {heure(c.date)}
                   </td>
-                  <td>{c.note ?? "—"}</td>
+                  <td>{c.note ?? "-"}</td>
                   <td className="num">{c.nb_produits}</td>
                   <td className={`num ${c.manque > 0 ? "neg" : ""}`}>
-                    {c.manque > 0 ? formatCFA(c.manque) : "—"}
+                    {c.manque > 0 ? formatCFA(c.manque) : "-"}
                   </td>
                   <td className={`num ${c.surplus > 0 ? "pos" : ""}`}>
-                    {c.surplus > 0 ? formatCFA(c.surplus) : "—"}
+                    {c.surplus > 0 ? formatCFA(c.surplus) : "-"}
                   </td>
                   <td className="num">
                     <Link href={`/controle/${c.id}`} className="btn ghost">

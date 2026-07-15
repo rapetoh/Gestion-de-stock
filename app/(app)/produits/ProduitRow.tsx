@@ -118,7 +118,7 @@ export default function ProduitRow({
   return (
     <tr>
       <td className="prod">{p.nom}</td>
-      <td className="muted">{p.categorie ?? "—"}</td>
+      <td className="muted">{p.categorie ?? "-"}</td>
       <td className="num">{p.stock}</td>
       <td className="num">{formatCFA(p.prix_achat)}</td>
       <td className="num">{formatCFA(p.frais)}</td>

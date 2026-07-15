@@ -29,7 +29,7 @@ export default function AchatRow({
           <form action={enregistrer}>
             <input type="hidden" name="id" value={a.id} />
             <div className="hint" style={{ marginBottom: 10 }}>
-              {a.nom} — modifie ce qui est faux, puis enregistre. Le stock se
+              {a.nom} : modifie ce qui est faux, puis enregistre. Le stock se
               corrige tout seul.
             </div>
             <div className="row3" style={{ marginBottom: 12 }}>

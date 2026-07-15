@@ -14,7 +14,7 @@ export default function AchatsPage() {
         <div>
           <h1>Achats</h1>
           <div className="when">
-            Enregistre un produit qui arrive — du fournisseur ou du marché.
+            Enregistre un produit qui arrive, du fournisseur ou du marché.
           </div>
         </div>
       </div>

@@ -98,8 +98,8 @@ export default function ControleForm() {
     setRecherche("");
     setFlash(
       m > 0
-        ? `Contrôle enregistré ✓ — manque de ${formatCFA(m)}`
-        : "Contrôle enregistré ✓ — tout est juste"
+        ? `Contrôle enregistré ✓ : manque de ${formatCFA(m)}`
+        : "Contrôle enregistré ✓ : tout est juste"
     );
   }
 
@@ -115,7 +115,7 @@ export default function ControleForm() {
         <h2>Compter l&apos;étagère</h2>
         <div className="hint">
           Cherche un produit, tape ce que tu comptes vraiment. Tu peux n&apos;en
-          vérifier que quelques-uns — ceux que tu as comptés restent affichés.
+          vérifier que quelques-uns : ceux que tu as comptés restent affichés.
         </div>
 
         <div className="field" style={{ marginTop: 10 }}>
@@ -163,19 +163,19 @@ export default function ControleForm() {
                         style={{ width: 80, padding: "6px 8px", textAlign: "right" }}
                         value={comptes[p.id] ?? ""}
                         inputMode="numeric"
-                        placeholder="—"
+                        placeholder="-"
                         onChange={(e) =>
                           setComptes((prev) => ({ ...prev, [p.id]: e.target.value }))
                         }
                       />
                     </td>
-                    <td className="num">{compteValide ? ecartBadge(ecart) : "—"}</td>
+                    <td className="num">{compteValide ? ecartBadge(ecart) : "-"}</td>
                     <td
                       className={`num ${
                         compteValide && ecart < 0 ? "neg" : ecart > 0 ? "pos" : ""
                       }`}
                     >
-                      {compteValide && ecart !== 0 ? formatCFA(ecart * p.cout) : "—"}
+                      {compteValide && ecart !== 0 ? formatCFA(ecart * p.cout) : "-"}
                     </td>
                   </tr>
                 );

@@ -79,7 +79,7 @@ export default async function ActivitePage({
         <div className="hint">
           {lignes.length} action{lignes.length > 1 ? "s" : ""} affichée
           {lignes.length > 1 ? "s" : ""} (les plus récentes en premier)
-          {lignes.length >= 200 ? " — limité aux 200 dernières" : ""}.
+          {lignes.length >= 200 ? " (limité aux 200 dernières)" : ""}.
         </div>
         <table>
           <thead>
@@ -105,12 +105,12 @@ export default async function ActivitePage({
                   <td className="muted">
                     {jourCourt(l.date)} {heure(l.date)}
                   </td>
-                  <td>{l.user_nom ?? "—"}</td>
+                  <td>{l.user_nom ?? "-"}</td>
                   <td>{badge(l.action)}</td>
-                  <td className="muted">{l.entite ? ENTITES[l.entite] ?? l.entite : "—"}</td>
+                  <td className="muted">{l.entite ? ENTITES[l.entite] ?? l.entite : "-"}</td>
                   <td>{l.details}</td>
                   <td className="num">
-                    {l.montant != null ? formatCFA(l.montant) : "—"}
+                    {l.montant != null ? formatCFA(l.montant) : "-"}
                   </td>
                 </tr>
               ))

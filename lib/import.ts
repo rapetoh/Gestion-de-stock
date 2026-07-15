@@ -1,4 +1,4 @@
-// Parseur d'import de produits — générique, partagé par l'aperçu (client) et l'action (serveur).
+// Parseur d'import de produits : générique, partagé par l'aperçu (client) et l'action (serveur).
 //
 // Principe : on ne suppose RIEN de la structure du fichier. On lit les colonnes telles qu'elles
 // arrivent (2 ou 30, dans n'importe quel ordre, avec colonnes en trop, ligne de titre au-dessus,
@@ -123,7 +123,7 @@ function champPourEntete(entete: string, strict = false): Champ | null {
 }
 
 // Nombres venant de fichiers. Les exports de logiciels écrivent des décimales flottantes
-// (« 999.9997 » pour 1 000 F, « 2133.3328 »…) — le F CFA n'a pas de centimes, on arrondit.
+// (« 999.9997 » pour 1 000 F, « 2133.3328 »…) : le F CFA n'a pas de centimes, on arrondit.
 // Cas gardé : « 1.500 » à la française (point des milliers, partie entière courte) = 1500.
 export function parseNombreImport(brut: string): number {
   let s = brut.trim().replace(/\s|(F\s*CFA|FCFA|CFA|F)$/gi, "");
@@ -203,7 +203,7 @@ export function parseGrille(texte: string): Grille {
 }
 
 // Propose un champ pour chaque colonne d'une ligne d'en-tête. Chaque champ n'est attribué
-// QU'UNE fois (la 1re colonne qui correspond gagne) — ainsi « En stock » l'emporte sur
+// QU'UNE fois (la 1re colonne qui correspond gagne), ainsi « En stock » l'emporte sur
 // « Total en stock » / « Qté », et « Prix d'achat unit. » sur une colonne « Prix d'achat » vide.
 // Deux passes : d'abord les correspondances précises sur TOUTES les colonnes (« Code à bars »
 // prend le code-barres), puis les génériques sur ce qui reste (« Code » seul peut encore

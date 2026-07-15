@@ -1,4 +1,4 @@
-// Repository achats — chaque achat met à jour le produit et le stock dans une transaction.
+// Repository achats : chaque achat met à jour le produit et le stock dans une transaction.
 import { all, one, run, tx, nowIso } from "../db";
 import { journaliser } from "./activite";
 
@@ -71,7 +71,7 @@ export function createAchat(input: CreateAchatInput): number {
     // Le produit reflète le DERNIER achat : coût (prix_achat + frais unitaires) et prix de vente.
     // Le formulaire pré-remplit ces valeurs avec celles du produit et prévient si le prix de vente
     // change (ré-étiquetage), donc cette mise à jour est volontaire, jamais une surprise silencieuse.
-    // NB : modifier un achat passé (updateAchat) ne réécrit PAS le prix courant du produit — sinon
+    // NB : modifier un achat passé (updateAchat) ne réécrit PAS le prix courant du produit, sinon
     // corriger une vieille ligne changerait le prix d'aujourd'hui.
     run(
       `UPDATE produit SET

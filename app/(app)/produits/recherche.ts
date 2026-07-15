@@ -3,7 +3,7 @@
 import { getSession } from "@/lib/auth";
 import { chercherProduits, type Produit } from "@/lib/repo/produits";
 
-// Pour la caisse (accessible à la vendeuse) : on ne renvoie QUE le strict nécessaire — pas le coût.
+// Pour la caisse (accessible à la vendeuse) : on ne renvoie QUE le strict nécessaire, pas le coût.
 export type ProduitVente = { id: number; nom: string; prix_vente: number; stock: number };
 
 export async function rechercherPourVente(q: string): Promise<ProduitVente[]> {

@@ -101,7 +101,7 @@ export default function DepenseRow({
         {d.recurrente === 1 ? "Chaque mois" : jourCourt(d.date)}
       </td>
       <td className="prod">{d.libelle}</td>
-      <td>{d.categorie ?? "—"}</td>
+      <td>{d.categorie ?? "-"}</td>
       <td className="num neg">{formatCFA(d.montant)}</td>
       <td className="num">
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>

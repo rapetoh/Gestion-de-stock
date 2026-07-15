@@ -44,7 +44,7 @@ export default function ImportProduits({ existants }: { existants: string[] }) {
   const nbLignesEntete = Math.min(grille.lignes.length, 8);
 
   // Quand la source change (nouveau fichier, collage, exemple), propose un en-tête + un mapping
-  // de départ — corrigeables ensuite. Motif React recommandé : on ajuste l'état pendant le rendu
+  // de départ, corrigeables ensuite. Motif React recommandé : on ajuste l'état pendant le rendu
   // (pas dans un effet), ça se stabilise dès que la signature correspond.
   const [sig, setSig] = useState<string | null>(null);
   if (sig !== texte) {
@@ -126,7 +126,7 @@ export default function ImportProduits({ existants }: { existants: string[] }) {
           <div className="hint">
             <strong>Depuis Excel :</strong> Fichier → Enregistrer sous → <strong>CSV</strong>{" "}
             (le fichier <em>.xlsx</em> n&apos;est pas lu directement). Puis choisis ce fichier ci-dessous
-            — ou colle directement la liste. Peu importe l&apos;ordre des colonnes, les colonnes en trop,
+            Ou colle directement la liste. Peu importe l&apos;ordre des colonnes, les colonnes en trop,
             ou une ligne de titre en haut : tu diras toi-même, juste après, ce que chaque colonne
             représente.
           </div>
@@ -165,7 +165,7 @@ export default function ImportProduits({ existants }: { existants: string[] }) {
             <>
               <h2 style={{ marginTop: 22 }}>2. Dire ce que chaque colonne contient</h2>
               <div className="hint">
-                On a proposé une correspondance automatique — <strong>vérifie-la et corrige-la</strong>{" "}
+                On a proposé une correspondance automatique : <strong>vérifie-la et corrige-la</strong>{" "}
                 si besoin. Le <strong>Nom est obligatoire</strong> ; tout ce que tu laisses sur
                 « Ignorer » n&apos;est pas importé.
               </div>
@@ -201,7 +201,7 @@ export default function ImportProduits({ existants }: { existants: string[] }) {
                     return (
                       <tr key={i}>
                         <td className="prod">{sourceLabel(i)}</td>
-                        <td className="muted">{exemple || "—"}</td>
+                        <td className="muted">{exemple || "-"}</td>
                         <td>
                           <select
                             className="input"
@@ -281,7 +281,7 @@ export default function ImportProduits({ existants }: { existants: string[] }) {
       </div>
 
       <div className="card">
-        <h2>Aperçu — ce qui sera enregistré ({rows.length})</h2>
+        <h2>Aperçu : ce qui sera enregistré ({rows.length})</h2>
         {!charge ? (
           <div className="hint">
             Charge un fichier ou colle ta liste à gauche : l&apos;aperçu exact de ce qui sera
@@ -317,7 +317,7 @@ export default function ImportProduits({ existants }: { existants: string[] }) {
               <div className="note" style={{ color: "var(--accent)" }}>
                 {nbDoublons > 0 ? `⚠ ${nbDoublons} nom(s) en double dans ta liste. ` : ""}
                 {nbSansPrix > 0
-                  ? `⚠ ${nbSansPrix} nouveau(x) produit(s) sans prix de vente — tu ne pourras pas les vendre tant que tu n'auras pas mis un prix.`
+                  ? `⚠ ${nbSansPrix} nouveau(x) produit(s) sans prix de vente : tu ne pourras pas les vendre tant que tu n'auras pas mis un prix.`
                   : ""}
               </div>
             ) : null}
@@ -335,7 +335,7 @@ export default function ImportProduits({ existants }: { existants: string[] }) {
                 {rows.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="muted">
-                      Aucune ligne lisible pour l&apos;instant — vérifie la correspondance des
+                      Aucune ligne lisible pour l&apos;instant : vérifie la correspondance des
                       colonnes à gauche.
                     </td>
                   </tr>
@@ -357,13 +357,13 @@ export default function ImportProduits({ existants }: { existants: string[] }) {
                           ) : null}
                         </td>
                         <td className="num">
-                          {achatProvided ? formatCFA(cout) : maj ? "—" : formatCFA(0)}
+                          {achatProvided ? formatCFA(cout) : maj ? "-" : formatCFA(0)}
                         </td>
                         <td className="num">
                           {r.prixVente !== undefined
                             ? formatCFA(r.prixVente)
                             : maj
-                            ? "—"
+                            ? "-"
                             : formatCFA(0)}
                         </td>
                         <td className="num">

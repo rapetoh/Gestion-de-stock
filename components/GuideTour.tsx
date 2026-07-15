@@ -25,7 +25,7 @@ const OWNER: Step[] = [
   {
     titre: "Vendre",
     corps:
-      "Choisis le produit, encaisse. Pas besoin d'ouvrir une caisse — le stock baisse tout seul.",
+      "Choisis le produit, encaisse. Pas besoin d'ouvrir une caisse : le stock baisse tout seul.",
     cible: '[data-tour="/ventes"]',
   },
   {

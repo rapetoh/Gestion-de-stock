@@ -28,7 +28,7 @@ export default function EquipeRow({ u }: { u: Utilisateur }) {
         </td>
         <td className="num">
           {estProprietaire ? (
-            <span className="muted">— (c&apos;est toi)</span>
+            <span className="muted">(c&apos;est toi)</span>
           ) : (
             <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", flexWrap: "wrap" }}>
               <button type="button" className="btn ghost" onClick={() => setResetOuvert((v) => !v)}>

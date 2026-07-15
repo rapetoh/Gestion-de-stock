@@ -13,7 +13,7 @@ export default function Error({
     <div className="card" style={{ maxWidth: 520, margin: "40px auto", textAlign: "center" }}>
       <h2>Oups, ça n&apos;a pas marché</h2>
       <div className="hint" style={{ marginTop: 8 }}>
-        Une petite erreur est arrivée. Rien n&apos;est perdu — réessaie. Si ça
+        Une petite erreur est arrivée. Rien n&apos;est perdu : réessaie. Si ça
         recommence, ferme puis rouvre la page.
       </div>
       <button

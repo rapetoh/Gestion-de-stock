@@ -1,4 +1,4 @@
-// Exports CSV lisibles dans Excel — pour consulter/partager, en plus de la sauvegarde .db.
+// Exports CSV lisibles dans Excel, pour consulter/partager, en plus de la sauvegarde .db.
 import { all } from "../db";
 
 // Échappe une cellule CSV (guillemets, virgules, retours ligne).

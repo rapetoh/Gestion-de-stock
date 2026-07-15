@@ -1,15 +1,15 @@
-// Data layer — built on Node's built-in SQLite (node:sqlite).
+// Data layer, built on Node's built-in SQLite (node:sqlite).
 // Kept deliberately small and abstracted: feature code never touches SQL directly,
 // it goes through the repositories in lib/repo/*. Swapping to hosted SQLite (Turso)
 // or Postgres later means reimplementing only this file + the repos.
 //
-// Money is stored as INTEGER francs CFA (no decimals — the currency has no cents).
+// Money is stored as INTEGER francs CFA (no decimals: the currency has no cents).
 
 import fs from "node:fs";
 import path from "node:path";
 import bcrypt from "bcryptjs";
 
-// Load the built-in SQLite via process.getBuiltinModule — the bundler-proof way to
+// Load the built-in SQLite via process.getBuiltinModule, the bundler-proof way to
 // reach a Node core module. A static `import ... from "node:sqlite"` gets re-externalized
 // into a bare `require()` on hot-reload ("require is not defined"), and
 // `createRequire(import.meta.url)("node:sqlite")` makes Turbopack choke on the file:// URL
@@ -30,7 +30,7 @@ function connect(): DatabaseSync {
   fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
   const conn = new DatabaseSync(DB_PATH);
   // busy_timeout first, so the lock-sensitive pragmas/migrate below wait instead of failing
-  // instantly when several processes touch the same file at once — e.g. `next build`'s
+  // instantly when several processes touch the same file at once, e.g. `next build`'s
   // parallel page-data workers, or a dev server running alongside a one-off script.
   conn.exec("PRAGMA busy_timeout = 5000;");
   conn.exec("PRAGMA journal_mode = WAL;");
@@ -39,7 +39,7 @@ function connect(): DatabaseSync {
   return conn;
 }
 
-// Connection is opened lazily on first query — NOT at module import. Importing a repo
+// Connection is opened lazily on first query, NOT at module import. Importing a repo
 // (which happens for every page during `next build`'s page-data collection) must not open
 // or migrate the database, or 13 build workers race on the file and it locks.
 let cached: DatabaseSync | undefined = globalForDb.__maboutiqueDb;
@@ -61,7 +61,7 @@ export const db: DatabaseSync = new Proxy({} as DatabaseSync, {
 });
 
 // Sauvegarde cohérente de TOUTE la base dans un seul fichier (snapshot SQLite propre,
-// sûr même pendant que l'app tourne — c'est le rôle de VACUUM INTO).
+// sûr même pendant que l'app tourne : c'est le rôle de VACUUM INTO).
 export function exporterBase(dest: string): void {
   const safe = dest.replace(/'/g, "''");
   getDb().exec(`VACUUM INTO '${safe}'`);
@@ -71,7 +71,7 @@ export function exporterBase(dest: string): void {
 
 // node:sqlite returns rows as null-prototype objects. React Server Components
 // refuse to pass those across the server→client boundary, so we normalize every
-// row to a plain object here (one place) — feature code always gets plain objects.
+// row to a plain object here (one place): feature code always gets plain objects.
 export function all<T = Record<string, unknown>>(sql: string, ...params: unknown[]): T[] {
   return (db.prepare(sql).all(...(params as never[])) as Record<string, unknown>[]).map(
     (r) => ({ ...r }) as T

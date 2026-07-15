@@ -11,7 +11,7 @@ type Ligne = {
   nom: string;
   prix: number;
   quantite: number;
-  stock: number; // stock connu au moment de l'ajout — pour avertir, jamais bloquer
+  stock: number; // stock connu au moment de l'ajout : pour avertir, jamais bloquer
 };
 type Paiement = "especes" | "tmoney" | "flooz" | "credit";
 
@@ -55,7 +55,7 @@ export default function VenteCaisse() {
     setLignes([]);
     setPaiement("especes");
     setRecherche("");
-    setFlash(`Vente enregistrée ✓ — ${formatCFA(montant)}`);
+    setFlash(`Vente enregistrée ✓ : ${formatCFA(montant)}`);
   }
 
   // Douchette code-barres = clavier : elle « tape » le code puis envoie Entrée.
@@ -105,7 +105,7 @@ export default function VenteCaisse() {
     [lignes]
   );
 
-  // Lignes où l'on vend plus que le stock connu — autorisé, mais signalé.
+  // Lignes où l'on vend plus que le stock connu : autorisé, mais signalé.
   const surventes = useMemo(
     () => lignes.filter((l) => l.quantite > l.stock),
     [lignes]
@@ -272,7 +272,7 @@ export default function VenteCaisse() {
           >
             ⚠️ Tu vends plus que le stock pour{" "}
             <strong>{surventes.map((l) => l.nom).join(", ")}</strong>. La vente
-            est permise — le stock passera en négatif (à vérifier au Contrôle de
+            est permise : le stock passera en négatif (à vérifier au Contrôle de
             stock).
           </div>
         ) : null}

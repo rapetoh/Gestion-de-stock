@@ -1,4 +1,4 @@
-// Repository ventes — une vente baisse le stock dans une transaction. Aucune caisse à ouvrir.
+// Repository ventes : une vente baisse le stock dans une transaction. Aucune caisse à ouvrir.
 import { all, one, run, tx, nowIso } from "../db";
 import { journaliser } from "./activite";
 import { bornesJour } from "../periodes";

@@ -41,7 +41,7 @@ export default function EquipeForm() {
         {pending ? "Création…" : "Créer le compte vendeuse"}
       </button>
       <div className="note">
-        Elle pourra encaisser les ventes et voir le stock — mais pas les marges,
+        Elle pourra encaisser les ventes et voir le stock, mais pas les marges,
         l&apos;argent, ni supprimer une vente. Chaque vente portera son nom.
       </div>
     </form>

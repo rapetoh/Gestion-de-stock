@@ -8,7 +8,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 // L'aide est organisée par QUESTIONS (celles qu'on se pose vraiment en travaillant),
-// pas par écrans. Chaque réponse a été vérifiée contre ce que l'app fait réellement —
+// pas par écrans. Chaque réponse a été vérifiée contre ce que l'app fait réellement :
 // quand quelque chose n'existe pas encore (ex : restaurer une sauvegarde soi-même),
 // la réponse honnête est « appelle Roch », jamais une invention.
 
@@ -30,7 +30,7 @@ const OWNER: Section[] = [
         r: (
           <p>
             Va dans <strong>Produits</strong> → « Ajouter un produit ». Donne le nom, le
-            prix d&apos;achat, le prix de vente et le stock. C&apos;est tout — le
+            prix d&apos;achat, le prix de vente et le stock. C&apos;est tout : le
             code-barres et la catégorie sont facultatifs.
           </p>
         ),
@@ -63,7 +63,7 @@ const OWNER: Section[] = [
         r: (
           <p>
             <strong>Produits</strong> → cherche-le → bouton <strong>Supprimer</strong>{" "}
-            sur sa ligne, puis confirme. Ses ventes passées restent dans ton historique —
+            sur sa ligne, puis confirme. Ses ventes passées restent dans ton historique :
             tu ne perds aucun chiffre.
           </p>
         ),
@@ -95,7 +95,7 @@ const OWNER: Section[] = [
           <p>
             Jamais obligatoire. Si un produit en a un, une douchette (lecteur de
             code-barres) le retrouve instantanément à la caisse, aux achats et au
-            contrôle — la douchette « tape » le code à ta place.
+            contrôle : la douchette « tape » le code à ta place.
           </p>
         ),
       },
@@ -119,11 +119,11 @@ const OWNER: Section[] = [
         q: "Les frais de transport : par unité ou pour tout le lot ?",
         r: (
           <p>
-            Les deux marchent — dis-le simplement à l&apos;app : sous la case des frais,
+            Les deux marchent. Dis-le simplement à l&apos;app : sous la case des frais,
             choisis <strong>« pour tout le lot »</strong> (ex : 2 000 F de taxi pour
             toute la marchandise) ou <strong>« par unité »</strong> (ex : 100 F par
             sardine). La ligne « Transport (tout le lot) » te montre le total avant
-            d&apos;enregistrer — vérifie-la d&apos;un coup d&apos;œil.
+            d&apos;enregistrer : vérifie-la d&apos;un coup d&apos;œil.
           </p>
         ),
         lien: { href: "/achats", label: "Ouvrir Achats" },
@@ -184,7 +184,7 @@ const OWNER: Section[] = [
         ),
       },
       {
-        q: "Je me suis trompée sur une vente — je fais quoi ?",
+        q: "Je me suis trompée sur une vente, je fais quoi ?",
         r: (
           <p>
             <strong>Ventes</strong> → la liste du jour est sous la caisse →{" "}
@@ -207,7 +207,7 @@ const OWNER: Section[] = [
         q: "L'app affiche stock 0 mais j'ai le produit en main ?",
         r: (
           <p>
-            Vends quand même — la vente passe, l&apos;app te le signale simplement.
+            Vends quand même : la vente passe, l&apos;app te le signale simplement.
             Ensuite, remets le stock d&apos;équerre avec un petit{" "}
             <strong>Contrôle de stock</strong>.
           </p>
@@ -219,7 +219,7 @@ const OWNER: Section[] = [
     titre: "Tu t'es trompée ? Tout se corrige",
     items: [
       {
-        q: "J'ai fait une erreur quelque part — c'est grave ?",
+        q: "J'ai fait une erreur quelque part, c'est grave ?",
         r: (
           <p>
             Non. Presque tout se <strong>modifie</strong> ou se{" "}
@@ -243,7 +243,7 @@ const OWNER: Section[] = [
         q: "Est-ce que l'app garde une trace de ce qui a été fait ?",
         r: (
           <p>
-            Oui — la page <strong>Activité</strong> montre qui a fait quoi et à quelle
+            Oui : la page <strong>Activité</strong> montre qui a fait quoi et à quelle
             heure : ventes, modifications, suppressions, contrôles, connexions.
           </p>
         ),
@@ -287,11 +287,11 @@ const OWNER: Section[] = [
         ),
       },
       {
-        q: "Le contrôle montre un manque — ça veut dire quoi ?",
+        q: "Le contrôle montre un manque, ça veut dire quoi ?",
         r: (
           <p>
             De la marchandise est sortie sans être notée : perte, casse… ou vol.
-            L&apos;app te montre combien ça vaut en F CFA. Fais-le régulièrement — et une
+            L&apos;app te montre combien ça vaut en F CFA. Fais-le régulièrement, et une
             grande fois avec ta vendeuse avant son départ.
           </p>
         ),
@@ -300,7 +300,7 @@ const OWNER: Section[] = [
         q: "Je peux revoir mes anciens contrôles ?",
         r: (
           <p>
-            Oui — en bas de la page Contrôle, « Contrôles récents » garde chaque contrôle
+            Oui : en bas de la page Contrôle, « Contrôles récents » garde chaque contrôle
             avec son écart. Clique dessus pour voir le détail.
           </p>
         ),
@@ -325,7 +325,7 @@ const OWNER: Section[] = [
         q: "Il manque de l'argent dans les soldes du soir ?",
         r: (
           <p>
-            Un manque isolé peut être une dépense oubliée ou un crédit non noté — note
+            Un manque isolé peut être une dépense oubliée ou un crédit non noté : note
             tout et refais le point demain. Un manque qui <strong>revient</strong>,
             c&apos;est de l&apos;argent qui sort sans être noté : creuse.
           </p>
@@ -393,8 +393,8 @@ const OWNER: Section[] = [
         r: (
           <p>
             Seulement <strong>Ventes</strong> et <strong>Stock</strong>. Elle ne voit ni
-            tes marges, ni ton argent, et elle ne peut ni modifier ni supprimer une vente
-            — ça, c&apos;est toi seule.
+            tes marges, ni ton argent, et elle ne peut ni modifier ni supprimer une vente.
+            Ça, c&apos;est toi seule.
           </p>
         ),
       },
@@ -428,7 +428,7 @@ const OWNER: Section[] = [
           <p>
             <strong>Sauvegarde</strong> → « Télécharger une copie de mes données ».
             Range le fichier en lieu sûr (clé USB, e-mail, Google Drive). Fais-le chaque
-            fin de semaine — c&apos;est ta ceinture de sécurité.
+            fin de semaine : c&apos;est ta ceinture de sécurité.
           </p>
         ),
         lien: { href: "/sauvegarde", label: "Ouvrir Sauvegarde" },
@@ -437,7 +437,7 @@ const OWNER: Section[] = [
         q: "Je peux ouvrir mes données dans Excel ?",
         r: (
           <p>
-            Oui — la page Sauvegarde propose aussi tes produits, ventes, dépenses et
+            Oui : la page Sauvegarde propose aussi tes produits, ventes, dépenses et
             commissions en <strong>CSV</strong>, lisibles dans Excel.
           </p>
         ),
@@ -446,7 +446,7 @@ const OWNER: Section[] = [
         q: "Comment je remets une sauvegarde (restaurer) ?",
         r: (
           <p>
-            Ça ne se fait pas toute seule depuis l&apos;app : appelle {TEL} — on le fait
+            Ça ne se fait pas toute seule depuis l&apos;app : appelle {TEL} : on le fait
             ensemble en cinq minutes, sans rien perdre.
           </p>
         ),
@@ -469,7 +469,7 @@ const OWNER: Section[] = [
         q: "J'ai oublié mon mot de passe ?",
         r: (
           <p>
-            Appelle {TEL} — il te le remet. (Ta vendeuse, elle, passe par toi : page
+            Appelle {TEL}, il te le remet. (Ta vendeuse, elle, passe par toi : page
             Équipe → Mot de passe.)
           </p>
         ),
@@ -505,7 +505,7 @@ const OWNER: Section[] = [
         q: "Un chiffre me paraît bizarre ?",
         r: (
           <p>
-            Regarde <strong>Activité</strong> : qui a fait quoi, et quand — souvent la
+            Regarde <strong>Activité</strong> : qui a fait quoi, et quand : souvent la
             réponse y est. Sinon, appelle {TEL}.
           </p>
         ),
@@ -515,7 +515,7 @@ const OWNER: Section[] = [
         q: "Je suis bloquée, rien ne marche ?",
         r: (
           <p>
-            Respire — presque tout se corrige. Appelle {TEL}, à n&apos;importe quelle
+            Respire : presque tout se corrige. Appelle {TEL}, à n&apos;importe quelle
             heure raisonnable, et on règle ça ensemble.
           </p>
         ),
@@ -551,7 +551,7 @@ const VENDEUSE: Section[] = [
         q: "Le client paie par TMoney ou Flooz ?",
         r: (
           <p>
-            Choisis le bon bouton avant d&apos;encaisser — c&apos;est important pour les
+            Choisis le bon bouton avant d&apos;encaisser : c&apos;est important pour les
             comptes du soir.
           </p>
         ),
@@ -582,7 +582,7 @@ const VENDEUSE: Section[] = [
         q: "Comment je vois ce qu'il reste ?",
         r: (
           <p>
-            Page <strong>Stock</strong>. En rouge : fini ou presque — préviens la
+            Page <strong>Stock</strong>. En rouge : fini ou presque. Préviens la
             propriétaire pour qu&apos;elle recommande.
           </p>
         ),
@@ -606,7 +606,7 @@ const VENDEUSE: Section[] = [
         q: "Quelque chose cloche ?",
         r: (
           <p>
-            Pas de panique — tu ne peux pas casser l&apos;application. Préviens la
+            Pas de panique : tu ne peux pas casser l&apos;application. Préviens la
             propriétaire.
           </p>
         ),

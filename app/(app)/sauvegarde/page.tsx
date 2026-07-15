@@ -35,7 +35,7 @@ export default function SauvegardePage() {
             Télécharger une copie de mes données
           </a>
           <div className="note">
-            À faire régulièrement — par exemple chaque fin de semaine.
+            À faire régulièrement, par exemple chaque fin de semaine.
           </div>
         </div>
 

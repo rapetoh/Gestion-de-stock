@@ -80,7 +80,7 @@ export default function DepenseForm() {
       </div>
       <div className="hint" style={{ marginTop: 4 }}>
         « Revient chaque mois » : à saisir une seule fois (loyer, salaire…). Elle
-        compte automatiquement les mois suivants — pas besoin de la ressaisir.
+        compte automatiquement les mois suivants, pas besoin de la ressaisir.
       </div>
 
       <SubmitButton className="btn primary big" style={{ width: "100%" }}>

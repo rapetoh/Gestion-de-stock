@@ -45,7 +45,7 @@ export default function TableauDeBordPage() {
         >
           <h2>Bienvenue 👋 Commence ici</h2>
           <div className="hint">
-            Cinq étapes pour bien démarrer. Prends-les à ton rythme — ce panneau
+            Cinq étapes pour bien démarrer. Prends-les à ton rythme : ce panneau
             disparaîtra dès que tu auras ajouté tes produits.
           </div>
           <ol className="start-list">
@@ -54,35 +54,35 @@ export default function TableauDeBordPage() {
               <Link className="lien" href="/produits/import">
                 Ajoute ou importe tes produits
               </Link>{" "}
-              — la liste de ce que tu vends.
+              : la liste de ce que tu vends.
             </li>
             <li>
               <strong>2.</strong>{" "}
               <Link className="lien" href="/controle">
                 Fais ton premier contrôle de stock
               </Link>{" "}
-              — c&apos;est ton inventaire de départ.
+              : c&apos;est ton inventaire de départ.
             </li>
             <li>
               <strong>3.</strong>{" "}
               <Link className="lien" href="/ventes">
                 Enregistre une vente
               </Link>{" "}
-              — dès qu&apos;un client achète.
+              : dès qu&apos;un client achète.
             </li>
             <li>
               <strong>4.</strong>{" "}
               <Link className="lien" href="/equipe">
                 Crée le code de ta vendeuse
               </Link>{" "}
-              — chaque vente portera son nom.
+              : chaque vente portera son nom.
             </li>
             <li>
               <strong>5.</strong>{" "}
               <Link className="lien" href="/sauvegarde">
                 Sauvegarde
               </Link>{" "}
-              — pour ne jamais rien perdre.
+              : pour ne jamais rien perdre.
             </li>
           </ol>
           <div className="note">
@@ -124,7 +124,7 @@ export default function TableauDeBordPage() {
           <span className="ic-corner">★</span>
           <div className="label">Ce qui se vend le plus</div>
           <div className="value" style={{ fontSize: 22 }}>
-            {data.topProduits[0]?.nom ?? "—"}
+            {data.topProduits[0]?.nom ?? "-"}
           </div>
           <div className="delta flat">en tête ce mois-ci</div>
         </div>
@@ -133,7 +133,7 @@ export default function TableauDeBordPage() {
       <div className="card">
         <h2>À recommander bientôt</h2>
         <div className="hint">
-          Ces produits vont finir — pense à passer commande.
+          Ces produits vont finir : pense à passer commande.
         </div>
         <table>
           <thead>
@@ -178,7 +178,7 @@ export default function TableauDeBordPage() {
       <div className="card">
         <h2>Classement des ventes du mois</h2>
         <div className="hint">
-          Pour savoir sur quoi te concentrer — et ce qui ne marche pas.
+          Pour savoir sur quoi te concentrer, et ce qui ne marche pas.
         </div>
         <table>
           <thead>

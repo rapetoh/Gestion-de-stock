@@ -12,7 +12,7 @@ export async function enregistrerAchat(formData: FormData): Promise<void> {
 
   const quantite = parseCFA(String(formData.get("quantite") ?? ""));
   const prixAchat = parseCFA(String(formData.get("prixAchat") ?? ""));
-  // Saisis « par unité » ou « pour tout le lot » (fraisMode) — toujours ramenés au lot
+  // Saisis « par unité » ou « pour tout le lot » (fraisMode) : toujours ramenés au lot
   // ici, à la frontière : le stockage et tous les calculs en aval restent inchangés.
   const frais = fraisPourLeLot(
     parseCFA(String(formData.get("frais") ?? "")),

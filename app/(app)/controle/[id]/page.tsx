@@ -82,7 +82,7 @@ export default async function ControleDetailPage({
                     l.ecart < 0 ? "neg" : l.ecart > 0 ? "pos" : ""
                   }`}
                 >
-                  {l.ecart !== 0 ? formatCFA(l.valeur_ecart) : "—"}
+                  {l.ecart !== 0 ? formatCFA(l.valeur_ecart) : "-"}
                 </td>
               </tr>
             ))}

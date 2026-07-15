@@ -83,7 +83,7 @@ export default async function CommissionsPage({
         <div className="card">
           <h2>Commissions de {moisAnnee(year, month)}</h2>
           <div className="hint">
-            Total du mois : <strong>{formatCFA(total)}</strong> — ajouté à ta
+            Total du mois : <strong>{formatCFA(total)}</strong>, ajouté à ta
             marge dans Bénéfices.
           </div>
           <table>

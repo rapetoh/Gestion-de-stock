@@ -1,4 +1,4 @@
-// Repository activité — le journal "qui a fait quoi, et quand".
+// Repository activité : le journal "qui a fait quoi, et quand".
 // Écrit depuis les autres repos, au moment où la donnée change (donc dans la même transaction
 // quand il y en a une). Best-effort : une erreur de log ne doit JAMAIS casser l'opération métier.
 import { all, run, nowIso } from "../db";

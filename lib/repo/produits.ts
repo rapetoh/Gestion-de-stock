@@ -1,4 +1,4 @@
-// Repository produits — accès données via les helpers de lib/db uniquement.
+// Repository produits : accès données via les helpers de lib/db uniquement.
 import { all, one, run, tx, nowIso } from "../db";
 import { journaliser } from "./activite";
 import type { ImportRow } from "../import";
@@ -33,7 +33,7 @@ export function getProduit(id: number): Produit | undefined {
   return one<Produit>(`SELECT * FROM produit WHERE id = ?`, id);
 }
 
-// Liste filtrée + paginée — pour que les pages Produits/Stock tiennent la route à des milliers d'articles
+// Liste filtrée + paginée, pour que les pages Produits/Stock tiennent la route à des milliers d'articles
 // (on n'affiche qu'une page à la fois, filtrable par nom, catégorie et « stock bas »).
 export type FiltreProduits = {
   recherche?: string;
@@ -80,12 +80,12 @@ export function listCategories(): string[] {
   ).map((r) => r.categorie);
 }
 
-// Recherche bornée pour l'autocomplétion (caisse, achats, contrôle) — on N'ENVOIE PAS tout le
+// Recherche bornée pour l'autocomplétion (caisse, achats, contrôle) : on N'ENVOIE PAS tout le
 // catalogue au téléphone : seulement les quelques produits qui correspondent à ce qu'elle tape.
 export function chercherProduits(q: string, limit = 15): Produit[] {
   const s = q.trim();
   if (!s) return [];
-  // Nom OU code-barres exact : une douchette « tape » le code puis Entrée —
+  // Nom OU code-barres exact : une douchette « tape » le code puis Entrée :
   // le scan retrouve donc le produit dans la même case de recherche.
   return all<Produit>(
     `SELECT * FROM produit WHERE actif = 1 AND (nom LIKE ? OR code_barre = ?) ORDER BY nom LIMIT ?`,
@@ -124,7 +124,7 @@ export function createProduit(data: ProduitInput, userId?: number | null): numbe
   const nom = normaliserNom(data.nom);
 
   // Anti-doublon : si un produit du même nom existe DÉJÀ (même supprimé), on réutilise sa ligne au lieu
-  // d'en créer une seconde — sinon supprimer puis racheter « Eau » scinderait stock et historique en deux.
+  // d'en créer une seconde, sinon supprimer puis racheter « Eau » scinderait stock et historique en deux.
   // On ne touche pas au stock (géré par achats/ventes/contrôle) ; on réactive juste si besoin.
   const existant = one<Produit>(
     `SELECT * FROM produit WHERE nom = ? COLLATE NOCASE LIMIT 1`,
@@ -247,7 +247,7 @@ export function importerProduits(
 
       if (existant) {
         // Produit existant : on ne met à jour QUE les colonnes réellement remplies.
-        // Le stock n'est JAMAIS écrasé par l'import (il se gère via Achats/Ventes/Contrôle) —
+        // Le stock n'est JAMAIS écrasé par l'import (il se gère via Achats/Ventes/Contrôle) :
         // une liste collée a un stock périmé dès qu'on la tape.
         const sets: string[] = [];
         const vals: unknown[] = [];
@@ -302,7 +302,7 @@ export function importerProduits(
 
 // Le tableau de bord n'affiche que les plus urgents (les plus en dessous du seuil) ;
 // le total réel vient de nbProduitsARecommander(). La liste complète vit sur
-// Produits ?bas=1 (filtrée + paginée) — le tableau de bord ne doit jamais
+// Produits ?bas=1 (filtrée + paginée) : le tableau de bord ne doit jamais
 // dérouler tout un catalogue.
 export function produitsARecommander(limite = 8): Produit[] {
   return all<Produit>(

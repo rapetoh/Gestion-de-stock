@@ -1,4 +1,4 @@
-// Authentification — sessions par cookie signé (JWT via jose, vérifiable sur edge).
+// Authentification : sessions par cookie signé (JWT via jose, vérifiable sur edge).
 // On garde tout volontairement simple : un seul cookie "session" httpOnly.
 import { cookies } from "next/headers";
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
@@ -14,7 +14,7 @@ function getSecret(): Uint8Array {
   if (process.env.NODE_ENV === "production") {
     throw new Error("AUTH_SECRET manquant en production.");
   }
-  // Repli uniquement pour le développement local — NE PAS utiliser en production.
+  // Repli uniquement pour le développement local. NE PAS utiliser en production.
   console.warn(
     "[auth] AUTH_SECRET absent : utilisation d'un secret de développement (non sécurisé)."
   );

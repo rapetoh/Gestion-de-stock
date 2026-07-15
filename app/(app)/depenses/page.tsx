@@ -82,7 +82,7 @@ export default async function DepensesPage({
         <div className="card">
           <h2>Dépenses de {moisAnnee(year, month)}</h2>
           <div className="hint">
-            Total du mois : <strong>{formatCFA(total)}</strong> — retiré de ta
+            Total du mois : <strong>{formatCFA(total)}</strong>, retiré de ta
             marge dans Bénéfices.
           </div>
           <table>
