@@ -7,6 +7,22 @@
 
 ## 2026-07-14
 
+### Achats : « Derniers achats » en journal (2 lignes/entrée) + sélecteur de date
+- **What:** Critique UI de l'utilisateur (capture à l'appui) : le tableau 6 colonnes + 2 boutons
+  dans une demi-page étranglait la colonne Nom (noms sur 5 lignes, « 4 500 F » coupé en deux) ;
+  et tout achat sorti des 20 derniers était injoignable pour correction. (1) Chaque entrée devient
+  une **carte journal** : ligne 1 = nom complet jamais tronqué (les noms réels ne diffèrent
+  souvent qu'à la fin, « 400 ML » vs « 250 ML », l'ellipse était interdite), ligne 2 =
+  « 14 juillet · 3 × 3 400 F · + 200 F de frais · vend à 4 500 F · (fournisseur) », segments
+  insécables, boutons à droite, empilement propre sur mobile. Éditeur en place conservé (radios
+  frais lot/unité comprises). (2) **Sélecteur de date** (même motif que Ventes) :
+  `listAchatsDuJour(jour)` (bornesJour, LIMIT 200), vide = 20 plus récents ; en-tête et lien
+  « Revenir aux plus récents » ; FAQ mise à jour. Aval intact : aucune écriture touchée.
+- **Result:** 83/83 tests, tsc/lint/build OK. E2E navigateur (10 contrôles) : hauteur d'entrée
+  ~101 px max au lieu de ~140 avec moins d'information, nom complet affiché, filtre par date
+  retrouve un achat antidaté de 30 jours, jour vide correct, éditeur ouvre/enregistre/referme,
+  pas de débordement horizontal en 390 px. Capture visuelle validée. Déployé sur monpanier.fly.dev.
+
 ### Zéro tiret cadratin dans toute l'application (demande explicite de l'utilisateur)
 - **What:** 148 occurrences de « — » (et 2 « – ») dans app/, components/, lib/, middleware.ts,
   scripts/ : textes visibles (Aide, guides, formulaires, messages flash, confirmations) ET

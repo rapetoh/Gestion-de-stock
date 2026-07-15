@@ -134,7 +134,8 @@ const OWNER: Section[] = [
           <p>
             <strong>Achats</strong> → retrouve la ligne dans « Derniers achats » →{" "}
             <strong>Modifier</strong> → corrige → Enregistrer. Le stock et le coût se
-            recalculent tout seuls.
+            recalculent tout seuls. Pour un achat plus ancien, choisis son{" "}
+            <strong>jour</strong> avec la case date au-dessus de la liste.
           </p>
         ),
       },

@@ -258,6 +258,28 @@ tfoot td { padding: 14px 12px; font-weight: 800; font-size: 15.5px; border-top: 
 .guide-body { font-size: 15px; line-height: 1.5; color: var(--ink); margin-bottom: 16px; }
 .guide-actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 
+/* ---------- Journal des achats (une entrée = deux lignes, comme un cahier) ---------- */
+.achat-liste { display: flex; flex-direction: column; margin-top: 4px; }
+.achat-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 11px 2px; border-bottom: 1px solid var(--line);
+}
+.achat-liste > .achat-item:last-of-type { border-bottom: none; }
+.achat-item.achat-edit { background: var(--primary-l); border-radius: 10px; padding: 14px; margin: 6px 0; border-bottom: none; }
+.achat-main { flex: 1; min-width: 0; }
+.achat-nom { font-weight: 700; font-size: 15px; line-height: 1.35; }
+.achat-detail {
+  color: var(--ink-soft); font-size: 13.5px; margin-top: 3px;
+  display: flex; flex-wrap: wrap; column-gap: 6px; row-gap: 2px;
+}
+.achat-detail span { white-space: nowrap; }
+.achat-detail span + span::before { content: "· "; }
+.achat-actions { display: flex; gap: 8px; flex: none; }
+@media (max-width: 640px) {
+  .achat-item { flex-direction: column; align-items: stretch; gap: 8px; }
+  .achat-actions { justify-content: flex-end; }
+}
+
 /* ---------- Frais d'achat : « pour tout le lot » / « par unité » ---------- */
 .frais-mode { display: flex; gap: 18px; margin-top: 7px; }
 .frais-mode label {

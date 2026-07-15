@@ -1,5 +1,6 @@
 // Repository achats : chaque achat met à jour le produit et le stock dans une transaction.
 import { all, one, run, tx, nowIso } from "../db";
+import { bornesJour } from "../periodes";
 import { journaliser } from "./activite";
 
 export type Achat = {
@@ -25,6 +26,23 @@ export function listAchats(limit = 20): AchatAvecProduit[] {
       ORDER BY a.date DESC, a.id DESC
       LIMIT ?`,
     limit
+  );
+}
+
+// Les achats d'UN jour précis : pour retrouver et corriger un achat qui a quitté la
+// fenêtre des « derniers achats ». Borné large (une journée de ravitaillement réelle
+// tient très en dessous de 200 lignes).
+export function listAchatsDuJour(jour: string): AchatAvecProduit[] {
+  const { debut, fin } = bornesJour(jour);
+  return all<AchatAvecProduit>(
+    `SELECT a.*, p.nom AS nom
+       FROM achat a
+       JOIN produit p ON p.id = a.produit_id
+      WHERE a.date >= ? AND a.date < ?
+      ORDER BY a.date DESC, a.id DESC
+      LIMIT 200`,
+    debut,
+    fin
   );
 }
 
