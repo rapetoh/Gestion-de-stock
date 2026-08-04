@@ -32,6 +32,8 @@ export type ControleResume = Controle & {
 export type EnregistrerControleInput = {
   note?: string | null;
   userId?: number | null;
+  // Jour réel du comptage (YYYY-MM-DD). Absent = maintenant.
+  jour?: string | null;
   // Seuls les produits réellement comptés sont passés (compté >= 0).
   lignes: { produitId: number; compte: number }[];
 };
@@ -44,9 +46,13 @@ export function enregistrerControle(input: EnregistrerControleInput): number {
 
   return tx(() => {
     const now = nowIso();
+    const dateControle =
+      input.jour && /^\d{4}-\d{2}-\d{2}$/.test(input.jour)
+        ? `${input.jour}T12:00:00.000Z`
+        : now;
     const controleId = run(
       `INSERT INTO controle_stock (date, note, user_id) VALUES (?,?,?)`,
-      now,
+      dateControle,
       input.note ?? null,
       input.userId ?? null
     ).lastId;

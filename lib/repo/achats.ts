@@ -55,7 +55,16 @@ export type CreateAchatInput = {
   fournisseur?: string | null;
   note?: string | null;
   userId?: number | null;
+  // Jour réel de l'achat (YYYY-MM-DD). Absent = maintenant. Comme dans le cahier :
+  // on note la date de l'événement, pas celle de la saisie.
+  jour?: string | null;
 };
+
+// Un jour choisi devient midi UTC (Lomé = UTC) : trié correctement dans le journal
+// et retrouvé par le filtre par date. Un jour absent ou invalide = maintenant.
+function dateAchat(jour: string | null | undefined, now: string): string {
+  return jour && /^\d{4}-\d{2}-\d{2}$/.test(jour) ? `${jour}T12:00:00.000Z` : now;
+}
 
 export function createAchat(input: CreateAchatInput): number {
   return tx(() => {
@@ -82,7 +91,7 @@ export function createAchat(input: CreateAchatInput): number {
       input.prixVente,
       input.fournisseur ?? null,
       input.note ?? null,
-      now,
+      dateAchat(input.jour, now),
       input.userId ?? null
     ).lastId;
 
@@ -133,7 +142,7 @@ export function createAchat(input: CreateAchatInput): number {
 
 export function updateAchat(
   id: number,
-  data: { quantite?: number; prixAchat?: number; frais?: number; prixVente?: number; fournisseur?: string | null; note?: string | null },
+  data: { quantite?: number; prixAchat?: number; frais?: number; prixVente?: number; fournisseur?: string | null; note?: string | null; jour?: string | null },
   userId?: number | null
 ): void {
   const before = one<Achat>(`SELECT * FROM achat WHERE id = ?`, id);
@@ -148,7 +157,7 @@ export function updateAchat(
 
     run(
       `UPDATE achat SET
-         quantite = ?, prix_achat = ?, frais = ?, prix_vente = ?, fournisseur = ?, note = ?
+         quantite = ?, prix_achat = ?, frais = ?, prix_vente = ?, fournisseur = ?, note = ?, date = ?
        WHERE id = ?`,
       nouvelleQte,
       prixAchat,
@@ -156,6 +165,7 @@ export function updateAchat(
       prixVente,
       data.fournisseur ?? before.fournisseur,
       data.note ?? before.note,
+      dateAchat(data.jour, before.date),
       id
     );
 

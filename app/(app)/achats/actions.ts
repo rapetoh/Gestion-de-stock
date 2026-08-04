@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { parseCFA, fraisPourLeLot } from "@/lib/money";
 import { getSession } from "@/lib/auth";
-import { getProduitParNom, createProduit } from "@/lib/repo/produits";
+import { getProduitParNom, createProduit, completerProduitDepuisAchat } from "@/lib/repo/produits";
 import { createAchat, updateAchat, deleteAchat } from "@/lib/repo/achats";
 
 export async function enregistrerAchat(formData: FormData): Promise<void> {
@@ -22,6 +22,9 @@ export async function enregistrerAchat(formData: FormData): Promise<void> {
   const prixVente = parseCFA(String(formData.get("prixVente") ?? ""));
   const fournisseur = String(formData.get("fournisseur") ?? "").trim() || null;
   const note = String(formData.get("note") ?? "").trim() || null;
+  const categorie = String(formData.get("categorie") ?? "").trim() || null;
+  const codeBarre = String(formData.get("codeBarre") ?? "").trim() || null;
+  const jour = String(formData.get("jour") ?? "").trim() || null;
 
   if (quantite <= 0) return;
 
@@ -32,6 +35,9 @@ export async function enregistrerAchat(formData: FormData): Promise<void> {
   const produitId = existant
     ? existant.id
     : createProduit({ nom, prixAchat, frais, prixVente }, session?.userId ?? null);
+  // Catégorie et code-barres saisis avec l'achat : appliqués prudemment
+  // (le code ne remplace jamais un code existant, ni un code déjà pris).
+  completerProduitDepuisAchat(produitId, categorie, codeBarre);
 
   createAchat({
     produitId,
@@ -41,6 +47,7 @@ export async function enregistrerAchat(formData: FormData): Promise<void> {
     prixVente,
     fournisseur,
     note,
+    jour,
     userId: session?.userId ?? null,
   });
 
@@ -70,6 +77,7 @@ export async function modifierAchat(formData: FormData): Promise<void> {
       prixVente: parseCFA(String(formData.get("prixVente") ?? "")),
       fournisseur: String(formData.get("fournisseur") ?? "").trim() || null,
       note: String(formData.get("note") ?? "").trim() || null,
+      jour: String(formData.get("jour") ?? "").trim() || null,
     },
     session?.userId ?? null
   );

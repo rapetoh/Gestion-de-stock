@@ -1,6 +1,7 @@
 "use client";
 
 import { formatCFA } from "@/lib/money";
+import { jourCourt } from "@/lib/dates";
 import type { Produit } from "@/lib/repo/produits";
 import SubmitButton from "@/components/SubmitButton";
 import { modifierProduit, supprimerProduit } from "./actions";
@@ -30,6 +31,10 @@ export default function ProduitRow({
         <td colSpan={8}>
           <form action={enregistrer}>
             <input type="hidden" name="id" value={p.id} />
+            <div className="hint" style={{ marginBottom: 10 }}>
+              Fiche créée le {jourCourt(p.cree_le)} · dernière modification (prix,
+              stock…) le {jourCourt(p.maj_le)}.
+            </div>
             <div className="row3" style={{ marginBottom: 12 }}>
               <div className="field" style={{ margin: 0 }}>
                 <label>Nom</label>
@@ -40,6 +45,7 @@ export default function ProduitRow({
                 <input
                   className="input"
                   name="categorie"
+                  list="liste-categories"
                   defaultValue={p.categorie ?? ""}
                 />
               </div>

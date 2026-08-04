@@ -71,7 +71,16 @@ export default function AchatRow({
               </div>
             </div>
           </div>
-          <div className="row2" style={{ marginBottom: 12 }}>
+          <div className="row3" style={{ marginBottom: 12 }}>
+            <div className="field" style={{ margin: 0 }}>
+              <label>Date de l&apos;achat</label>
+              <input
+                className="input"
+                type="date"
+                name="jour"
+                defaultValue={a.date.slice(0, 10)}
+              />
+            </div>
             <div className="field" style={{ margin: 0 }}>
               <label>Prix de vente</label>
               <input
@@ -93,6 +102,7 @@ export default function AchatRow({
               />
             </div>
           </div>
+          <div style={{ marginBottom: 12 }}></div>
           <div style={{ display: "flex", gap: 10 }}>
             <SubmitButton className="btn primary">Enregistrer</SubmitButton>
             <button type="button" className="btn ghost" onClick={onClose}>

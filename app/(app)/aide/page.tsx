@@ -80,6 +80,18 @@ const OWNER: Section[] = [
         ),
       },
       {
+        q: "Comment marchent les catégories ?",
+        r: (
+          <p>
+            Quand tu tapes une catégorie, l&apos;app te propose celles qui existent
+            déjà : choisis-en une ou écris-en une nouvelle. Pour renommer ou
+            supprimer un rayon entier d&apos;un coup :{" "}
+            <strong>Produits → Gérer les catégories</strong>.
+          </p>
+        ),
+        lien: { href: "/produits/categories", label: "Gérer les catégories" },
+      },
+      {
         q: "C'est quoi le « seuil » d'un produit ?",
         r: (
           <p>
@@ -110,7 +122,9 @@ const OWNER: Section[] = [
           <p>
             <strong>Achats</strong> → tape le nom du produit (ou crée-le) → quantité
             reçue, prix d&apos;achat par unité, frais de transport →{" "}
-            <strong>Enregistrer</strong>. Le stock monte tout seul.
+            <strong>Enregistrer</strong>. Le stock monte tout seul. La{" "}
+            <strong>date</strong> est déjà remplie (aujourd&apos;hui) : change-la si
+            tu rattrapes une saisie d&apos;un autre jour.
           </p>
         ),
         lien: { href: "/achats", label: "Ouvrir Achats" },

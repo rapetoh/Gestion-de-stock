@@ -262,13 +262,57 @@ function migrate(database: DatabaseSync): void {
       ref_id        INTEGER
     );
     CREATE INDEX IF NOT EXISTS idx_activite_date ON activite(date);
+
+    -- Catégories de PRODUITS : la liste de suggestions que la propriétaire gère.
+    -- La vérité reste le texte sur chaque produit ; cette table alimente les
+    -- suggestions et la page « Gérer les catégories ». (Les catégories de
+    -- dépenses sont un autre monde : elles ne passent jamais par ici.)
+    CREATE TABLE IF NOT EXISTS categorie (
+      id      INTEGER PRIMARY KEY AUTOINCREMENT,
+      nom     TEXT NOT NULL UNIQUE COLLATE NOCASE,
+      cree_le TEXT NOT NULL
+    );
   `);
 
   // Migrations additives idempotentes (un ALTER n'est pas couvert par CREATE TABLE IF NOT EXISTS).
   // attendu = ce qui DEVRAIT être sur le compte ce jour-là (capital/float), à côté du solde compté.
   ajouterColonneSiAbsente(database, "solde_journalier", "attendu", "INTEGER NOT NULL DEFAULT 0");
 
+  amorcerCategories(database);
   amorcerDonneesInitiales(database);
+}
+
+// Catégories de départ : la propre nomenclature de l'ancien logiciel de la boutique
+// (ses sections), écrite proprement. Idempotent : INSERT OR IGNORE, et toute catégorie
+// déjà tapée sur un produit existant est adoptée dans la liste (jamais perdue).
+const CATEGORIES_DEFAUT = [
+  "Bazar",
+  "Biscuiterie",
+  "Boissons alcoolisées",
+  "Boissons non alcoolisées",
+  "Communication",
+  "Confiserie",
+  "Cosmétique",
+  "Eau",
+  "Épicerie",
+  "Hygiène",
+  "Insecticides",
+  "Ménage",
+  "Produits frais",
+  "Snacks",
+];
+
+function amorcerCategories(database: DatabaseSync): void {
+  const now = new Date().toISOString();
+  const ins = database.prepare(
+    `INSERT OR IGNORE INTO categorie (nom, cree_le) VALUES (?, ?)`
+  );
+  for (const nom of CATEGORIES_DEFAUT) ins.run(nom, now);
+  database.exec(
+    `INSERT OR IGNORE INTO categorie (nom, cree_le)
+     SELECT DISTINCT categorie, '${now}' FROM produit
+      WHERE categorie IS NOT NULL AND TRIM(categorie) != ''`
+  );
 }
 
 // Amorçage NON destructif au premier démarrage : ne crée que ce qui manque, ne supprime JAMAIS rien.

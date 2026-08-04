@@ -26,6 +26,7 @@ const TIPS: Record<string, Tip> = {
       "Tape le nom du produit (ou crée-le s'il est nouveau).",
       "Mets la quantité et le prix d'achat par unité.",
       "Pour les frais de transport, dis si ton chiffre est « pour tout le lot » ou « par unité » : l'app fait le calcul.",
+      "La date est déjà remplie (aujourd'hui) : change-la si tu enregistres un achat d'un autre jour.",
       "Enregistre : le stock monte tout seul.",
     ],
   },

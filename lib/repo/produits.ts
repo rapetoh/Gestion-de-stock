@@ -1,5 +1,6 @@
 // Repository produits : accès données via les helpers de lib/db uniquement.
 import { all, one, run, tx, nowIso } from "../db";
+import { adopterCategorie } from "./categories";
 import { journaliser } from "./activite";
 import type { ImportRow } from "../import";
 
@@ -122,6 +123,7 @@ export type ProduitInput = {
 export function createProduit(data: ProduitInput, userId?: number | null): number {
   const now = nowIso();
   const nom = normaliserNom(data.nom);
+  adopterCategorie(data.categorie);
 
   // Anti-doublon : si un produit du même nom existe DÉJÀ (même supprimé), on réutilise sa ligne au lieu
   // d'en créer une seconde, sinon supprimer puis racheter « Eau » scinderait stock et historique en deux.
@@ -174,6 +176,7 @@ export function updateProduit(
   data: ProduitInput,
   userId?: number | null
 ): void {
+  adopterCategorie(data.categorie);
   run(
     `UPDATE produit SET
        nom = ?, categorie = ?, prix_achat = ?, frais = ?, prix_vente = ?,
@@ -212,6 +215,34 @@ export function removeProduit(id: number, userId?: number | null): void {
   });
 }
 
+// Complète un produit depuis le formulaire d'achat : la catégorie suit ce qui est
+// saisi ; le code-barres n'est posé QUE si le produit n'en a pas et que le code est
+// libre (index UNIQUE) : on ne vole jamais le code d'un autre produit, on n'écrase rien.
+export function completerProduitDepuisAchat(
+  id: number,
+  categorie: string | null,
+  codeBarre: string | null
+): void {
+  const p = getProduit(id);
+  if (!p) return;
+  const cat = (categorie ?? "").trim();
+  if (cat && cat !== (p.categorie ?? "")) {
+    adopterCategorie(cat);
+    run(`UPDATE produit SET categorie = ?, maj_le = ? WHERE id = ?`, cat, nowIso(), id);
+  }
+  const code = (codeBarre ?? "").trim();
+  if (code && !p.code_barre) {
+    const pris = one<{ id: number }>(
+      `SELECT id FROM produit WHERE code_barre = ? AND id != ?`,
+      code,
+      id
+    );
+    if (!pris) {
+      run(`UPDATE produit SET code_barre = ?, maj_le = ? WHERE id = ?`, code, nowIso(), id);
+    }
+  }
+}
+
 // Import en masse : crée les nouveaux produits, met à jour ceux dont le nom existe déjà
 // (régularisation), le tout dans une transaction. Une seule ligne de journal résume l'opération.
 export function importerProduits(
@@ -240,6 +271,7 @@ export function importerProduits(
     for (const r of rows) {
       const nom = normaliserNom(r.nom);
       if (!nom) continue;
+      adopterCategorie(r.categorie);
       const existant = one<{ id: number }>(
         `SELECT id FROM produit WHERE actif = 1 AND nom = ? COLLATE NOCASE`,
         nom

@@ -18,6 +18,11 @@ export default function AchatForm() {
   // le stockage et tous les calculs en aval ne changent pas.
   const [fraisMode, setFraisMode] = useState<"lot" | "unite">("lot");
   const [prixVente, setPrixVente] = useState("0");
+  const [categorie, setCategorie] = useState("");
+  const [codeBarre, setCodeBarre] = useState("");
+  // Jour réel de l'achat, déjà rempli : aujourd'hui. Modifiable pour rattraper
+  // une saisie en retard (comme on note la vraie date dans le cahier).
+  const [jour, setJour] = useState(() => new Date().toISOString().slice(0, 10));
   const [actuel, setActuel] = useState<Produit | null>(null); // produit existant correspondant
   const [flash, setFlash] = useState<string | null>(null);
 
@@ -30,6 +35,8 @@ export default function AchatForm() {
     setPrixAchat("0");
     setFrais("0");
     setPrixVente("0");
+    setCategorie("");
+    setCodeBarre("");
     setActuel(null);
     setSuggestions([]);
     setFlash(`Achat de « ${n} » enregistré ✓`);
@@ -66,6 +73,8 @@ export default function AchatForm() {
     setActuel(p);
     setPrixAchat(String(p.prix_achat));
     setPrixVente(String(p.prix_vente));
+    setCategorie(p.categorie ?? "");
+    setCodeBarre(p.code_barre ?? "");
     setSuggestions([]);
   }
 
@@ -233,11 +242,59 @@ export default function AchatForm() {
         ) : null}
       </div>
 
-      <div className="field">
-        <label>
-          Fournisseur <span className="sub">(facultatif)</span>
-        </label>
-        <input className="input" name="fournisseur" autoComplete="off" />
+      <div className="row2" style={{ marginBottom: 12 }}>
+        <div className="field" style={{ margin: 0 }}>
+          <label>
+            Date de l&apos;achat <span className="sub">(déjà remplie : aujourd&apos;hui)</span>
+          </label>
+          <input
+            className="input"
+            type="date"
+            name="jour"
+            value={jour}
+            onChange={(e) => setJour(e.target.value)}
+          />
+        </div>
+        <div className="field" style={{ margin: 0 }}>
+          <label>
+            Catégorie <span className="sub">(facultatif)</span>
+          </label>
+          <input
+            className="input"
+            name="categorie"
+            list="liste-categories"
+            value={categorie}
+            onChange={(e) => setCategorie(e.target.value)}
+            autoComplete="off"
+          />
+        </div>
+      </div>
+
+      <div className="row2" style={{ marginBottom: 12 }}>
+        <div className="field" style={{ margin: 0 }}>
+          <label>
+            Code-barres <span className="sub">(facultatif, scanne-le)</span>
+          </label>
+          <input
+            className="input"
+            name="codeBarre"
+            value={codeBarre}
+            onChange={(e) => setCodeBarre(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") e.preventDefault(); }}
+            autoComplete="off"
+          />
+          {actuel?.code_barre ? (
+            <div className="sub" style={{ marginTop: 4 }}>
+              Ce produit a déjà un code : il ne sera pas remplacé.
+            </div>
+          ) : null}
+        </div>
+        <div className="field" style={{ margin: 0 }}>
+          <label>
+            Fournisseur <span className="sub">(facultatif)</span>
+          </label>
+          <input className="input" name="fournisseur" autoComplete="off" />
+        </div>
       </div>
 
       <SubmitButton className="btn primary big" style={{ width: "100%" }}>

@@ -24,8 +24,9 @@ export async function enregistrerControleAction(
   if (!lignes.length) return;
 
   const note = String(formData.get("note") ?? "").trim() || null;
+  const jour = String(formData.get("jour") ?? "").trim() || null;
   const session = await getSession();
-  enregistrerControle({ note, lignes, userId: session?.userId ?? null });
+  enregistrerControle({ note, lignes, jour, userId: session?.userId ?? null });
 
   revalidatePath("/controle");
   revalidatePath("/stock");

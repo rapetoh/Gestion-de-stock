@@ -28,7 +28,7 @@ export default function NouveauProduitForm() {
         </div>
         <div className="field" style={{ margin: 0 }}>
           <label>Catégorie</label>
-          <input className="input" name="categorie" />
+          <input className="input" name="categorie" list="liste-categories" autoComplete="off" />
         </div>
         <div className="field" style={{ margin: 0 }}>
           <label>Stock</label>

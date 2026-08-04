@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { listProduitsFiltres, listCategories } from "@/lib/repo/produits";
+import { nomsCategories } from "@/lib/repo/categories";
 import NouveauProduitForm from "./NouveauProduitForm";
 import ProduitsRows from "./ProduitsRows";
 
@@ -27,6 +28,7 @@ export default async function ProduitsPage({
     offset: (pageNum - 1) * PAR_PAGE,
   });
   const categories = listCategories();
+  const suggestions = nomsCategories();
   const totalPages = Math.max(1, Math.ceil(total / PAR_PAGE));
 
   function lienPage(p: number): string {
@@ -48,10 +50,21 @@ export default async function ProduitsPage({
             Tous tes produits. Cherche par nom, filtre par catégorie ou stock bas.
           </div>
         </div>
-        <Link href="/produits/import" className="btn ghost">
-          Importer une liste
-        </Link>
+        <div className="right">
+          <Link href="/produits/categories" className="btn ghost">
+            Gérer les catégories
+          </Link>
+          <Link href="/produits/import" className="btn ghost">
+            Importer une liste
+          </Link>
+        </div>
       </div>
+
+      <datalist id="liste-categories">
+        {suggestions.map((c) => (
+          <option key={c} value={c} />
+        ))}
+      </datalist>
 
       <div className="card" style={{ marginBottom: 18 }}>
         <h2>Nouveau produit</h2>

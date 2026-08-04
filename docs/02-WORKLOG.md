@@ -5,6 +5,28 @@
 
 ---
 
+## 2026-07-21
+
+### Retour terrain #2 : dates réelles, catégories gérées, code-barres à l'achat
+- **What:** Observations de la propriétaire décodées puis triées (pas d'exécution aveugle).
+  (1) **Dates réelles** : champ « Date de l'achat » (défaut aujourd'hui, corrigeable aussi en
+  modification) et « Jour du comptage » au Contrôle : comme dans le cahier, on note la date de
+  l'événement, pas celle de la saisie. Les fiches produit affichent créé le / modifié le dans
+  l'éditeur. **Refusé** : antidater les VENTES (ça réécrirait les soldes du soir passés, son
+  outil anti-vol). (2) **Catégories** : table `categorie` (suggestions gérées) : 14 défauts tirés
+  de SA propre nomenclature (sections de l'ancien logiciel), auto-alimentée par toute catégorie
+  tapée ou importée, datalist sur Produits/Achats, page **Produits → Gérer les catégories**
+  (ajouter, renommer avec répercussion sur tous les produits et fusion des doublons, supprimer
+  avec confirmation chiffrée). Les catégories de DÉPENSES restent un monde séparé (testé).
+  (3) **Achats complète le produit** : catégorie + code-barres saisis avec l'achat ;
+  `completerProduitDepuisAchat` ne vole jamais un code pris et n'écrase jamais un code existant
+  (index UNIQUE). Ventes/Stock : rien à ajouter, le scan retrouve déjà : expliqué dans la FAQ.
+- **Result:** 96/96 tests (7 nouveaux). E2E navigateur : achat antidaté du 10 juillet d'un
+  Desperados avec catégorie suggérée + code-barres → journal au 10 juillet, scan retrouve le
+  produit à la caisse, fusion BIERRE→Boissons alcoolisées vérifiée, contrôle antidaté au
+  12 juillet. Migration prod vérifiée après déploiement : 19 catégories = 14 défauts + les 5
+  qu'elle avait déjà créées (adoptées, rien perdu). Déployé sur monpanier.fly.dev.
+
 ## 2026-07-15
 
 ### Section Statistiques complète : graphiques, tableaux de bord, rapport mensuel PDF

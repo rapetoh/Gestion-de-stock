@@ -206,6 +206,17 @@ export default function ControleForm() {
           <input type="hidden" name="lignes" value={payload} />
           <div className="field">
             <label>
+              Jour du comptage <span className="sub">(déjà rempli : aujourd&apos;hui)</span>
+            </label>
+            <input
+              className="input"
+              type="date"
+              name="jour"
+              defaultValue={new Date().toISOString().slice(0, 10)}
+            />
+          </div>
+          <div className="field">
+            <label>
               Note <span className="sub">(facultatif)</span>
             </label>
             <input

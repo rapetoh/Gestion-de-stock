@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { listAchats, listAchatsDuJour } from "@/lib/repo/achats";
 import { jourCourt } from "@/lib/dates";
+import { nomsCategories } from "@/lib/repo/categories";
 import AchatForm from "./AchatForm";
 import AchatsRows from "./AchatsRows";
 
@@ -17,6 +18,7 @@ export default async function AchatsPage({
   // pour retrouver et corriger une entrée qui a quitté la fenêtre récente.
   const jour = /^\d{4}-\d{2}-\d{2}$/.test(params.jour ?? "") ? params.jour! : null;
   const achats = jour ? listAchatsDuJour(jour) : listAchats(20);
+  const suggestions = nomsCategories();
 
   return (
     <>
@@ -28,6 +30,12 @@ export default async function AchatsPage({
           </div>
         </div>
       </div>
+
+      <datalist id="liste-categories">
+        {suggestions.map((c) => (
+          <option key={c} value={c} />
+        ))}
+      </datalist>
 
       <div
         className="grid"
