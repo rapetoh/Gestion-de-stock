@@ -36,9 +36,21 @@ export async function middleware(req: NextRequest) {
   if (pathname === "/connexion") return NextResponse.next();
 
   const role = await lireRole(req.cookies.get("session")?.value);
+
+  // La vitrine publique : un visiteur non connecté la voit ; quelqu'un de
+  // connecté n'a rien à y faire, on l'emmène directement dans la boutique.
+  if (pathname === "/bienvenue") {
+    if (!role) return NextResponse.next();
+    const url = req.nextUrl.clone();
+    url.pathname = "/";
+    return NextResponse.redirect(url);
+  }
+
   if (!role) {
     const url = req.nextUrl.clone();
-    url.pathname = "/connexion";
+    // La racine accueille avec la vitrine ; un lien profond (ex : /ventes)
+    // va droit à la connexion.
+    url.pathname = pathname === "/" ? "/bienvenue" : "/connexion";
     return NextResponse.redirect(url);
   }
 

@@ -7,6 +7,18 @@
 
 ## 2026-07-21
 
+### Vitrine publique /bienvenue : la façade de la boutique
+- **What:** Jusqu'ici un visiteur tombait directement sur le formulaire de connexion. Nouvelle
+  page publique : enseigne panier tressé (SVG maison), lieu, grand nom deux tons, une phrase,
+  un seul bouton « Entrer dans la boutique » vers la connexion, halos animés discrets
+  (prefers-reduced-motion respecté), pied TMoney & Flooz. Aiguillage : visiteur anonyme sur /
+  voit la vitrine ; un lien profond (ex : /ventes) va droit à la connexion ; une personne
+  connectée ne voit jamais la vitrine (renvoyée au tableau de bord). Aucune dépendance,
+  polices système, tout dans globals.css.
+- **Result:** 96/96 tests. Vérifié en navigateur : les 5 trajets d'aiguillage + captures
+  desktop et mobile inspectées (pas de débordement). Vérifié en prod après déploiement :
+  monpanier.fly.dev redirige bien un anonyme vers /bienvenue. 
+
 ### Retour terrain #2 : dates réelles, catégories gérées, code-barres à l'achat
 - **What:** Observations de la propriétaire décodées puis triées (pas d'exécution aveugle).
   (1) **Dates réelles** : champ « Date de l'achat » (défaut aujourd'hui, corrigeable aussi en
