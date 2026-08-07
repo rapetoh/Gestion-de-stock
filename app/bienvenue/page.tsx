@@ -1,9 +1,8 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Mon Panier · Boutique & Mobile Money à Lomé",
-  description:
-    "Mon Panier, la boutique de quartier à Lomé : alimentation, hygiène, boissons et Mobile Money (TMoney, Flooz).",
+  title: "Mon Panier · Lomé",
+  description: "Mon Panier, boutique à Lomé. Espace de gestion privé.",
 };
 
 // La vitrine publique : la seule page que voit un visiteur qui n'est pas de la
@@ -43,10 +42,6 @@ export default function BienvenuePage() {
         <h1 className="landing-nom">
           Mon <span>Panier</span>
         </h1>
-        <p className="landing-phrase">
-          La boutique du quartier, tenue au carré : chaque vente, chaque franc,
-          chaque jour. Alimentation, hygiène, boissons &amp; Mobile Money.
-        </p>
 
         <Link href="/connexion" className="landing-cta">
           Entrer dans la boutique
@@ -70,9 +65,7 @@ export default function BienvenuePage() {
       </section>
 
       <footer className="landing-pied">
-        <span>Mon Panier</span>
-        <span aria-hidden>·</span>
-        <span>TMoney &amp; Flooz acceptés</span>
+        <span>Mon Panier · Lomé</span>
       </footer>
     </main>
   );

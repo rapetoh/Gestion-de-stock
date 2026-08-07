@@ -317,7 +317,7 @@ tfoot td { padding: 14px 12px; font-weight: 800; font-size: 15.5px; border-top: 
 .landing-nom {
   font-size: clamp(52px, 11vw, 88px); line-height: 0.98;
   letter-spacing: -0.035em; font-weight: 800; color: var(--ink);
-  margin-bottom: 20px;
+  margin-bottom: 38px;
 }
 .landing-nom span {
   background: linear-gradient(120deg, var(--primary-d), var(--primary) 55%, #3fa37e);
