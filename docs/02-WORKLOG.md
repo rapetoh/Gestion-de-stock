@@ -1,6 +1,25 @@
 # Ma Boutique — Work Log
 
 > Chronological record of everything done on this project, newest first.
+
+## 2026-09-15
+
+### Péremption : la date sur le carton, surveillée par l'app
+- **What:** Champ « Péremption » facultatif sur l'achat (la date se lit sur le carton à la
+  réception) et sur la fiche produit (pour le stock déjà en rayon). Le produit retient la date
+  la PLUS PROCHE apportée par les achats (`retenirPeremption`, règle du minimum) ; corriger la
+  fiche à la main remplace tout, y compris effacer. Surveillance : carte « Péremptions à
+  surveiller » en haut de Stock (périmé ou sous 30 jours, ET stock > 0, du plus urgent, badge
+  périmé/bientôt, colonne « Valeur en jeu » réservée à la propriétaire : la vendeuse ne voit
+  pas les coûts) + une ligne d'alerte sur le tableau de bord vers Stock. Le journal des achats
+  mentionne « périme le X ». Volontairement PAS de suivi par lots (complexité entreprise) :
+  une date par produit, la plus urgente, honnête et suffisante pour une boutique. FAQ : une
+  question dans « Ton stock ». Migration additive idempotente (2 colonnes TEXT nulles).
+- **Result:** 100/100 tests (4 nouveaux : règle du minimum, écrasement manuel, filtre
+  stock>0/périmé/horizon, dates invalides ignorées). E2E navigateur : lait périmant sous 10
+  jours → carte Stock (badge bientôt, 11 040 F en jeu) + alerte tableau de bord ; spaghetti à
+  6 mois → aucune alerte ; capture inspectée. Migration vérifiée en prod après déploiement :
+  les deux colonnes existent. Déployé sur monpanier.fly.dev.
 > This is the "documenting everything" trail. Each entry: what, why, result, next.
 
 ---
