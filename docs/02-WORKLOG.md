@@ -1,6 +1,9 @@
 # Ma Boutique — Work Log
 
 > Chronological record of everything done on this project, newest first.
+> This is the "documenting everything" trail. Each entry: what, why, result, next.
+
+---
 
 ## 2026-09-15
 
@@ -28,9 +31,6 @@
   jours → carte Stock (badge bientôt, 11 040 F en jeu) + alerte tableau de bord ; spaghetti à
   6 mois → aucune alerte ; capture inspectée. Migration vérifiée en prod après déploiement :
   les deux colonnes existent. Déployé sur monpanier.fly.dev.
-> This is the "documenting everything" trail. Each entry: what, why, result, next.
-
----
 
 ## 2026-07-21
 
