@@ -14,6 +14,7 @@ export type Produit = {
   stock: number;
   seuil_stock: number;
   code_barre: string | null;
+  peremption: string | null; // YYYY-MM-DD : la date de péremption la plus proche connue
   actif: number;
   cree_le: string;
   maj_le: string;
@@ -118,6 +119,7 @@ export type ProduitInput = {
   stock?: number;
   seuilStock?: number;
   codeBarre?: string | null;
+  peremption?: string | null; // YYYY-MM-DD, facultatif
 };
 
 export function createProduit(data: ProduitInput, userId?: number | null): number {
@@ -148,8 +150,8 @@ export function createProduit(data: ProduitInput, userId?: number | null): numbe
 
   const r = run(
     `INSERT INTO produit
-       (nom, categorie, prix_achat, frais, prix_vente, stock, seuil_stock, code_barre, actif, cree_le, maj_le)
-     VALUES (?,?,?,?,?,?,?,?,1,?,?)`,
+       (nom, categorie, prix_achat, frais, prix_vente, stock, seuil_stock, code_barre, peremption, actif, cree_le, maj_le)
+     VALUES (?,?,?,?,?,?,?,?,?,1,?,?)`,
     nom,
     data.categorie ?? null,
     data.prixAchat ?? 0,
@@ -158,6 +160,7 @@ export function createProduit(data: ProduitInput, userId?: number | null): numbe
     data.stock ?? 0,
     data.seuilStock ?? 0,
     data.codeBarre ?? null,
+    validerJour(data.peremption),
     now,
     now
   );
@@ -180,7 +183,7 @@ export function updateProduit(
   run(
     `UPDATE produit SET
        nom = ?, categorie = ?, prix_achat = ?, frais = ?, prix_vente = ?,
-       stock = ?, seuil_stock = ?, code_barre = ?, maj_le = ?
+       stock = ?, seuil_stock = ?, code_barre = ?, peremption = ?, maj_le = ?
      WHERE id = ?`,
     normaliserNom(data.nom),
     data.categorie ?? null,
@@ -190,6 +193,7 @@ export function updateProduit(
     data.stock ?? 0,
     data.seuilStock ?? 0,
     data.codeBarre ?? null,
+    validerJour(data.peremption),
     nowIso(),
     id
   );
@@ -213,6 +217,64 @@ export function removeProduit(id: number, userId?: number | null): void {
     details: `Produit retiré${before ? ` : ${before.nom}` : ""}`,
     refId: id,
   });
+}
+
+// Un jour valide (YYYY-MM-DD) ou rien : jamais de texte libre dans une date.
+export function validerJour(jour: string | null | undefined): string | null {
+  const j = (jour ?? "").trim();
+  return /^\d{4}-\d{2}-\d{2}$/.test(j) ? j : null;
+}
+
+// Un achat apporte une date de péremption : le produit retient la PLUS PROCHE.
+// (Si elle corrige la fiche produit à la main, sa valeur remplace tout.)
+export function retenirPeremption(produitId: number, jour: string | null | undefined): void {
+  const j = validerJour(jour);
+  if (!j) return;
+  run(
+    `UPDATE produit SET peremption = ?, maj_le = ?
+      WHERE id = ? AND (peremption IS NULL OR peremption > ?)`,
+    j,
+    nowIso(),
+    produitId,
+    j
+  );
+}
+
+// Ce qui périme bientôt (ou est déjà périmé) ET qu'elle a encore en rayon :
+// c'est de l'argent qui risque de partir à la poubelle. Trié du plus urgent.
+export type ProduitAPeremption = {
+  id: number;
+  nom: string;
+  stock: number;
+  peremption: string;
+  valeur: number; // stock × coût de revient
+};
+export function produitsAPeremption(horizonJours = 30, limit = 12): ProduitAPeremption[] {
+  const horizon = new Date(Date.now() + horizonJours * 86400000)
+    .toISOString()
+    .slice(0, 10);
+  return all<ProduitAPeremption>(
+    `SELECT id, nom, stock, peremption,
+            stock * (prix_achat + frais) AS valeur
+       FROM produit
+      WHERE actif = 1 AND stock > 0 AND peremption IS NOT NULL AND peremption <= ?
+      ORDER BY peremption ASC, valeur DESC
+      LIMIT ?`,
+    horizon,
+    limit
+  );
+}
+export function nbProduitsAPeremption(horizonJours = 30): number {
+  const horizon = new Date(Date.now() + horizonJours * 86400000)
+    .toISOString()
+    .slice(0, 10);
+  return (
+    one<{ n: number }>(
+      `SELECT COUNT(*) AS n FROM produit
+        WHERE actif = 1 AND stock > 0 AND peremption IS NOT NULL AND peremption <= ?`,
+      horizon
+    )?.n ?? 0
+  );
 }
 
 // Complète un produit depuis le formulaire d'achat : la catégorie suit ce qui est

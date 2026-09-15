@@ -108,6 +108,17 @@ export default function ProduitRow({
                   defaultValue={p.code_barre ?? ""}
                 />
               </div>
+              <div className="field" style={{ margin: 0 }}>
+                <label>
+                  Péremption <span className="sub">(facultatif)</span>
+                </label>
+                <input
+                  className="input"
+                  type="date"
+                  name="peremption"
+                  defaultValue={p.peremption ?? ""}
+                />
+              </div>
             </div>
             <div style={{ display: "flex", gap: 10 }}>
               <SubmitButton className="btn primary">Enregistrer</SubmitButton>

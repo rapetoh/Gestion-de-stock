@@ -102,7 +102,19 @@ export default function AchatRow({
               />
             </div>
           </div>
-          <div style={{ marginBottom: 12 }}></div>
+          <div className="row3" style={{ marginBottom: 12 }}>
+            <div className="field" style={{ margin: 0 }}>
+              <label>
+                Péremption <span className="sub">(facultatif)</span>
+              </label>
+              <input
+                className="input"
+                type="date"
+                name="peremption"
+                defaultValue={a.peremption ?? ""}
+              />
+            </div>
+          </div>
           <div style={{ display: "flex", gap: 10 }}>
             <SubmitButton className="btn primary">Enregistrer</SubmitButton>
             <button type="button" className="btn ghost" onClick={onClose}>
@@ -126,6 +138,9 @@ export default function AchatRow({
           {a.frais > 0 ? <span>+ {formatCFA(a.frais)} de frais</span> : null}
           <span>vend à {formatCFA(a.prix_vente)}</span>
           {a.fournisseur ? <span>({a.fournisseur})</span> : null}
+          {a.peremption ? (
+            <span>périme le {jourCourt(`${a.peremption}T12:00:00.000Z`)}</span>
+          ) : null}
         </div>
       </div>
       <div className="achat-actions">

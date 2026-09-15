@@ -1,6 +1,12 @@
 import Link from "next/link";
-import { listProduitsFiltres, listCategories } from "@/lib/repo/produits";
+import {
+  listProduitsFiltres,
+  listCategories,
+  produitsAPeremption,
+} from "@/lib/repo/produits";
 import { formatCFA } from "@/lib/money";
+import { jourCourt, aujourdhuiISO } from "@/lib/dates";
+import { getSession } from "@/lib/auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -34,6 +40,11 @@ export default async function StockPage({
   });
   const categories = listCategories();
   const totalPages = Math.max(1, Math.ceil(total / PAR_PAGE));
+  // Ce qui périme dans les 30 jours (ou est déjà périmé) et qui est encore en rayon.
+  const peremptions = produitsAPeremption(30, 12);
+  const aujourdHui = aujourdhuiISO();
+  const session = await getSession();
+  const proprietaire = session?.role === "proprietaire";
 
   function lienPage(p: number): string {
     const sp = new URLSearchParams();
@@ -56,6 +67,45 @@ export default async function StockPage({
           </div>
         </div>
       </div>
+
+      {peremptions.length > 0 ? (
+        <div className="card" style={{ borderLeft: "3px solid var(--accent)", marginBottom: 18 }}>
+          <h2>Péremptions à surveiller</h2>
+          <div className="hint">
+            Encore en rayon et la date approche (ou est passée) : à vendre en
+            premier, ou à retirer.
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Produit</th>
+                <th className="num">Stock</th>
+                <th>Périme le</th>
+                {proprietaire ? <th className="num">Valeur en jeu</th> : null}
+              </tr>
+            </thead>
+            <tbody>
+              {peremptions.map((pp) => (
+                <tr key={pp.id}>
+                  <td className="prod">{pp.nom}</td>
+                  <td className="num">{pp.stock}</td>
+                  <td>
+                    {jourCourt(`${pp.peremption}T12:00:00.000Z`)}{" "}
+                    {pp.peremption < aujourdHui ? (
+                      <span className="badge bad">périmé</span>
+                    ) : (
+                      <span className="badge warn">bientôt</span>
+                    )}
+                  </td>
+                  {proprietaire ? (
+                    <td className="num">{formatCFA(pp.valeur)}</td>
+                  ) : null}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : null}
 
       <div className="card">
         <form method="get" style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 14 }}>

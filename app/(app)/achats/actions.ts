@@ -25,6 +25,7 @@ export async function enregistrerAchat(formData: FormData): Promise<void> {
   const categorie = String(formData.get("categorie") ?? "").trim() || null;
   const codeBarre = String(formData.get("codeBarre") ?? "").trim() || null;
   const jour = String(formData.get("jour") ?? "").trim() || null;
+  const peremption = String(formData.get("peremption") ?? "").trim() || null;
 
   if (quantite <= 0) return;
 
@@ -48,6 +49,7 @@ export async function enregistrerAchat(formData: FormData): Promise<void> {
     fournisseur,
     note,
     jour,
+    peremption,
     userId: session?.userId ?? null,
   });
 
@@ -78,6 +80,7 @@ export async function modifierAchat(formData: FormData): Promise<void> {
       fournisseur: String(formData.get("fournisseur") ?? "").trim() || null,
       note: String(formData.get("note") ?? "").trim() || null,
       jour: String(formData.get("jour") ?? "").trim() || null,
+      peremption: String(formData.get("peremption") ?? "").trim() || null,
     },
     session?.userId ?? null
   );

@@ -277,6 +277,11 @@ function migrate(database: DatabaseSync): void {
   // Migrations additives idempotentes (un ALTER n'est pas couvert par CREATE TABLE IF NOT EXISTS).
   // attendu = ce qui DEVRAIT être sur le compte ce jour-là (capital/float), à côté du solde compté.
   ajouterColonneSiAbsente(database, "solde_journalier", "attendu", "INTEGER NOT NULL DEFAULT 0");
+  // Péremption (YYYY-MM-DD, facultatif). Sur l'achat : la date lue sur le carton
+  // à la réception. Sur le produit : la date la PLUS PROCHE connue, celle que
+  // surveillent le Stock et le tableau de bord.
+  ajouterColonneSiAbsente(database, "achat", "peremption", "TEXT");
+  ajouterColonneSiAbsente(database, "produit", "peremption", "TEXT");
 
   amorcerCategories(database);
   amorcerDonneesInitiales(database);

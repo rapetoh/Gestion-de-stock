@@ -32,6 +32,7 @@ export async function ajouterProduit(formData: FormData): Promise<void> {
       stock: parseCFA(String(formData.get("stock") ?? "")),
       seuilStock: parseCFA(String(formData.get("seuilStock") ?? "")),
       codeBarre: String(formData.get("codeBarre") ?? "").trim() || null,
+      peremption: String(formData.get("peremption") ?? "").trim() || null,
     },
     session?.userId ?? null
   );
@@ -54,6 +55,7 @@ export async function modifierProduit(formData: FormData): Promise<void> {
       stock: parseCFA(String(formData.get("stock") ?? "")),
       seuilStock: parseCFA(String(formData.get("seuilStock") ?? "")),
       codeBarre: String(formData.get("codeBarre") ?? "").trim() || null,
+      peremption: String(formData.get("peremption") ?? "").trim() || null,
     },
     session?.userId ?? null
   );

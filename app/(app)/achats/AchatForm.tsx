@@ -20,6 +20,8 @@ export default function AchatForm() {
   const [prixVente, setPrixVente] = useState("0");
   const [categorie, setCategorie] = useState("");
   const [codeBarre, setCodeBarre] = useState("");
+  // La date lue sur le carton reçu : propre à CET arrivage, jamais préremplie.
+  const [peremption, setPeremption] = useState("");
   // Jour réel de l'achat, déjà rempli : aujourd'hui. Modifiable pour rattraper
   // une saisie en retard (comme on note la vraie date dans le cahier).
   const [jour, setJour] = useState(() => new Date().toISOString().slice(0, 10));
@@ -37,6 +39,7 @@ export default function AchatForm() {
     setPrixVente("0");
     setCategorie("");
     setCodeBarre("");
+    setPeremption("");
     setActuel(null);
     setSuggestions([]);
     setFlash(`Achat de « ${n} » enregistré ✓`);
@@ -295,6 +298,19 @@ export default function AchatForm() {
           </label>
           <input className="input" name="fournisseur" autoComplete="off" />
         </div>
+      </div>
+
+      <div className="field">
+        <label>
+          Péremption <span className="sub">(facultatif, la date sur le carton)</span>
+        </label>
+        <input
+          className="input"
+          type="date"
+          name="peremption"
+          value={peremption}
+          onChange={(e) => setPeremption(e.target.value)}
+        />
       </div>
 
       <SubmitButton className="btn primary big" style={{ width: "100%" }}>

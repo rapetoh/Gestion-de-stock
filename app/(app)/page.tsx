@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { dashboard } from "@/lib/repo/stats";
-import { produitsARecommander, nbProduitsActifs } from "@/lib/repo/produits";
+import {
+  produitsARecommander,
+  nbProduitsActifs,
+  nbProduitsAPeremption,
+} from "@/lib/repo/produits";
 import { formatCFA } from "@/lib/money";
 import { dateLongue } from "@/lib/dates";
 
@@ -20,6 +24,7 @@ export default function TableauDeBordPage() {
   // Produits ?bas=1. Jamais tout le catalogue sur cette page.
   const aRecommander = produitsARecommander(8);
   const boutiqueVide = nbProduitsActifs() === 0;
+  const nbPeremptions = nbProduitsAPeremption(30);
 
   return (
     <>
@@ -89,6 +94,21 @@ export default function TableauDeBordPage() {
             Besoin d&apos;aide à tout moment ? Le bouton <strong>Aide</strong> est
             en bas du menu, et tu peux revoir le petit guide de départ depuis là.
           </div>
+        </div>
+      ) : null}
+
+      {nbPeremptions > 0 ? (
+        <div
+          className="card"
+          style={{ borderLeft: "3px solid var(--accent)", marginBottom: 18 }}
+        >
+          <strong>
+            {nbPeremptions} produit{nbPeremptions > 1 ? "s" : ""} encore en rayon
+            {nbPeremptions > 1 ? " périment" : " périme"} bientôt (ou déjà).
+          </strong>{" "}
+          <Link className="lien" href="/stock">
+            Voir dans Stock →
+          </Link>
         </div>
       ) : null}
 

@@ -1,6 +1,7 @@
 // Repository achats : chaque achat met à jour le produit et le stock dans une transaction.
 import { all, one, run, tx, nowIso } from "../db";
 import { bornesJour } from "../periodes";
+import { validerJour, retenirPeremption } from "./produits";
 import { journaliser } from "./activite";
 
 export type Achat = {
@@ -13,6 +14,7 @@ export type Achat = {
   fournisseur: string | null;
   note: string | null;
   date: string;
+  peremption: string | null; // YYYY-MM-DD lue sur le carton, facultative
   user_id: number | null;
 };
 
@@ -58,6 +60,8 @@ export type CreateAchatInput = {
   // Jour réel de l'achat (YYYY-MM-DD). Absent = maintenant. Comme dans le cahier :
   // on note la date de l'événement, pas celle de la saisie.
   jour?: string | null;
+  // Date de péremption lue sur le carton (YYYY-MM-DD), facultative.
+  peremption?: string | null;
 };
 
 // Un jour choisi devient midi UTC (Lomé = UTC) : trié correctement dans le journal
@@ -82,8 +86,8 @@ export function createAchat(input: CreateAchatInput): number {
 
     const achatId = run(
       `INSERT INTO achat
-         (produit_id, quantite, prix_achat, frais, prix_vente, fournisseur, note, date, user_id)
-       VALUES (?,?,?,?,?,?,?,?,?)`,
+         (produit_id, quantite, prix_achat, frais, prix_vente, fournisseur, note, date, peremption, user_id)
+       VALUES (?,?,?,?,?,?,?,?,?,?)`,
       input.produitId,
       input.quantite,
       input.prixAchat,
@@ -92,8 +96,12 @@ export function createAchat(input: CreateAchatInput): number {
       input.fournisseur ?? null,
       input.note ?? null,
       dateAchat(input.jour, now),
+      validerJour(input.peremption),
       input.userId ?? null
     ).lastId;
+
+    // Le produit retient la péremption la plus proche connue.
+    retenirPeremption(input.produitId, input.peremption);
 
     // Le produit reflète le DERNIER achat : coût (prix_achat + frais unitaires) et prix de vente.
     // Le formulaire pré-remplit ces valeurs avec celles du produit et prévient si le prix de vente
@@ -142,7 +150,7 @@ export function createAchat(input: CreateAchatInput): number {
 
 export function updateAchat(
   id: number,
-  data: { quantite?: number; prixAchat?: number; frais?: number; prixVente?: number; fournisseur?: string | null; note?: string | null; jour?: string | null },
+  data: { quantite?: number; prixAchat?: number; frais?: number; prixVente?: number; fournisseur?: string | null; note?: string | null; jour?: string | null; peremption?: string | null },
   userId?: number | null
 ): void {
   const before = one<Achat>(`SELECT * FROM achat WHERE id = ?`, id);
@@ -157,7 +165,7 @@ export function updateAchat(
 
     run(
       `UPDATE achat SET
-         quantite = ?, prix_achat = ?, frais = ?, prix_vente = ?, fournisseur = ?, note = ?, date = ?
+         quantite = ?, prix_achat = ?, frais = ?, prix_vente = ?, fournisseur = ?, note = ?, date = ?, peremption = ?
        WHERE id = ?`,
       nouvelleQte,
       prixAchat,
@@ -166,8 +174,10 @@ export function updateAchat(
       data.fournisseur ?? before.fournisseur,
       data.note ?? before.note,
       dateAchat(data.jour, before.date),
+      validerJour(data.peremption) ?? before.peremption,
       id
     );
+    retenirPeremption(before.produit_id, data.peremption);
 
     // Réajuster le stock de la différence de quantité.
     const delta = nouvelleQte - before.quantite;

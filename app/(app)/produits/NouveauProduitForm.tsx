@@ -49,7 +49,7 @@ export default function NouveauProduitForm() {
           <input className="input" name="prixVente" defaultValue="0" inputMode="numeric" />
         </div>
       </div>
-      <div className="row2" style={{ marginBottom: 12 }}>
+      <div className="row3" style={{ marginBottom: 12 }}>
         <div className="field" style={{ margin: 0 }}>
           <label>Seuil de stock</label>
           <input className="input" name="seuilStock" defaultValue="0" inputMode="numeric" />
@@ -59,6 +59,12 @@ export default function NouveauProduitForm() {
             Code-barres <span className="sub">(facultatif)</span>
           </label>
           <input className="input" name="codeBarre" />
+        </div>
+        <div className="field" style={{ margin: 0 }}>
+          <label>
+            Péremption <span className="sub">(facultatif)</span>
+          </label>
+          <input className="input" type="date" name="peremption" />
         </div>
       </div>
       <div style={{ display: "flex", gap: 12, alignItems: "center" }}>

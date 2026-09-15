@@ -44,3 +44,8 @@ export function heure(iso: string): string {
   const d = new Date(iso);
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
+
+// YYYY-MM-DD du jour (Lomé = UTC), pour comparer des dates de péremption.
+export function aujourdhuiISO(): string {
+  return new Date().toISOString().slice(0, 10);
+}

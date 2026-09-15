@@ -312,6 +312,20 @@ const OWNER: Section[] = [
         ),
       },
       {
+        q: "Comment je surveille les dates de péremption ?",
+        r: (
+          <p>
+            Quand un carton arrive, note sa date dans la case{" "}
+            <strong>Péremption</strong> de l&apos;achat (elle est aussi sur la fiche
+            produit). Ensuite l&apos;app surveille pour toi : ce qui périme dans les
+            30 jours, et que tu as encore en rayon, s&apos;affiche en haut de{" "}
+            <strong>Stock</strong>, et le tableau de bord te prévient. À vendre en
+            premier, ou à retirer.
+          </p>
+        ),
+        lien: { href: "/stock", label: "Ouvrir Stock" },
+      },
+      {
         q: "Je peux revoir mes anciens contrôles ?",
         r: (
           <p>
