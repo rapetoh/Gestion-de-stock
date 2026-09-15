@@ -4,6 +4,14 @@
 
 ## 2026-09-15
 
+### Connexion : l'œil pour voir le mot de passe pendant la frappe
+- **What:** Bouton œil (lucide Eye/EyeOff) dans le champ mot de passe de la connexion :
+  montre/cache la saisie, type="button" (ne soumet jamais), aria-label, zone de 36 px.
+  Sur téléphone, taper à l'aveugle est la première cause de « je n'arrive pas à me connecter ».
+- **Result:** Vérifié en navigateur (390 px) : caché par défaut, visible au clic, valeur
+  intacte, recaché, formulaire non soumis par l'œil, connexion OK mot de passe affiché.
+  100/100 tests. Déployé sur monpanier.fly.dev.
+
 ### Péremption : la date sur le carton, surveillée par l'app
 - **What:** Champ « Péremption » facultatif sur l'achat (la date se lit sur le carton à la
   réception) et sur la fiche produit (pour le stock déjà en rayon). Le produit retient la date

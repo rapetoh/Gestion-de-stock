@@ -258,6 +258,17 @@ tfoot td { padding: 14px 12px; font-weight: 800; font-size: 15.5px; border-top: 
 .guide-body { font-size: 15px; line-height: 1.5; color: var(--ink); margin-bottom: 16px; }
 .guide-actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 
+/* ---------- Connexion : l'œil qui montre/cache le mot de passe ---------- */
+.mdp-champ { position: relative; }
+.mdp-champ .input { width: 100%; padding-right: 46px; }
+.mdp-oeil {
+  position: absolute; top: 50%; right: 6px; transform: translateY(-50%);
+  display: grid; place-items: center; width: 36px; height: 36px;
+  border: none; background: none; border-radius: 9px; cursor: pointer;
+  color: var(--ink-soft);
+}
+.mdp-oeil:hover { background: var(--bg); color: var(--ink); }
+
 /* ---------- Vitrine publique (/bienvenue) ---------- */
 .landing {
   min-height: 100dvh;
